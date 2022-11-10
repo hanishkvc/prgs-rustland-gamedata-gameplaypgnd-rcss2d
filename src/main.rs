@@ -4,6 +4,7 @@
 //!
 
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color};
+use sdl2::gfx::primitives::DrawRenderer;
 
 mod entity;
 use entity::Entity;
@@ -74,6 +75,8 @@ fn main() {
         for i in 0..players.len() {
             players[i].draw(&mut swc);
         }
+
+        swc.character(100, 100, 'K', Color::RGB(0, 0, 200)).unwrap();
 
         swc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));
