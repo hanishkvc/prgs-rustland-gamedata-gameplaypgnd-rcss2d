@@ -28,9 +28,9 @@ fn setup_entities(nplayers: i32) -> Vec<Entity> {
 }
 
 fn update_entities(vplayers: &mut Vec<Entity>, bpos: i32) {
-    vplayers[0].pos_set(bpos, bpos);
+    vplayers[0].pos_set_abs(bpos, bpos);
     for i in 1..vplayers.len() {
-        vplayers[i].pos_update(1, 1);
+        vplayers[i].pos_set_rel(1, 1);
     }
 }
 
@@ -39,7 +39,7 @@ fn main() {
     println!("Hello, world!");
     let (_sctxt, _sv, mut swc, mut se) = sdl_init();
     let mut dcolor = 20;
-    let mut players = setup_entities(4);
+    let mut players = setup_entities(12*2);
 
     'mainloop: loop {
         // Clear the background

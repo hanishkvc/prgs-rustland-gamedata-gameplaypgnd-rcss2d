@@ -24,11 +24,11 @@ impl Entity {
         }
     }
 
-    pub fn pos_set(&mut self, ix: i32, iy: i32) {
+    pub fn pos_set_abs(&mut self, ix: i32, iy: i32) {
         self.pos = (ix, iy);
     }
 
-    pub fn pos_update(&mut self, ix: i32, iy: i32) {
+    pub fn pos_set_rel(&mut self, ix: i32, iy: i32) {
         self.pos = (self.pos.0 + ix, self.pos.1 + iy);
     }
 
