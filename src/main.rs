@@ -3,7 +3,10 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color, ttf};
+use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color, ttf::{self, Font}};
+use sdl2::render::{TextureCreator};
+use sdl2::video::WindowContext;
+
 
 mod entity;
 use entity::Entity;
@@ -19,11 +22,11 @@ fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     return (sctxt, sv, swc, se);
 }
 
-fn setup_entities(nplayers: i32) -> Vec<Entity> {
+fn setup_entities<'a>(nplayers: i32, font: &'a Font<'a, 'a>, tc: &'a TextureCreator<WindowContext>) -> Vec<Entity<'a>> {
     let mut vplayers = Vec::new();
     for i in 0..nplayers {
         let iy: i32 = (rand::random::<u32>() % entity::SCREEN_HEIGHT) as i32;
-        vplayers.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), Color::RGB(200, 0, 0)));
+        vplayers.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), Color::RGB(200, 0, 0), font, tc));
     }
     return vplayers;
 }
@@ -45,7 +48,7 @@ fn main() {
     let swctc = swc.texture_creator();
 
     let mut dcolor = 20;
-    let mut players = setup_entities(12*2);
+    let mut players = setup_entities(12*2, &font, &swctc);
 
     let mut bpause = false;
     'mainloop: loop {
@@ -83,7 +86,7 @@ fn main() {
 
         // Draw entities
         for i in 0..players.len() {
-            players[i].draw(&mut swc, &font, &swctc);
+            players[i].draw(&mut swc);
         }
 
         swc.present();

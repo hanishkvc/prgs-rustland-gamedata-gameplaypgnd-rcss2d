@@ -4,7 +4,7 @@
 //!
 
 use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect, ttf::Font};
-use sdl2::render::TextureCreator;
+use sdl2::render::{TextureCreator, Texture};
 use sdl2::video::WindowContext;
 
 
@@ -15,21 +15,25 @@ pub const SCREEN_WIDTH: u32 = 800;
 pub const SCREEN_HEIGHT: u32 = 600;
 
 
-pub struct Entity {
-    id: String,
+pub struct Entity<'a> {
+    _id: String,
     pos: (i32, i32),
     color: Color,
     onscreen: bool,
+    idtx: Texture<'a>,
 }
 
-impl Entity {
+impl<'a> Entity<'a> {
 
-    pub fn new(id: &str, pos: (i32, i32), color: Color) -> Entity {
+    pub fn new(id: &str, pos: (i32, i32), color: Color, font: &Font, tc: &'a TextureCreator<WindowContext>) -> Entity<'a> {
+        let ts = font.render(id).blended(Color::WHITE).unwrap();
+        let tt = ts.as_texture(tc).unwrap();
         Entity {
-            id: id.to_string(),
+            _id: id.to_string(),
             pos: pos,
             color: color,
             onscreen: true,
+            idtx: tt,
         }
     }
 
@@ -59,15 +63,11 @@ impl Entity {
     }
 
     /// Draw the entity on passed canvas
-    pub fn draw(&self, wc: &mut WindowCanvas, font: &Font, tc: &TextureCreator<WindowContext>) {
+    pub fn draw(&self, wc: &mut WindowCanvas) {
         wc.set_draw_color(self.color);
         wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
         //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
-        let txt = font.render(&self.id);
-        //let ts = txt.shaded(Color::WHITE, Color::RGB(0, 0, 0)).unwrap();
-        let ts = txt.blended(Color::WHITE).unwrap();
-        let tt = ts.as_texture(tc).unwrap();
-        wc.copy(&tt, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
+        wc.copy(&self.idtx, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
     }
 
 }
