@@ -42,6 +42,7 @@ fn main() {
     let mut dcolor = 20;
     let mut players = setup_entities(12*2);
 
+    let mut bpause = false;
     'mainloop: loop {
         // Clear the background
         swc.set_draw_color(Color::RGB(20+dcolor, 200, 20));
@@ -58,6 +59,9 @@ fn main() {
                         Keycode::W => {
                             dcolor += 20;
                         }
+                        Keycode::P => {
+                            bpause = !bpause;
+                        }
                         _ => {
 
                         }
@@ -68,7 +72,9 @@ fn main() {
         }
 
         // Update the entities
-        update_entities(&mut players, dcolor as i32);
+        if !bpause {
+            update_entities(&mut players, dcolor as i32);
+        }
 
         // Draw entities
         for i in 0..players.len() {
