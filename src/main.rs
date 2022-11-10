@@ -4,7 +4,6 @@
 //!
 
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color};
-use rand::Rng;
 
 mod entity;
 use entity::Entity;
@@ -31,7 +30,8 @@ fn setup_entities(nplayers: i32) -> Vec<Entity> {
 fn update_entities(vplayers: &mut Vec<Entity>, bpos: i32) {
     vplayers[0].pos_set_abs(bpos, bpos);
     for i in 1..vplayers.len() {
-        vplayers[i].pos_set_rel(1, 1);
+        let dy: i32 = (rand::random::<i32>() % 4) as i32;
+        vplayers[i].pos_set_rel(1, dy);
     }
 }
 
