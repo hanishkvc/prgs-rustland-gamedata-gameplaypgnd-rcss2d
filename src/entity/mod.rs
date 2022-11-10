@@ -29,10 +29,12 @@ impl Entity {
         }
     }
 
+    /// Set absolute position of the entity
     pub fn pos_set_abs(&mut self, ix: i32, iy: i32) {
         self.pos = (ix, iy);
     }
 
+    /// Set relative position of the entity
     pub fn pos_set_rel(&mut self, ix: i32, iy: i32) {
         self.pos = (self.pos.0 + ix, self.pos.1 + iy);
 
@@ -52,6 +54,7 @@ impl Entity {
         }
     }
 
+    /// Draw the entity on passed canvas
     pub fn draw(&self, wc: &mut WindowCanvas) {
         wc.set_draw_color(self.color);
         wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
