@@ -16,6 +16,7 @@ const SCREEN_HEIGHT: u32 = 600;
 pub struct Entity {
     pos: (i32, i32),
     color: Color,
+    onscreen: bool,
 }
 
 impl Entity {
@@ -24,6 +25,7 @@ impl Entity {
         Entity {
             pos: pos,
             color: color,
+            onscreen: true,
         }
     }
 
@@ -33,11 +35,20 @@ impl Entity {
 
     pub fn pos_set_rel(&mut self, ix: i32, iy: i32) {
         self.pos = (self.pos.0 + ix, self.pos.1 + iy);
-        if self.pos.0 > (SCREEN_WIDTH as i32) {
-            self.pos.0 = 0;
-        }
-        if self.pos.1 > (SCREEN_HEIGHT as i32) {
-            self.pos.1 = 0;
+
+        if self.onscreen {
+            if self.pos.0 < 0 {
+                self.pos.0 = SCREEN_WIDTH as i32;
+            }
+            if self.pos.0 > (SCREEN_WIDTH as i32) {
+                self.pos.0 = 0;
+            }
+            if self.pos.1 < 0 {
+                self.pos.1 = SCREEN_HEIGHT as i32;
+            }
+            if self.pos.1 > (SCREEN_HEIGHT as i32) {
+                self.pos.1 = 0;
+            }
         }
     }
 
