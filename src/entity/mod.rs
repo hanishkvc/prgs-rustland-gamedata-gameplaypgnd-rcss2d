@@ -4,6 +4,7 @@
 //!
 
 use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect};
+use sdl2::gfx::primitives::DrawRenderer;
 
 
 const ENTITY_WIDTH: u32 = 16;
@@ -14,6 +15,7 @@ pub const SCREEN_HEIGHT: u32 = 600;
 
 
 pub struct Entity {
+    id: String,
     pos: (i32, i32),
     color: Color,
     onscreen: bool,
@@ -21,8 +23,9 @@ pub struct Entity {
 
 impl Entity {
 
-    pub fn new(pos: (i32, i32), color: Color) -> Entity {
+    pub fn new(id: &str, pos: (i32, i32), color: Color) -> Entity {
         Entity {
+            id: id.to_string(),
             pos: pos,
             color: color,
             onscreen: true,
@@ -58,6 +61,7 @@ impl Entity {
     pub fn draw(&self, wc: &mut WindowCanvas) {
         wc.set_draw_color(self.color);
         wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
+        wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
     }
 
 }

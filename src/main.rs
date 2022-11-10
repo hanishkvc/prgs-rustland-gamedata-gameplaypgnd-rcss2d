@@ -4,7 +4,6 @@
 //!
 
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color};
-use sdl2::gfx::primitives::DrawRenderer;
 
 mod entity;
 use entity::Entity;
@@ -23,7 +22,7 @@ fn setup_entities(nplayers: i32) -> Vec<Entity> {
     let mut vplayers = Vec::new();
     for i in 0..nplayers {
         let iy: i32 = (rand::random::<u32>() % entity::SCREEN_HEIGHT) as i32;
-        vplayers.push(Entity::new((i*20i32,iy), Color::RGB(200, 0, 0)));
+        vplayers.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), Color::RGB(200, 0, 0)));
     }
     return vplayers;
 }
@@ -75,8 +74,6 @@ fn main() {
         for i in 0..players.len() {
             players[i].draw(&mut swc);
         }
-
-        swc.character(100, 100, 'K', Color::RGB(0, 0, 200)).unwrap();
 
         swc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));
