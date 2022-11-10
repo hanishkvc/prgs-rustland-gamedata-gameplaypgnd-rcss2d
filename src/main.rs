@@ -5,6 +5,11 @@
 
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color};
 
+
+mod entity;
+use entity::Entity;
+
+
 fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     let sctxt = sdl2::init().unwrap();
     let sv = sctxt.video().unwrap();
@@ -14,11 +19,20 @@ fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     return (sctxt, sv, swc, se);
 }
 
+fn setup_entities(nplayers: usize) -> Vec<Entity> {
+    let mut vplayers = Vec::new();
+    for _i in 0..nplayers {
+        vplayers.push(Entity::new((0,0), Color::RGB(200, 0, 0)));
+    }
+    return vplayers;
+}
+
 
 fn main() {
     println!("Hello, world!");
     let (_sctxt, _sv, mut swc, mut se) = sdl_init();
     let mut dcolor = 20;
+    let mut players = setup_entities(2);
 
     'mainloop: loop {
         swc.set_draw_color(Color::RGB(20+dcolor, 200, 20));
@@ -41,8 +55,13 @@ fn main() {
                 _ => (),
             }
         }
-        swc.set_draw_color(Color::RGB(200, 20, 20));
-        swc.fill_rect(sdl2::rect::Rect::new(dcolor as i32, dcolor as i32, 16, 16));
+        players[0].pos_set(dcolor as i32, dcolor as i32);
+        players[1].pos_update(1, 1);
+
+        for player in players {
+            player.draw(&mut swc);
+        }
+
         swc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));
     }
