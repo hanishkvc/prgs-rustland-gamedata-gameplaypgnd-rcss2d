@@ -4,7 +4,7 @@
 //!
 
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color};
-
+use rand::Rng;
 
 mod entity;
 use entity::Entity;
@@ -22,7 +22,8 @@ fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
 fn setup_entities(nplayers: i32) -> Vec<Entity> {
     let mut vplayers = Vec::new();
     for i in 0..nplayers {
-        vplayers.push(Entity::new((i*20i32,0), Color::RGB(200, 0, 0)));
+        let iy: i32 = (rand::random::<u32>() % entity::SCREEN_HEIGHT) as i32;
+        vplayers.push(Entity::new((i*20i32,iy), Color::RGB(200, 0, 0)));
     }
     return vplayers;
 }

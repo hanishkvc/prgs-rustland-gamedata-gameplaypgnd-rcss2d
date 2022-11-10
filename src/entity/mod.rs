@@ -9,8 +9,8 @@ use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect};
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
 
-const SCREEN_WIDTH: u32 = 800;
-const SCREEN_HEIGHT: u32 = 600;
+pub const SCREEN_WIDTH: u32 = 800;
+pub const SCREEN_HEIGHT: u32 = 600;
 
 
 pub struct Entity {
