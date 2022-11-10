@@ -3,8 +3,9 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect};
-use sdl2::gfx::primitives::DrawRenderer;
+use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect, ttf::Font};
+use sdl2::render::TextureCreator;
+use sdl2::video::WindowContext;
 
 
 const ENTITY_WIDTH: u32 = 16;
@@ -58,10 +59,14 @@ impl Entity {
     }
 
     /// Draw the entity on passed canvas
-    pub fn draw(&self, wc: &mut WindowCanvas) {
+    pub fn draw(&self, wc: &mut WindowCanvas, font: &Font, tc: &TextureCreator<WindowContext>) {
         wc.set_draw_color(self.color);
         wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
-        wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
+        //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
+        let txt = font.render(&self.id);
+        let ts = txt.solid(Color::RGB(0, 0, 0)).unwrap();
+        let tt = ts.as_texture(tc).unwrap();
+        wc.copy(&tt, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
     }
 
 }

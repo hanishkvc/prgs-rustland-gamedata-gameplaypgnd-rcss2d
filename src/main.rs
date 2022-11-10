@@ -3,22 +3,20 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color, ttf::{self, Font}};
+use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color, ttf};
 
 mod entity;
 use entity::Entity;
 
 
-fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump, Font) {
+fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     let sctxt = sdl2::init().unwrap();
     let sv = sctxt.video().unwrap();
     let sw = sv.window("Playback", 800, 600).build().unwrap();
     let swc = sw.into_canvas().build().unwrap();
     let se = sctxt.event_pump().unwrap();
     //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
-    let stx = ttf::init().unwrap();
-    let fx = stx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
-    return (sctxt, sv, swc, se, fx);
+    return (sctxt, sv, swc, se);
 }
 
 fn setup_entities(nplayers: i32) -> Vec<Entity> {
@@ -41,7 +39,11 @@ fn update_entities(vplayers: &mut Vec<Entity>, bpos: i32) {
 
 fn main() {
     println!("Hello, world!");
-    let (_sctxt, _sv, mut swc, mut se, fx) = sdl_init();
+    let (_sctxt, _sv, mut swc, mut se) = sdl_init();
+    let stx = ttf::init().unwrap();
+    let font = stx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
+    let swctc = swc.texture_creator();
+
     let mut dcolor = 20;
     let mut players = setup_entities(12*2);
 
@@ -81,7 +83,7 @@ fn main() {
 
         // Draw entities
         for i in 0..players.len() {
-            players[i].draw(&mut swc);
+            players[i].draw(&mut swc, &font, &swctc);
         }
 
         swc.present();
