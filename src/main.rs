@@ -58,8 +58,8 @@ fn main() {
         players[0].pos_set(dcolor as i32, dcolor as i32);
         players[1].pos_update(1, 1);
 
-        for player in players {
-            player.draw(&mut swc);
+        for i in 0..players.len() {
+            players[i].draw(&mut swc);
         }
 
         swc.present();
