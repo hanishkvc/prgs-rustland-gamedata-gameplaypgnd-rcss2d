@@ -64,7 +64,8 @@ impl Entity {
         wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
         //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
         let txt = font.render(&self.id);
-        let ts = txt.solid(Color::RGB(0, 0, 0)).unwrap();
+        //let ts = txt.shaded(Color::WHITE, Color::RGB(0, 0, 0)).unwrap();
+        let ts = txt.blended(Color::WHITE).unwrap();
         let tt = ts.as_texture(tc).unwrap();
         wc.copy(&tt, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
     }
