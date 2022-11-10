@@ -3,7 +3,7 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels};
+use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color};
 
 fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     let sctxt = sdl2::init().unwrap();
@@ -21,7 +21,7 @@ fn main() {
     let mut dcolor = 20;
 
     'mainloop: loop {
-        swc.set_draw_color(pixels::Color::RGB(20+dcolor, 200, 20));
+        swc.set_draw_color(Color::RGB(20+dcolor, 200, 20));
         swc.clear();
         for ev in se.poll_iter() {
             use sdl2::event::Event;
@@ -41,6 +41,8 @@ fn main() {
                 _ => (),
             }
         }
+        swc.set_draw_color(Color::RGB(200, 20, 20));
+        swc.fill_rect(sdl2::rect::Rect::new(dcolor as i32, dcolor as i32, 16, 16));
         swc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));
     }
