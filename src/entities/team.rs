@@ -37,7 +37,11 @@ impl<'a> Team<'a> {
             let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
             team.players.push(Entity::new(i.to_string().as_str(), (bx+fx, fy), team.color, font));
             team.pmoves.push((0.0,0.0));
-            team.pchgmovs.push(fx.round() as i32);
+            let mut chgmov = fx.round() as i32;
+            if chgmov == 0 {
+                chgmov = 1;
+            }
+            team.pchgmovs.push(chgmov);
         }
         print!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team);
         team
