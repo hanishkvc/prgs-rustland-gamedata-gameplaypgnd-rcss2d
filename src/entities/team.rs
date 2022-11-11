@@ -27,11 +27,13 @@ impl<'a> Team<'a> {
             color: color,
             players: Vec::new(),
         };
+        let bx: i32 = (rand::random::<u32>() % entities::SCREEN_WIDTH) as i32;
         for i in 0..nplayers {
+            let ix: i32 = (rand::random::<u32>() % (entities::SCREEN_WIDTH/4)) as i32;
             let iy: i32 = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as i32;
-            team.players.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), team.color, font));
+            team.players.push(Entity::new(i.to_string().as_str(), (bx+ix, iy), team.color, font));
         }
-        print!("INFO:PGND:Team:Created:{}:{:?}", team.name, team);
+        print!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team);
         team
     }
 
