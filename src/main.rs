@@ -15,7 +15,7 @@ use entities::Entity;
 fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     let sctxt = sdl2::init().unwrap();
     let sv = sctxt.video().unwrap();
-    let sw = sv.window("Playback", 800, 600).build().unwrap();
+    let sw = sv.window("Playback", entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT).build().unwrap();
     let swc = sw.into_canvas().build().unwrap();
     let se = sctxt.event_pump().unwrap();
     //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
@@ -53,7 +53,7 @@ fn main() {
     let mut bpause = false;
     'mainloop: loop {
         // Clear the background
-        swc.set_draw_color(Color::RGB(20+dcolor, 200, 20));
+        swc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         swc.clear();
 
         // handle any pending events
