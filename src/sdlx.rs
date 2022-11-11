@@ -53,10 +53,6 @@ impl<'a> SdlX<'a> {
 
 }
 
-impl<'a,'b> SdlX<'a> {
-
-    pub fn text_surface(font: &'b Font, text: &str, color: Color) -> Surface<'b> {
-        return font.render(text).blended(color).unwrap();
-    }
-
+pub fn text_surface<'a>(font: &'a Font<'a, 'a>, text: &str, color: Color) -> Surface<'a> {
+    return font.render(text).blended(color).unwrap();
 }

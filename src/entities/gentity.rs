@@ -7,7 +7,7 @@ use sdl2::{pixels::Color, rect::Rect};
 use sdl2::ttf::Font;
 use sdl2::surface::Surface;
 
-use crate::sdlx::SdlX;
+use crate::sdlx::{self, SdlX};
 
 use super::SCREEN_WIDTH;
 use super::SCREEN_HEIGHT;
@@ -26,7 +26,7 @@ pub struct Entity<'a> {
 impl<'a> Entity<'a> {
 
     pub fn new(id: &str, pos: (i32, i32), color: Color, font: &'a Font) -> Entity<'a> {
-        let ts = SdlX::text_surface(font, id, Color::WHITE);
+        let ts = sdlx::text_surface(font, id, Color::WHITE);
         Entity {
             _id: id.to_string(),
             pos: pos,
