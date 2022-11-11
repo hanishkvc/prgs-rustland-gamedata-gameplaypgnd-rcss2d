@@ -32,4 +32,23 @@ impl Rcg {
         }
     }
 
+    pub fn next_record(&self) -> Vec<String> {
+        let bcontinue = true;
+        let mut vtoks = Vec::new();
+        while bcontinue {
+            let mut tstr = TStr::from_str(&self.lines[self.inext], true);
+            if tstr.len() == 0 {
+                continue;
+            }
+            if tstr.char_first().unwrap() == '#' {
+                continue;
+            }
+            vtoks = tstr.tokens_vec(' ', true, true).unwrap();
+            if vtoks[0].starts_with("show") {
+                break;
+            }
+        }
+        return vtoks;
+    }
+
 }
