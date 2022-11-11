@@ -17,7 +17,7 @@ use super::ENTITY_HEIGHT;
 
 pub struct Entity<'a> {
     _id: String,
-    pos: (i32, i32),
+    fpos: (f32, f32),
     color: Color,
     onscreen: bool,
     ids: Surface<'a>,
@@ -25,39 +25,43 @@ pub struct Entity<'a> {
 
 impl<'a> Entity<'a> {
 
-    pub fn new(id: &str, pos: (i32, i32), color: Color, font: &'a Font) -> Entity<'a> {
+    pub fn new(id: &str, fpos: (f32, f32), color: Color, font: &'a Font) -> Entity<'a> {
         let ts = sdlx::text_surface(font, id, Color::WHITE);
         Entity {
             _id: id.to_string(),
-            pos: pos,
+            fpos: fpos,
             color: color,
             onscreen: true,
             ids: ts,
         }
     }
 
+    pub fn ipos(&self) -> (i32, i32) {
+        ((self.fpos.0.round() as i32), (self.fpos.1.round() as i32))
+    }
+
     #[allow(dead_code)]
     /// Set absolute position of the entity
-    pub fn pos_set_abs(&mut self, ix: i32, iy: i32) {
-        self.pos = (ix, iy);
+    pub fn pos_set_abs(&mut self, fx: f32, fy: f32) {
+        self.fpos = (fx, fy);
     }
 
     /// Set relative position of the entity
-    pub fn pos_set_rel(&mut self, ix: i32, iy: i32) {
-        self.pos = (self.pos.0 + ix, self.pos.1 + iy);
+    pub fn pos_set_rel(&mut self, fx: f32, fy: f32) {
+        self.fpos = (self.fpos.0 + fx, self.fpos.1 + fy);
 
         if self.onscreen {
-            if self.pos.0 < 0 {
-                self.pos.0 = SCREEN_WIDTH as i32;
+            if self.fpos.0 < 0.0 {
+                self.fpos.0 = SCREEN_WIDTH as f32;
             }
-            if self.pos.0 > (SCREEN_WIDTH as i32) {
-                self.pos.0 = 0;
+            if self.fpos.0 > (SCREEN_WIDTH as f32) {
+                self.fpos.0 = 0.0;
             }
-            if self.pos.1 < 0 {
-                self.pos.1 = SCREEN_HEIGHT as i32;
+            if self.fpos.1 < 0.0 {
+                self.fpos.1 = SCREEN_HEIGHT as f32;
             }
-            if self.pos.1 > (SCREEN_HEIGHT as i32) {
-                self.pos.1 = 0;
+            if self.fpos.1 > (SCREEN_HEIGHT as f32) {
+                self.fpos.1 = 0.0;
             }
         }
     }
@@ -65,10 +69,11 @@ impl<'a> Entity<'a> {
     /// Draw the entity on passed canvas
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
-        sx.wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
+        let ipos = self.ipos();
+        sx.wc.fill_rect(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
         //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
-        sx.wc.copy(&tx, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
+        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0, ipos.1, 16, 16))).unwrap();
     }
 
 }
@@ -77,7 +82,7 @@ impl std::fmt::Debug for Entity<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Entity")
             .field("_id", &self._id)
-            .field("pos", &self.pos)
+            .field("pos", &self.fpos)
             .field("color", &self.color)
             .field("onscreen", &self.onscreen)
             .finish()
