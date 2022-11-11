@@ -12,7 +12,7 @@ use crate::sdlx::SdlX;
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
 
-pub const SCREEN_WIDTH: u32 = 800;
+pub const SCREEN_WIDTH: u32 = 1024;
 pub const SCREEN_HEIGHT: u32 = 600;
 pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 

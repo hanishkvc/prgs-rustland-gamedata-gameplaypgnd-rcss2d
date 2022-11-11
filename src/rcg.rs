@@ -77,7 +77,7 @@ impl Rcg {
                         let fy = (fy + 50.0)*6.0;
                         tu.ateampositions.push((iplayer-1, fx, fy));
                     } else {
-                        let fx = (fx + 56.0)*7.0;
+                        let fx = (fx + 56.0)*9.0;
                         let fy = (fy + 50.0)*6.0;
                         tu.bteampositions.push((iplayer-1, fx, fy));
                     }
