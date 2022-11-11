@@ -15,7 +15,7 @@ fn main() {
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, font);
 
     let mut dcolor = 20;
-    let mut pgentities = entities::Entities::new(11, 11, &sx);
+    let mut pgentities = entities::Entities::new(11, 11, &sx.font);
 
     let mut bpause = false;
     'mainloop: loop {

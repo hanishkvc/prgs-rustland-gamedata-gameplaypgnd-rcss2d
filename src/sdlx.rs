@@ -3,7 +3,7 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::{self, Font, Sdl2TtfContext}};
+use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
 use sdl2::render::{WindowCanvas, TextureCreator, Texture};
 use sdl2::video::WindowContext;
 use sdl2::pixels::Color;
@@ -14,7 +14,7 @@ pub struct SdlX<'a> {
     vs: VideoSubsystem,
     pub wc: WindowCanvas,
     pub ep: EventPump,
-    wctc: TextureCreator<WindowContext>,
+    pub wctc: TextureCreator<WindowContext>,
     pub font: Font<'a,'a>,
 }
 
@@ -49,6 +49,10 @@ impl<'a> SdlX<'a> {
         let ts = self.font.render(text).blended(color).unwrap();
         let tt = ts.as_texture(&self.wctc).unwrap();
         return tt;
+    }
+
+    pub fn text_surface(font: &Font, text: &str, color: Color) -> Surface<'a> {
+        return font.render(text).blended(color).unwrap();
     }
 
 }

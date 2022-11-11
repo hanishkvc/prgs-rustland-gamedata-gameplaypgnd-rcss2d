@@ -4,6 +4,7 @@
 //!
 
 use sdl2::pixels::Color;
+use sdl2::ttf::Font;
 
 use crate::sdlx::SdlX;
 
@@ -37,10 +38,10 @@ pub(crate) struct Entities<'a> {
 
 impl<'a> Entities<'a> {
 
-    pub fn new(anplayers: i32, bnplayers: i32, sx: &'a SdlX) -> Entities<'a> {
+    pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         Entities {
-            ateam: team::Team::new("ateam", Color::RED, anplayers, sx),
-            bteam: team::Team::new("bteam", Color::BLUE, bnplayers, sx),
+            ateam: team::Team::new("ateam", Color::RED, anplayers, font),
+            bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
         }
     }
 

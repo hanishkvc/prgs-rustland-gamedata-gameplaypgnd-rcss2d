@@ -4,7 +4,8 @@
 //!
 
 use sdl2::{pixels::Color, rect::Rect};
-use sdl2::render::Texture;
+use sdl2::ttf::Font;
+use sdl2::surface::Surface;
 
 use crate::sdlx::SdlX;
 
@@ -19,19 +20,19 @@ pub struct Entity<'a> {
     pos: (i32, i32),
     color: Color,
     onscreen: bool,
-    idtx: Texture<'a>,
+    ids: Surface<'a>,
 }
 
 impl<'a> Entity<'a> {
 
-    pub fn new(id: &str, pos: (i32, i32), color: Color, sx: &'a SdlX) -> Entity<'a> {
-        let tt = sx.text_texture(id, Color::WHITE);
+    pub fn new(id: &str, pos: (i32, i32), color: Color, font: &'a Font) -> Entity<'a> {
+        let ts = SdlX::text_surface(font, id, Color::WHITE);
         Entity {
             _id: id.to_string(),
             pos: pos,
             color: color,
             onscreen: true,
-            idtx: tt,
+            ids: ts,
         }
     }
 
@@ -65,7 +66,8 @@ impl<'a> Entity<'a> {
         sx.wc.set_draw_color(self.color);
         sx.wc.fill_rect(Rect::new(self.pos.0, self.pos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
         //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
-        sx.wc.copy(&self.idtx, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
+        let tx = self.ids.as_texture(&sx.wctc).unwrap();
+        sx.wc.copy(&tx, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
     }
 
 }
