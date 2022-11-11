@@ -51,10 +51,16 @@ impl Rcg {
             if tstr.char_first().unwrap() == '#' {
                 continue;
             }
+            if tstr.the_str().starts_with("ULG") {
+                continue;
+            }
+            tstr.peel_bracket('(').unwrap();
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
             if toks[0].starts_with("show") {
                 vtoks = toks;
                 break;
+            } else {
+                print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
             }
         }
         return vtoks;
