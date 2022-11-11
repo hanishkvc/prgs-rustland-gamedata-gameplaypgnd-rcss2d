@@ -3,10 +3,12 @@
 //! HanishKVC, 2022
 //!
 
+use std::env;
 
 mod entities;
 mod sdlx;
 mod rcg;
+use rcg::Rcg;
 
 
 fn main() {
@@ -17,6 +19,12 @@ fn main() {
 
     let mut dcolor = 20;
     let mut pgentities = entities::Entities::new(11, 11, &font);
+
+    let clargs = env::args().collect::<Vec<String>>();
+    let mut rcg: Option<Rcg> = None;
+    if clargs.len() > 1 {
+        rcg = Some(Rcg::new(&clargs[1]));
+    }
 
     let mut bpause = false;
     let mut step = -1;
@@ -54,7 +62,11 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            pgentities.update(step as usize);
+            if rcg.is_none() {
+                pgentities.update(step as usize);
+            } else {
+                print!("DBUG:{:?}", rcg.as_ref().unwrap().next_record());
+            }
         }
 
         // Draw entities

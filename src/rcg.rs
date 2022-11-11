@@ -6,7 +6,7 @@
 use std::{fs::File, io::Read};
 use tokensk::TStr;
 
-struct Rcg {
+pub struct Rcg {
     fname: String,
     file: File,
     lines: Vec<String>,
