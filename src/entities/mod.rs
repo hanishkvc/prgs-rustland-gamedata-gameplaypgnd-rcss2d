@@ -5,6 +5,8 @@
 
 use sdl2::pixels::Color;
 
+use crate::sdlx::SdlX;
+
 
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
@@ -35,16 +37,12 @@ pub(crate) struct Entities<'a> {
 
 impl<'a> Entities<'a> {
 
-    pub fn new(anplayers: i32, bnplayers: i32) -> Entities<'a> {
+    pub fn new(anplayers: i32, bnplayers: i32, sx: &SdlX) -> Entities<'a> {
         Entities {
-            ateam: team::Team::new("ateam", Color::RED, anplayers),
-            bteam: team::Team::new("bteam", Color::BLUE, bnplayers),
+            ateam: team::Team::new("ateam", Color::RED, anplayers, sx),
+            bteam: team::Team::new("bteam", Color::BLUE, bnplayers, sx),
         }
     }
 
 }
 
-fn setup_entities<'a>(nplayers: i32, font: &'a Font<'a, 'a>, tc: &'a TextureCreator<WindowContext>) -> Vec<Entity<'a>> {
-    let mut vplayers = Vec::new();
-    return vplayers;
-}

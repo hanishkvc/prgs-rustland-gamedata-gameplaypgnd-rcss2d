@@ -3,10 +3,10 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect, ttf::Font};
-use sdl2::render::{TextureCreator, Texture};
-use sdl2::video::WindowContext;
+use sdl2::{pixels::Color, render::WindowCanvas, rect::Rect};
+use sdl2::render::Texture;
 
+use crate::sdlx::SdlX;
 
 use super::SCREEN_WIDTH;
 use super::SCREEN_HEIGHT;
@@ -24,7 +24,8 @@ pub struct Entity<'a> {
 
 impl<'a> Entity<'a> {
 
-    pub fn new(id: &str, pos: (i32, i32), color: Color, font: &Font, tc: &'a TextureCreator<WindowContext>) -> Entity<'a> {
+    pub fn new(id: &str, pos: (i32, i32), color: Color, sx: &SdlX) -> Entity<'a> {
+        let tt = sx.text_texture(id, Color::WHITE);
         Entity {
             _id: id.to_string(),
             pos: pos,
