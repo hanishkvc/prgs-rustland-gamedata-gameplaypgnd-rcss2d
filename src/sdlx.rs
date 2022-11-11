@@ -9,18 +9,17 @@ use sdl2::video::WindowContext;
 use sdl2::pixels::Color;
 
 
-pub struct SdlX<'a> {
+pub struct SdlX {
     ctxt: Sdl,
     vs: VideoSubsystem,
     pub wc: WindowCanvas,
     pub ep: EventPump,
     pub wctc: TextureCreator<WindowContext>,
-    pub font: Font<'a,'a>,
 }
 
-impl<'a> SdlX<'a> {
+impl SdlX {
 
-    pub fn init_plus(width: u32, height: u32, font: Font<'a,'a>) -> SdlX<'a> {
+    pub fn init_plus(width: u32, height: u32) -> SdlX {
         let ctxt = sdl2::init().unwrap();
         // Setup window
         let vs = ctxt.video().unwrap();
@@ -37,22 +36,21 @@ impl<'a> SdlX<'a> {
             wc: wc,
             ep: ep,
             wctc: wctc,
-            font: font,
         }
     }
 
 }
 
-impl<'a> SdlX<'a> {
+impl SdlX {
 
-    pub fn text_texture(&self, text: &str, color: Color) -> Texture {
-        let ts = self.font.render(text).blended(color).unwrap();
+    pub fn text_texture(&self, text: &str, color: Color, font: &Font) -> Texture {
+        let ts = font.render(text).blended(color).unwrap();
         let tt = ts.as_texture(&self.wctc).unwrap();
         return tt;
     }
 
 }
 
-pub fn text_surface<'a>(font: &'a Font<'a, 'a>, text: &str, color: Color) -> Surface<'a> {
+pub fn text_surface<'a>(font: &'a Font, text: &str, color: Color) -> Surface<'a> {
     return font.render(text).blended(color).unwrap();
 }

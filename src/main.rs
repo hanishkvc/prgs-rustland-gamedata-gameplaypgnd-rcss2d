@@ -12,10 +12,10 @@ fn main() {
     println!("Hello, world!");
     let ttfx = sdl2::ttf::init().unwrap();
     let font = ttfx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
-    let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, font);
+    let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
 
     let mut dcolor = 20;
-    let mut pgentities = entities::Entities::new(11, 11, &sx.font);
+    let mut pgentities = entities::Entities::new(11, 11, &font);
 
     let mut bpause = false;
     'mainloop: loop {
