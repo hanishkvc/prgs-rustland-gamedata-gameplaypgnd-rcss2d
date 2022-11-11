@@ -10,6 +10,8 @@ use crate::entities;
 use crate::entities::gentity::Entity;
 use crate::sdlx::SdlX;
 
+use super::TeamUpdates;
+
 
 
 #[derive(Debug)]
@@ -56,6 +58,14 @@ impl<'a> Team<'a> {
                 self.pmoves[i] = (dx, dy);
             }
             player.pos_set_rel(self.pmoves[i].0, self.pmoves[i].1);
+        }
+    }
+
+    pub fn update(&mut self, tposs: Vec<(i32, f32, f32)>) {
+        for ppos in tposs {
+            let fx = ppos.1;
+            let fy = ppos.2;
+            self.players[ppos.0 as usize].pos_set_abs(fx, fy);
         }
     }
 

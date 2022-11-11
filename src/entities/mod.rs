@@ -32,6 +32,12 @@ pub mod gentity;
 pub mod team;
 
 
+pub struct TeamUpdates {
+    ateampositions: Vec<(i32, f32, f32)>,
+    bteampositions: Vec<(i32, f32, f32)>,
+}
+
+
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
     ateam: team::Team<'a>,
@@ -50,6 +56,11 @@ impl<'a> Entities<'a> {
     pub fn update_dummy(&mut self, step: usize) {
         self.ateam.update_dummy(step);
         self.bteam.update_dummy(step);
+    }
+
+    pub fn update(&mut self, tu: TeamUpdates) {
+        self.ateam.update(tu.ateampositions);
+        self.bteam.update(tu.bteampositions);
     }
 
     pub fn draw(&self, sx: &mut SdlX) {
