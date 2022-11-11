@@ -51,8 +51,9 @@ impl Rcg {
             if tstr.char_first().unwrap() == '#' {
                 continue;
             }
-            vtoks = tstr.tokens_vec(' ', true, true).unwrap();
-            if vtoks[0].starts_with("show") {
+            let toks = tstr.tokens_vec(' ', true, true).unwrap();
+            if toks[0].starts_with("show") {
+                vtoks = toks;
                 break;
             }
         }
