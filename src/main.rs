@@ -65,7 +65,10 @@ fn main() {
             if rcg.is_none() {
                 pgentities.update(step as usize);
             } else {
-                print!("DBUG:{:?}", rcg.as_ref().unwrap().next_record());
+                let rcg = rcg.as_mut().unwrap();
+                if !rcg.bdone {
+                    print!("DBUG:{:?}\n", rcg.next_record());
+                }
             }
         }
 

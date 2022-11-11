@@ -10,7 +10,8 @@ pub struct Rcg {
     fname: String,
     file: File,
     lines: Vec<String>,
-    inext: usize,
+    iline: isize,
+    pub bdone: bool,
 }
 
 impl Rcg {
@@ -28,15 +29,22 @@ impl Rcg {
             fname: fname.to_string(),
             file: file,
             lines: vline,
-            inext: 0,
+            iline: -1,
+            bdone: false,
         }
     }
 
-    pub fn next_record(&self) -> Vec<String> {
+    pub fn next_record(&mut self) -> Vec<String> {
         let bcontinue = true;
         let mut vtoks = Vec::new();
         while bcontinue {
-            let mut tstr = TStr::from_str(&self.lines[self.inext], true);
+            self.iline += 1;
+            if self.iline >= self.lines.len() as isize {
+                print!("WARN:PGND:Rcg:No more data\n");
+                self.bdone = true;
+                break;
+            }
+            let mut tstr = TStr::from_str(&self.lines[self.iline as usize], true);
             if tstr.len() == 0 {
                 continue;
             }
