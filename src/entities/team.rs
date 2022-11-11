@@ -16,7 +16,8 @@ use crate::sdlx::SdlX;
 pub struct Team<'a> {
     name: String,
     color: Color,
-    players: Vec<Entity<'a>>
+    players: Vec<Entity<'a>>,
+    pmoves: Vec<(i32,i32)>,
 }
 
 impl<'a> Team<'a> {
@@ -26,21 +27,28 @@ impl<'a> Team<'a> {
             name: name.to_string(),
             color: color,
             players: Vec::new(),
+            pmoves: Vec::new(),
         };
         let bx: i32 = (rand::random::<u32>() % entities::SCREEN_WIDTH) as i32;
         for i in 0..nplayers {
             let ix: i32 = (rand::random::<u32>() % (entities::SCREEN_WIDTH/4)) as i32;
             let iy: i32 = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as i32;
             team.players.push(Entity::new(i.to_string().as_str(), (bx+ix, iy), team.color, font));
+            team.pmoves.push((0,0));
         }
         print!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team);
         team
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, step: usize) {
         for i in 0..self.players.len() {
-            let dy: i32 = (rand::random::<i32>() % 4) as i32;
-            self.players[i].pos_set_rel(1, dy);
+            let player = &mut self.players[i];
+            if step % 20 == 0 {
+                let dx: i32 = (rand::random::<i32>() % 4) as i32;
+                let dy = (rand::random::<i32>() % 4) as i32;
+                self.pmoves[i] = (dx,dy);
+            }
+            player.pos_set_rel(self.pmoves[i].0, self.pmoves[i].1);
         }
     }
 

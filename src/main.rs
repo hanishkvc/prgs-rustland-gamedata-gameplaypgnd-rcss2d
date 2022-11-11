@@ -18,7 +18,9 @@ fn main() {
     let mut pgentities = entities::Entities::new(11, 11, &font);
 
     let mut bpause = false;
+    let mut step = -1;
     'mainloop: loop {
+        step += 1;
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
@@ -48,7 +50,7 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            pgentities.update();
+            pgentities.update(step as usize);
         }
 
         // Draw entities
