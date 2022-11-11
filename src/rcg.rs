@@ -71,11 +71,15 @@ impl Rcg {
                     let (steam, splayer) = tstr.split_once(' ').unwrap();
                     let iplayer: i32 = splayer.parse().unwrap();
                     let fx: f32 = vdata[3].parse().unwrap();
-                    let fy: f32 = vdata[3].parse().unwrap();
+                    let fy: f32 = vdata[4].parse().unwrap();
                     if steam == "l" {
-                        tu.ateampositions.push((iplayer, fx, fy));
+                        let fx = (fx + 56.0)*7.0;
+                        let fy = (fy + 50.0)*6.0;
+                        tu.ateampositions.push((iplayer-1, fx, fy));
                     } else {
-                        tu.bteampositions.push((iplayer, fx, fy));
+                        let fx = (fx + 56.0)*7.0;
+                        let fy = (fy + 50.0)*6.0;
+                        tu.bteampositions.push((iplayer-1, fx, fy));
                     }
                 }
                 break;
