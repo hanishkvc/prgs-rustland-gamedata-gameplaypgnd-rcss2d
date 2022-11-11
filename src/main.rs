@@ -67,7 +67,8 @@ fn main() {
             } else {
                 let rcg = rcg.as_mut().unwrap();
                 if !rcg.bdone {
-                    print!("DBUG:{:?}\n", rcg.next_record());
+                    let tu = rcg.next_record();
+                    print!("DBUG:{:?}\n", tu);
                 }
             }
         }

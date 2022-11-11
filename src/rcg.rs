@@ -6,6 +6,8 @@
 use std::{fs::File, io::Read};
 use tokensk::TStr;
 
+use crate::entities::TeamUpdates;
+
 pub struct Rcg {
     _fname: String,
     _file: File,
@@ -34,9 +36,9 @@ impl Rcg {
         }
     }
 
-    pub fn next_record(&mut self) -> Vec<String> {
+    pub fn next_record(&mut self) -> TeamUpdates {
         let bcontinue = true;
-        let mut vtoks = Vec::new();
+        let mut tu = TeamUpdates::new();
         while bcontinue {
             self.iline += 1;
             if self.iline >= self.lines.len() as isize {
@@ -57,13 +59,25 @@ impl Rcg {
             tstr.peel_bracket('(').unwrap();
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
             if toks[0].starts_with("show") {
-                vtoks = toks;
+                for tok in toks {
+                    if !tok.starts_with("((l") && !tok.starts_with("((r") {
+                        continue;
+                    }
+                    let mut tstr = TStr::from_str(&tok, true);
+                    tstr.peel_bracket('(').unwrap();
+                    let vdata = tstr.tokens_vec(' ', true, true).unwrap();
+                    if vdata[0].starts_with("(l 4)") {
+                        let fx: f32 = vdata[3].parse().unwrap();
+                        let fy: f32 = vdata[3].parse().unwrap();
+                        tu.ateampositions.push((4, fx, fy));
+                    }
+                }
                 break;
             } else {
                 print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
             }
         }
-        return vtoks;
+        return tu;
     }
 
 }

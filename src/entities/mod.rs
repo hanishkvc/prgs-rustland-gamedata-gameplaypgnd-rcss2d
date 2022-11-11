@@ -32,9 +32,18 @@ pub mod gentity;
 pub mod team;
 
 
+#[derive(Debug)]
 pub struct TeamUpdates {
-    ateampositions: Vec<(i32, f32, f32)>,
-    bteampositions: Vec<(i32, f32, f32)>,
+    pub ateampositions: Vec<(i32, f32, f32)>,
+    pub bteampositions: Vec<(i32, f32, f32)>,
+}
+
+impl TeamUpdates {
+
+    pub fn new() -> TeamUpdates {
+        TeamUpdates { ateampositions: Vec::new(), bteampositions: Vec::new() }
+    }
+
 }
 
 
