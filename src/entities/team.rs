@@ -19,9 +19,9 @@ pub struct Team<'a> {
 
 impl<'a> Team<'a> {
 
-    pub fn new(name: String, color: Color, nplayers: i32) -> Team<'a> {
+    pub fn new(name: &str, color: Color, nplayers: i32) -> Team<'a> {
         let team = Team {
-            name: name,
+            name: name.to_string(),
             color: color,
             players: Vec::new(),
         };

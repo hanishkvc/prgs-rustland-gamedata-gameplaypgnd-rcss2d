@@ -22,10 +22,6 @@ fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
     return (sctxt, sv, swc, se);
 }
 
-fn setup_entities<'a>(nplayers: i32, font: &'a Font<'a, 'a>, tc: &'a TextureCreator<WindowContext>) -> Vec<Entity<'a>> {
-    let mut vplayers = Vec::new();
-    return vplayers;
-}
 
 fn update_entities(vplayers: &mut Vec<Entity>, bpos: i32) {
     vplayers[0].pos_set_abs(bpos, bpos);
@@ -44,7 +40,7 @@ fn main() {
     let swctc = swc.texture_creator();
 
     let mut dcolor = 20;
-    let mut players = setup_entities(12*2, &font, &swctc);
+    let mut pgentities = entities::Entities::new(11, 11); //setup_entities(12*2, &font, &swctc);
 
     let mut bpause = false;
     'mainloop: loop {

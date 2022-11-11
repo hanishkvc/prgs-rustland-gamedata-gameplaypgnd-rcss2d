@@ -27,3 +27,24 @@ type PosInt = i32;
 
 pub mod gentity;
 pub mod team;
+
+pub(crate) struct Entities<'a> {
+    ateam: team::Team<'a>,
+    bteam: team::Team<'a>,
+}
+
+impl<'a> Entities<'a> {
+
+    pub fn new(anplayers: i32, bnplayers: i32) -> Entities<'a> {
+        Entities {
+            ateam: team::Team::new("ateam", Color::RED, anplayers),
+            bteam: team::Team::new("bteam", Color::BLUE, bnplayers),
+        }
+    }
+
+}
+
+fn setup_entities<'a>(nplayers: i32, font: &'a Font<'a, 'a>, tc: &'a TextureCreator<WindowContext>) -> Vec<Entity<'a>> {
+    let mut vplayers = Vec::new();
+    return vplayers;
+}
