@@ -7,8 +7,8 @@ use std::{fs::File, io::Read};
 use tokensk::TStr;
 
 pub struct Rcg {
-    fname: String,
-    file: File,
+    _fname: String,
+    _file: File,
     lines: Vec<String>,
     iline: isize,
     pub bdone: bool,
@@ -19,15 +19,15 @@ impl Rcg {
     pub fn new(fname: &str) -> Rcg {
         let mut file = File::open(fname).unwrap();
         let mut sdata = String::new();
-        let gotr = file.read_to_string(&mut sdata).unwrap();
+        let _gotr = file.read_to_string(&mut sdata).unwrap();
         let vdata = sdata.split('\n').collect::<Vec<&str>>();
         let mut vline = Vec::new();
         for line in vdata {
             vline.push(line.to_string());
         }
         Rcg {
-            fname: fname.to_string(),
-            file: file,
+            _fname: fname.to_string(),
+            _file: file,
             lines: vline,
             iline: -1,
             bdone: false,
