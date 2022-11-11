@@ -15,13 +15,12 @@ pub struct SdlX<'a> {
     pub wc: WindowCanvas,
     pub ep: EventPump,
     wctc: TextureCreator<WindowContext>,
-    ttfx: Sdl2TtfContext,
     pub font: Font<'a,'a>,
 }
 
 impl<'a> SdlX<'a> {
 
-    pub fn init_plus(width: u32, height: u32) -> SdlX<'a> {
+    pub fn init_plus(width: u32, height: u32, font: Font<'a,'a>) -> SdlX<'a> {
         let ctxt = sdl2::init().unwrap();
         // Setup window
         let vs = ctxt.video().unwrap();
@@ -32,16 +31,12 @@ impl<'a> SdlX<'a> {
         let ep = ctxt.event_pump().unwrap();
         // Font related
         //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
-        let ttfx = ttf::init().unwrap();
-        let font = ttfx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
-
         SdlX {
             ctxt: ctxt,
             vs: vs,
             wc: wc,
             ep: ep,
             wctc: wctc,
-            ttfx: ttfx,
             font: font,
         }
     }
