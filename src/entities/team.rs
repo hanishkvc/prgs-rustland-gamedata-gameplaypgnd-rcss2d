@@ -47,7 +47,7 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn update(&mut self, step: usize) {
+    pub fn update_dummy(&mut self, step: usize) {
         for i in 0..self.players.len() {
             let player = &mut self.players[i];
             if step % (self.pchgmovs[i] as usize) == 0 {

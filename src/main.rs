@@ -63,7 +63,7 @@ fn main() {
         // Update the entities
         if !bpause {
             if rcg.is_none() {
-                pgentities.update(step as usize);
+                pgentities.update_dummy(step as usize);
             } else {
                 let rcg = rcg.as_mut().unwrap();
                 if !rcg.bdone {

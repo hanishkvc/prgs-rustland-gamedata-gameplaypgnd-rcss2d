@@ -47,9 +47,9 @@ impl<'a> Entities<'a> {
         }
     }
 
-    pub fn update(&mut self, step: usize) {
-        self.ateam.update(step);
-        self.bteam.update(step);
+    pub fn update_dummy(&mut self, step: usize) {
+        self.ateam.update_dummy(step);
+        self.bteam.update_dummy(step);
     }
 
     pub fn draw(&self, sx: &mut SdlX) {
