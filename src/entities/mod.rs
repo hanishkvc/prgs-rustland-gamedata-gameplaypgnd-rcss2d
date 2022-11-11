@@ -31,6 +31,8 @@ type _PosInt = i32;
 pub mod gentity;
 pub mod team;
 
+
+#[derive(Debug)]
 pub(crate) struct Entities<'a> {
     ateam: team::Team<'a>,
     bteam: team::Team<'a>,

@@ -39,6 +39,9 @@ fn main() {
                         Keycode::P => {
                             bpause = !bpause;
                         }
+                        Keycode::D => {
+                            print!("DBUG:PGND:Main:Entities:{:#?}\n", pgentities);
+                        }
                         _ => {
 
                         }
