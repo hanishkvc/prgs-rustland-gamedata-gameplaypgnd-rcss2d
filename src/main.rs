@@ -9,7 +9,7 @@ use sdl2::video::WindowContext;
 
 
 mod entities;
-use entities::Entity;
+use entities::gentity::Entity;
 
 
 fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
