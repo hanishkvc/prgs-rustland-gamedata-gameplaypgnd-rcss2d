@@ -12,6 +12,7 @@ use crate::sdlx::SdlX;
 
 
 
+#[derive(Debug)]
 pub struct Team<'a> {
     name: String,
     color: Color,
@@ -30,6 +31,7 @@ impl<'a> Team<'a> {
             let iy: i32 = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as i32;
             team.players.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), team.color, font));
         }
+        print!("INFO:PGND:Team:Created:{}:{:?}", team.name, team);
         team
     }
 

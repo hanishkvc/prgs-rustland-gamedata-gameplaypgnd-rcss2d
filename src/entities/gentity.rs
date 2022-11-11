@@ -36,6 +36,7 @@ impl<'a> Entity<'a> {
         }
     }
 
+    #[allow(dead_code)]
     /// Set absolute position of the entity
     pub fn pos_set_abs(&mut self, ix: i32, iy: i32) {
         self.pos = (ix, iy);
@@ -70,4 +71,15 @@ impl<'a> Entity<'a> {
         sx.wc.copy(&tx, None, Some(Rect::new(self.pos.0, self.pos.1, 16, 16))).unwrap();
     }
 
+}
+
+impl std::fmt::Debug for Entity<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Entity")
+            .field("_id", &self._id)
+            .field("pos", &self.pos)
+            .field("color", &self.color)
+            .field("onscreen", &self.onscreen)
+            .finish()
+    }
 }

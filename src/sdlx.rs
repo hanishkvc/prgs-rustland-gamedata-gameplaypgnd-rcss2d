@@ -10,8 +10,8 @@ use sdl2::pixels::Color;
 
 
 pub struct SdlX {
-    ctxt: Sdl,
-    vs: VideoSubsystem,
+    _ctxt: Sdl,
+    _vs: VideoSubsystem,
     pub wc: WindowCanvas,
     pub ep: EventPump,
     pub wctc: TextureCreator<WindowContext>,
@@ -31,8 +31,8 @@ impl SdlX {
         // Font related
         //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
         SdlX {
-            ctxt: ctxt,
-            vs: vs,
+            _ctxt: ctxt,
+            _vs: vs,
             wc: wc,
             ep: ep,
             wctc: wctc,
@@ -43,6 +43,7 @@ impl SdlX {
 
 impl SdlX {
 
+    #[allow(dead_code)]
     pub fn text_texture(&self, text: &str, color: Color, font: &Font) -> Texture {
         let ts = font.render(text).blended(color).unwrap();
         let tt = ts.as_texture(&self.wctc).unwrap();

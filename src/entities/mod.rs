@@ -26,7 +26,7 @@ pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     }
 }
 
-type PosInt = i32;
+type _PosInt = i32;
 
 pub mod gentity;
 pub mod team;
