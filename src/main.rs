@@ -6,6 +6,7 @@
 
 mod entities;
 mod sdlx;
+mod rcg;
 
 
 fn main() {
