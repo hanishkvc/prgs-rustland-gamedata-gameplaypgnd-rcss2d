@@ -24,10 +24,6 @@ fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
 
 fn setup_entities<'a>(nplayers: i32, font: &'a Font<'a, 'a>, tc: &'a TextureCreator<WindowContext>) -> Vec<Entity<'a>> {
     let mut vplayers = Vec::new();
-    for i in 0..nplayers {
-        let iy: i32 = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as i32;
-        vplayers.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), Color::RGB(200, 0, 0), font, tc));
-    }
     return vplayers;
 }
 
@@ -85,9 +81,6 @@ fn main() {
         }
 
         // Draw entities
-        for i in 0..players.len() {
-            players[i].draw(&mut swc);
-        }
 
         swc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));
