@@ -8,8 +8,8 @@ use sdl2::render::{TextureCreator};
 use sdl2::video::WindowContext;
 
 
-mod entity;
-use entity::Entity;
+mod entities;
+use entities::Entity;
 
 
 fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
@@ -25,7 +25,7 @@ fn sdl_init() -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
 fn setup_entities<'a>(nplayers: i32, font: &'a Font<'a, 'a>, tc: &'a TextureCreator<WindowContext>) -> Vec<Entity<'a>> {
     let mut vplayers = Vec::new();
     for i in 0..nplayers {
-        let iy: i32 = (rand::random::<u32>() % entity::SCREEN_HEIGHT) as i32;
+        let iy: i32 = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as i32;
         vplayers.push(Entity::new(i.to_string().as_str(), (i*20i32, iy), Color::RGB(200, 0, 0), font, tc));
     }
     return vplayers;
