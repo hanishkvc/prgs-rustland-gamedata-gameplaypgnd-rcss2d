@@ -25,8 +25,6 @@ pub struct Entity<'a> {
 impl<'a> Entity<'a> {
 
     pub fn new(id: &str, pos: (i32, i32), color: Color, font: &Font, tc: &'a TextureCreator<WindowContext>) -> Entity<'a> {
-        let ts = font.render(id).blended(Color::WHITE).unwrap();
-        let tt = ts.as_texture(tc).unwrap();
         Entity {
             _id: id.to_string(),
             pos: pos,

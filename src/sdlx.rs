@@ -3,24 +3,55 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{self, VideoSubsystem, Sdl, EventPump, render::WindowCanvas, pixels::Color, ttf::{self, Font}};
-use sdl2::render::{TextureCreator};
+use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::{self, Font}};
+use sdl2::render::{WindowCanvas, TextureCreator, Texture};
 use sdl2::video::WindowContext;
+use sdl2::pixels::Color;
 
 
-pub fn sdl_init(width: u32, height: u32) -> (Sdl, VideoSubsystem, WindowCanvas, EventPump) {
-    let sctxt = sdl2::init().unwrap();
-    let sv = sctxt.video().unwrap();
-    let sw = sv.window("Playback", width, height).build().unwrap();
-    let swc = sw.into_canvas().build().unwrap();
-    let se = sctxt.event_pump().unwrap();
-    //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
-    return (sctxt, sv, swc, se);
+pub struct SdlX<'a> {
+    ctxt: Sdl,
+    vs: VideoSubsystem,
+    pub wc: WindowCanvas,
+    pub ep: EventPump,
+    wctc: TextureCreator<WindowContext>,
+    pub font: Font<'a,'a>,
 }
 
-pub fn font_init() {
-    let stx = ttf::init().unwrap();
-    let font = stx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
-    let swctc = swc.texture_creator();
+impl<'a> SdlX<'a> {
+
+    pub fn init_plus(width: u32, height: u32) -> SdlX<'a> {
+        let ctxt = sdl2::init().unwrap();
+        // Setup window
+        let vs = ctxt.video().unwrap();
+        let win = vs.window("Playback", width, height).build().unwrap();
+        let wc = win.into_canvas().build().unwrap();
+        let wctc = wc.texture_creator();
+        // Setup events
+        let ep = ctxt.event_pump().unwrap();
+        // Font related
+        //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
+        let ttfx = ttf::init().unwrap();
+        let font = ttfx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
+
+        SdlX {
+            ctxt: ctxt,
+            vs: vs,
+            wc: wc,
+            ep: ep,
+            wctc: wctc,
+            font: font,
+        }
+    }
+
+}
+
+impl<'a> SdlX<'a> {
+
+    pub fn text_texture(&self, text: &str, color: Color) -> Texture {
+        let ts = self.font.render(text).blended(color).unwrap();
+        let tt = ts.as_texture(&self.wctc).unwrap();
+        return tt;
+    }
 
 }

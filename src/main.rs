@@ -21,7 +21,7 @@ fn update_entities(vplayers: &mut Vec<Entity>, bpos: i32) {
 
 fn main() {
     println!("Hello, world!");
-    let (_sctxt, _sv, mut swc, mut se) = sdlx::sdl_init(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
+    let sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
 
     let mut dcolor = 20;
     let mut pgentities = entities::Entities::new(11, 11); //setup_entities(12*2, &font, &swctc);
@@ -29,11 +29,11 @@ fn main() {
     let mut bpause = false;
     'mainloop: loop {
         // Clear the background
-        swc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
-        swc.clear();
+        sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
+        sx.wc.clear();
 
         // handle any pending events
-        for ev in se.poll_iter() {
+        for ev in sx.ep.poll_iter() {
             use sdl2::event::Event;
             use sdl2::keyboard::Keycode;
             match ev {
@@ -62,7 +62,7 @@ fn main() {
 
         // Draw entities
 
-        swc.present();
+        sx.wc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));
     }
 
