@@ -37,11 +37,21 @@ pub(crate) struct Entities<'a> {
 
 impl<'a> Entities<'a> {
 
-    pub fn new(anplayers: i32, bnplayers: i32, sx: &SdlX) -> Entities<'a> {
+    pub fn new(anplayers: i32, bnplayers: i32, sx: &'a SdlX) -> Entities<'a> {
         Entities {
             ateam: team::Team::new("ateam", Color::RED, anplayers, sx),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, sx),
         }
+    }
+
+    pub fn update(&mut self) {
+        self.ateam.update();
+        self.bteam.update();
+    }
+
+    pub fn draw(&self, sx: &mut SdlX) {
+        self.ateam.draw(sx);
+        self.bteam.draw(sx);
     }
 
 }

@@ -3,7 +3,7 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::{self, Font}};
+use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::{self, Font, Sdl2TtfContext}};
 use sdl2::render::{WindowCanvas, TextureCreator, Texture};
 use sdl2::video::WindowContext;
 use sdl2::pixels::Color;
@@ -15,6 +15,7 @@ pub struct SdlX<'a> {
     pub wc: WindowCanvas,
     pub ep: EventPump,
     wctc: TextureCreator<WindowContext>,
+    ttfx: Sdl2TtfContext,
     pub font: Font<'a,'a>,
 }
 
@@ -40,6 +41,7 @@ impl<'a> SdlX<'a> {
             wc: wc,
             ep: ep,
             wctc: wctc,
+            ttfx: ttfx,
             font: font,
         }
     }

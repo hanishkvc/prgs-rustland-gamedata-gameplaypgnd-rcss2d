@@ -5,23 +5,12 @@
 
 
 mod entities;
-use entities::gentity::Entity;
-
 mod sdlx;
-
-
-fn update_entities(vplayers: &mut Vec<Entity>, bpos: i32) {
-    vplayers[0].pos_set_abs(bpos, bpos);
-    for i in 1..vplayers.len() {
-        let dy: i32 = (rand::random::<i32>() % 4) as i32;
-        vplayers[i].pos_set_rel(1, dy);
-    }
-}
 
 
 fn main() {
     println!("Hello, world!");
-    let sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
+    let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
 
     let mut dcolor = 20;
     let mut pgentities = entities::Entities::new(11, 11, &sx);
@@ -57,10 +46,11 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            update_entities(&mut players, dcolor as i32);
+            pgentities.update();
         }
 
         // Draw entities
+        pgentities.draw(&mut sx);
 
         sx.wc.present();
         std::thread::sleep(std::time::Duration::from_millis(40));

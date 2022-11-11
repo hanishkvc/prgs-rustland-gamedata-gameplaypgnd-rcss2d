@@ -4,7 +4,6 @@
 //!
 
 use sdl2::pixels::Color;
-use sdl2::render::WindowCanvas;
 
 use crate::entities;
 use crate::entities::gentity::Entity;
@@ -20,8 +19,8 @@ pub struct Team<'a> {
 
 impl<'a> Team<'a> {
 
-    pub fn new(name: &str, color: Color, nplayers: i32, sx: &SdlX) -> Team<'a> {
-        let team = Team {
+    pub fn new(name: &str, color: Color, nplayers: i32, sx: &'a SdlX) -> Team<'a> {
+        let mut team = Team {
             name: name.to_string(),
             color: color,
             players: Vec::new(),
@@ -33,9 +32,16 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn draw(&self, swc: &mut WindowCanvas) {
+    pub fn update(&mut self) {
         for i in 0..self.players.len() {
-            self.players[i].draw(swc);
+            let dy: i32 = (rand::random::<i32>() % 4) as i32;
+            self.players[i].pos_set_rel(1, dy);
+        }
+    }
+
+    pub fn draw(&self, sx: &mut SdlX) {
+        for i in 0..self.players.len() {
+            self.players[i].draw(sx);
         }
     }
 
