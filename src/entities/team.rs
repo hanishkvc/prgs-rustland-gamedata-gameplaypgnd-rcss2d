@@ -18,6 +18,7 @@ pub struct Team<'a> {
     color: Color,
     players: Vec<Entity<'a>>,
     pmoves: Vec<(i32,i32)>,
+    pchgmovs: Vec<i32>,
 }
 
 impl<'a> Team<'a> {
@@ -28,6 +29,7 @@ impl<'a> Team<'a> {
             color: color,
             players: Vec::new(),
             pmoves: Vec::new(),
+            pchgmovs: Vec::new(),
         };
         let bx: i32 = (rand::random::<u32>() % entities::SCREEN_WIDTH) as i32;
         for i in 0..nplayers {
@@ -35,6 +37,7 @@ impl<'a> Team<'a> {
             let iy: i32 = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as i32;
             team.players.push(Entity::new(i.to_string().as_str(), (bx+ix, iy), team.color, font));
             team.pmoves.push((0,0));
+            team.pchgmovs.push(ix);
         }
         print!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team);
         team
@@ -43,7 +46,7 @@ impl<'a> Team<'a> {
     pub fn update(&mut self, step: usize) {
         for i in 0..self.players.len() {
             let player = &mut self.players[i];
-            if step % 20 == 0 {
+            if step % (self.pchgmovs[i] as usize) == 0 {
                 let dx: i32 = (rand::random::<i32>() % 4) as i32;
                 let dy = (rand::random::<i32>() % 4) as i32;
                 self.pmoves[i] = (dx,dy);
