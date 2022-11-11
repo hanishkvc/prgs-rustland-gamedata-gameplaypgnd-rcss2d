@@ -69,6 +69,7 @@ fn main() {
                 if !rcg.bdone {
                     let tu = rcg.next_record();
                     print!("DBUG:{:?}\n", tu);
+                    pgentities.update(tu);
                 }
             }
         }

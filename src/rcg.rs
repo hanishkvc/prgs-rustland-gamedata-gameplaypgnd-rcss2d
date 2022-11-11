@@ -66,10 +66,16 @@ impl Rcg {
                     let mut tstr = TStr::from_str(&tok, true);
                     tstr.peel_bracket('(').unwrap();
                     let vdata = tstr.tokens_vec(' ', true, true).unwrap();
-                    if vdata[0].starts_with("(l 4)") {
-                        let fx: f32 = vdata[3].parse().unwrap();
-                        let fy: f32 = vdata[3].parse().unwrap();
-                        tu.ateampositions.push((4, fx, fy));
+                    let mut tstr = TStr::from_str(&vdata[0], true);
+                    tstr.peel_bracket('(').unwrap();
+                    let (steam, splayer) = tstr.split_once(' ').unwrap();
+                    let iplayer: i32 = splayer.parse().unwrap();
+                    let fx: f32 = vdata[3].parse().unwrap();
+                    let fy: f32 = vdata[3].parse().unwrap();
+                    if steam == "l" {
+                        tu.ateampositions.push((iplayer, fx, fy));
+                    } else {
+                        tu.bteampositions.push((iplayer, fx, fy));
                     }
                 }
                 break;
