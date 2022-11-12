@@ -17,10 +17,15 @@ use super::ENTITY_HEIGHT;
 
 pub struct Entity<'a> {
     _id: String,
+    /// Position of the entity in 0.0-1.0 space
     fpos: (f32, f32),
     color: Color,
+    /// Should the entity be moved back into screen, if it goes out
     onscreen: bool,
+    /// A cache of the Id string, as a SDL surface
     ids: Surface<'a>,
+    /// Any motion vector that should be used to move entity,
+    /// when next frame is called.
     mov: (f32, f32),
 }
 
@@ -41,22 +46,23 @@ impl<'a> Entity<'a> {
     fn fpos_fix(&mut self) {
         if self.onscreen {
             if self.fpos.0 < 0.0 {
-                self.fpos.0 = SCREEN_WIDTH as f32;
+                self.fpos.0 = 1.0;
             }
-            if self.fpos.0 > (SCREEN_WIDTH as f32) {
+            if self.fpos.0 > 1.0 {
                 self.fpos.0 = 0.0;
             }
             if self.fpos.1 < 0.0 {
-                self.fpos.1 = SCREEN_HEIGHT as f32;
+                self.fpos.1 = 1.0;
             }
-            if self.fpos.1 > (SCREEN_HEIGHT as f32) {
+            if self.fpos.1 > 1.0 {
                 self.fpos.1 = 0.0;
             }
         }
     }
 
+    /// Convert the entity's position into screen space from normal space
     pub fn ipos(&self) -> (i32, i32) {
-        ((self.fpos.0.round() as i32), (self.fpos.1.round() as i32))
+        ((self.fpos.0 * SCREEN_WIDTH as f32).round() as i32, (self.fpos.1 * SCREEN_HEIGHT as f32).round() as i32)
     }
 
     /// Set absolute position of the entity
