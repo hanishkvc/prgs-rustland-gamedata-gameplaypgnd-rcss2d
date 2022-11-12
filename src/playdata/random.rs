@@ -133,7 +133,8 @@ impl PlayData for RandomData {
             let dy = (rand::random::<i32>() % 8) as f32;
             self.apos[i].0 += dx;
             self.apos[i].1 += dy;
-            pu.ateampositions.push((i as i32, self.apos[i].0, self.apos[i].1));
+            let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
+            pu.ateampositions.push((i as i32, fx, fy));
         }
         let mut dx;
         let mut dy;
@@ -147,7 +148,8 @@ impl PlayData for RandomData {
             }
             self.bpos[i].0 += dx as f32;
             self.bpos[i].1 += dy as f32;
-            pu.bteampositions.push((i as i32, self.bpos[i].0, self.bpos[i].1));
+            let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
+            pu.bteampositions.push((i as i32, fx, fy));
         }
         pu
     }
