@@ -43,9 +43,9 @@ fn main() {
     }
 
     let mut bpause = false;
-    let mut frame: usize = 0;
+    let mut _frame: usize = 0;
     'mainloop: loop {
-        frame += 1;
+        _frame += 1;
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();

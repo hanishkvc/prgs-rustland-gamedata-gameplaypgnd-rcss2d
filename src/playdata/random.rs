@@ -80,8 +80,8 @@ impl PlayData for RandomData {
                 dx = 1 + rand::random::<i32>() % 2;
                 dy = 1 + rand::random::<i32>() % 2;
             }
-            self.bpos[i].0 += (dx as f32);
-            self.bpos[i].1 += (dy as f32);
+            self.bpos[i].0 += dx as f32;
+            self.bpos[i].1 += dy as f32;
             pu.bteampositions.push((i as i32, self.bpos[i].0, self.bpos[i].1));
         }
         pu

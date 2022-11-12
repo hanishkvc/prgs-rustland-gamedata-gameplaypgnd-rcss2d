@@ -45,7 +45,7 @@ impl Rcg {
 
 impl PlayData for Rcg {
 
-    fn setup(&mut self, fps: f32) {
+    fn setup(&mut self, _fps: f32) {
         self.framesper_record = 1.0;
         self.framesafter_lastrecord = 0.0;
     }
