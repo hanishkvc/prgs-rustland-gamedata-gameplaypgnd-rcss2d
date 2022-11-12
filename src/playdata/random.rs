@@ -44,7 +44,7 @@ impl RandomData {
             let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
             apos.push((fx, fy));
             amov.push((0.0, 0.0));
-            achg.push(rand::random::<usize>() % 128);
+            achg.push(1 + (rand::random::<usize>() % 128));
         }
         let mut bpos = Vec::new();
         let mut bmov = Vec::new();
@@ -54,7 +54,7 @@ impl RandomData {
             let fy = (rand::random::<u32>() % 400) as f32;
             bpos.push((fx, fy));
             bmov.push((0.0, 0.0));
-            bchg.push(rand::random::<usize>() % 128);
+            bchg.push((rand::random::<usize>() % 128) + 1);
         }
 
         let srect = ((-20.0, -20.0), (SCREEN_WIDTH as f32 + 20.0, SCREEN_HEIGHT as f32 + 20.0));
