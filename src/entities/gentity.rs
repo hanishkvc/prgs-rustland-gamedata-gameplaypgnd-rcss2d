@@ -38,20 +38,7 @@ impl<'a> Entity<'a> {
         }
     }
 
-    pub fn ipos(&self) -> (i32, i32) {
-        ((self.fpos.0.round() as i32), (self.fpos.1.round() as i32))
-    }
-
-    #[allow(dead_code)]
-    /// Set absolute position of the entity
-    pub fn pos_set_abs(&mut self, fx: f32, fy: f32) {
-        self.fpos = (fx, fy);
-    }
-
-    /// Set relative position of the entity
-    pub fn pos_set_rel(&mut self, fx: f32, fy: f32) {
-        self.fpos = (self.fpos.0 + fx, self.fpos.1 + fy);
-
+    fn fpos_fix(&mut self) {
         if self.onscreen {
             if self.fpos.0 < 0.0 {
                 self.fpos.0 = SCREEN_WIDTH as f32;
@@ -66,6 +53,22 @@ impl<'a> Entity<'a> {
                 self.fpos.1 = 0.0;
             }
         }
+    }
+
+    pub fn ipos(&self) -> (i32, i32) {
+        ((self.fpos.0.round() as i32), (self.fpos.1.round() as i32))
+    }
+
+    /// Set absolute position of the entity
+    pub fn pos_set_abs(&mut self, fx: f32, fy: f32) {
+        self.fpos = (fx, fy);
+        self.fpos_fix();
+    }
+
+    /// Set relative position of the entity
+    pub fn pos_set_rel(&mut self, fx: f32, fy: f32) {
+        self.fpos = (self.fpos.0 + fx, self.fpos.1 + fy);
+        self.fpos_fix();
     }
 
     pub fn move_to_in_frames(&mut self, fpos: (f32, f32), frames: f32) {
