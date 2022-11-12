@@ -57,8 +57,8 @@ pub fn text_surface<'a>(font: &'a Font, text: &str, color: Color) -> Surface<'a>
 }
 
 
-type XPoint = (f32,f32);
-type XRect = (XPoint,XPoint);
+pub type XPoint = (f32,f32);
+pub type XRect = (XPoint,XPoint);
 
 pub struct XSpaces {
     drect: XRect,

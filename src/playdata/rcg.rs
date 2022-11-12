@@ -8,6 +8,8 @@ use tokensk::TStr;
 
 use crate::playdata::PositionsUpdate;
 use crate::playdata::PlayData;
+use crate::sdlx::XSpaces;
+
 
 pub struct Rcg {
     _fname: String,
@@ -17,6 +19,7 @@ pub struct Rcg {
     pub bdone: bool,
     framesper_record: f32,
     framesafter_lastrecord: f32,
+    r2d: XSpaces,
 }
 
 impl Rcg {
@@ -30,6 +33,8 @@ impl Rcg {
         for line in vdata {
             vline.push(line.to_string());
         }
+        let rrect = ((-56.0, -50.0), (56.0, 50.0));
+        let drect = ((0.0,0.0), (1.0,1.0));
         Rcg {
             _fname: fname.to_string(),
             _file: file,
@@ -38,6 +43,7 @@ impl Rcg {
             bdone: false,
             framesper_record: 1.0,
             framesafter_lastrecord: 0.0,
+            r2d: XSpaces::new(rrect, drect)
         }
     }
 
@@ -94,13 +100,11 @@ impl PlayData for Rcg {
                     let iplayer: i32 = splayer.parse().unwrap();
                     let fx: f32 = vdata[3].parse().unwrap();
                     let fy: f32 = vdata[4].parse().unwrap();
+                    let fx = self.r2d.d2ox(fx);
+                    let fy = self.r2d.d2oy(fy);
                     if steam == "l" {
-                        let fx = (fx + 56.0)*7.0;
-                        let fy = (fy + 50.0)*6.0;
                         pu.ateampositions.push((iplayer-1, fx, fy));
                     } else {
-                        let fx = (fx + 56.0)*9.0;
-                        let fy = (fy + 50.0)*6.0;
                         pu.bteampositions.push((iplayer-1, fx, fy));
                     }
                 }
