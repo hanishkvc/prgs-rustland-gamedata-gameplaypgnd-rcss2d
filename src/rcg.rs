@@ -6,7 +6,7 @@
 use std::{fs::File, io::Read};
 use tokensk::TStr;
 
-use crate::playdata::TeamUpdates;
+use crate::playdata::PlayUpdate;
 
 pub struct Rcg {
     _fname: String,
@@ -36,9 +36,9 @@ impl Rcg {
         }
     }
 
-    pub fn next_record(&mut self) -> TeamUpdates {
+    pub fn next_record(&mut self) -> PlayUpdate {
         let bcontinue = true;
-        let mut tu = TeamUpdates::new();
+        let mut tu = PlayUpdate::new();
         while bcontinue {
             self.iline += 1;
             if self.iline >= self.lines.len() as isize {

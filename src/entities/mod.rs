@@ -7,7 +7,7 @@ use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
 use crate::sdlx::SdlX;
-use crate::playdata::TeamUpdates;
+use crate::playdata::PlayUpdate;
 
 
 const ENTITY_WIDTH: u32 = 16;
@@ -53,7 +53,7 @@ impl<'a> Entities<'a> {
         self.bteam.update_dummy(step);
     }
 
-    pub fn update(&mut self, tu: TeamUpdates) {
+    pub fn update(&mut self, tu: PlayUpdate) {
         self.ateam.update(tu.ateampositions);
         self.bteam.update(tu.bteampositions);
     }
