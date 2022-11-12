@@ -59,11 +59,15 @@ impl<'a> Team<'a> {
         }
     }
 
-    pub fn update(&mut self, tposs: Vec<(i32, f32, f32)>) {
+    pub fn update(&mut self, tposs: Vec<(i32, f32, f32)>, babsolute: bool) {
         for ppos in tposs {
             let fx = ppos.1;
             let fy = ppos.2;
-            self.players[ppos.0 as usize].move_to_in_frames((fx, fy), entities::FRAMES_PER_SEC as f32);
+            if babsolute {
+                self.players[ppos.0 as usize].pos_set_abs(fx, fy);
+            } else {
+                self.players[ppos.0 as usize].move_to_in_frames((fx, fy), entities::FRAMES_PER_SEC as f32);
+            }
         }
     }
 

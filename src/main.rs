@@ -68,7 +68,7 @@ fn main() {
                 if rcg.next_frame_is_record_ready() {
                     let tu = rcg.next_record();
                     print!("DBUG:{:?}\n", tu);
-                    pgentities.update(tu);
+                    pgentities.update(tu, false);
                 }
             }
             pgentities.next_frame();

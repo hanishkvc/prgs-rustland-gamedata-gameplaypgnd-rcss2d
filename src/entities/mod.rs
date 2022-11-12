@@ -55,9 +55,9 @@ impl<'a> Entities<'a> {
         self.bteam.update_dummy(step);
     }
 
-    pub fn update(&mut self, pu: PositionsUpdate) {
-        self.ateam.update(pu.ateampositions);
-        self.bteam.update(pu.bteampositions);
+    pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
+        self.ateam.update(pu.ateampositions, babsolute);
+        self.bteam.update(pu.bteampositions, babsolute);
     }
 
     pub fn next_frame(&mut self) {
