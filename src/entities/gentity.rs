@@ -68,6 +68,16 @@ impl<'a> Entity<'a> {
         }
     }
 
+    pub fn move_to_in_frames(&mut self, fpos: (f32, f32), frames: f32) {
+        let dx = (fpos.0 - self.fpos.0)/frames;
+        let dy = (fpos.1 - self.fpos.1)/frames;
+        self.mov = (dx, dy);
+    }
+
+    pub fn next_frame(&mut self) {
+        self.pos_set_rel(self.mov.0, self.mov.1);
+    }
+
     /// Draw the entity on passed canvas
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
