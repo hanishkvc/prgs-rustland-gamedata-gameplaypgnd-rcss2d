@@ -64,19 +64,24 @@ impl PlayData for RandomData {
     fn next_record(&mut self) -> PositionsUpdate {
         let mut pu = PositionsUpdate::new();
         for i in 0..self.acnt {
-            let dx = (rand::random::<i32>() % 128) as f32;
-            let dy = (rand::random::<i32>() % 128) as f32;
+            let dx = (rand::random::<i32>() % 8) as f32;
+            let dy = (rand::random::<i32>() % 8) as f32;
             self.apos[i].0 += dx;
             self.apos[i].1 += dy;
             pu.ateampositions.push((i as i32, self.apos[i].0, self.apos[i].1));
         }
-        let maxx = 1 + rand::random::<u32>() % 256;
+        let mut dx;
+        let mut dy;
         for i in 0..self.bcnt {
-            let maxy = 1 + rand::random::<u32>() % 256;
-            let dx = (rand::random::<i32>() % maxx as i32) as f32;
-            let dy = (rand::random::<i32>() % maxy as i32) as f32;
-            self.bpos[i].0 += dx;
-            self.bpos[i].1 += dy;
+            if cfg!(feature="inbetween_frames") {
+                dx = 1 + rand::random::<i32>() % 16;
+                dy = 1 + rand::random::<i32>() % 16;
+            } else {
+                dx = 1 + rand::random::<i32>() % 2;
+                dy = 1 + rand::random::<i32>() % 2;
+            }
+            self.bpos[i].0 += (dx as f32);
+            self.bpos[i].1 += (dy as f32);
             pu.bteampositions.push((i as i32, self.bpos[i].0, self.bpos[i].1));
         }
         pu
