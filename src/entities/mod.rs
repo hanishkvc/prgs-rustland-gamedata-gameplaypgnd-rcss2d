@@ -7,6 +7,7 @@ use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
 use crate::sdlx::SdlX;
+use crate::playdata::TeamUpdates;
 
 
 const ENTITY_WIDTH: u32 = 16;
@@ -30,21 +31,6 @@ type _PosInt = i32;
 
 pub mod gentity;
 pub mod team;
-
-
-#[derive(Debug)]
-pub struct TeamUpdates {
-    pub ateampositions: Vec<(i32, f32, f32)>,
-    pub bteampositions: Vec<(i32, f32, f32)>,
-}
-
-impl TeamUpdates {
-
-    pub fn new() -> TeamUpdates {
-        TeamUpdates { ateampositions: Vec::new(), bteampositions: Vec::new() }
-    }
-
-}
 
 
 #[derive(Debug)]

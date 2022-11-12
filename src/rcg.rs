@@ -6,7 +6,7 @@
 use std::{fs::File, io::Read};
 use tokensk::TStr;
 
-use crate::entities::TeamUpdates;
+use crate::playdata::TeamUpdates;
 
 pub struct Rcg {
     _fname: String,

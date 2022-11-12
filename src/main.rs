@@ -7,6 +7,7 @@ use std::env;
 
 mod entities;
 mod sdlx;
+mod playdata;
 mod rcg;
 use rcg::Rcg;
 
@@ -27,7 +28,7 @@ fn main() {
     }
 
     let mut bpause = false;
-    let mut step = -1;
+    let mut step: i32 = -1;
     'mainloop: loop {
         step += 1;
         // Clear the background
