@@ -55,11 +55,11 @@ impl PlayData for RandomData {
             let dy = (rand::random::<i32>() % 128) as f32;
             pu.ateampositions.push((i as i32, dx, dy));
         }
-        let maxx = rand::random::<i32>() % 256;
+        let maxx = 1 + rand::random::<u32>() % 256;
         for i in 0..self.bcnt {
-            let maxy = rand::random::<i32>() % 256;
-            let dx = (rand::random::<i32>() % maxx) as f32;
-            let dy = (rand::random::<i32>() % maxy) as f32;
+            let maxy = 1 + rand::random::<u32>() % 256;
+            let dx = (rand::random::<i32>() % maxx as i32) as f32;
+            let dy = (rand::random::<i32>() % maxy as i32) as f32;
             pu.bteampositions.push((i as i32, dx, dy));
         }
         pu
