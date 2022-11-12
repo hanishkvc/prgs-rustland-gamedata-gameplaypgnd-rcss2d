@@ -8,8 +8,7 @@ use std::env;
 mod entities;
 mod sdlx;
 mod playdata;
-mod rcg;
-use rcg::Rcg;
+use playdata::rcg::Rcg;
 
 
 fn main() {
