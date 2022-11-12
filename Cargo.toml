@@ -6,6 +6,9 @@ license = "GPL-3.0-or-later"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+inbetween_frames = []
+
 [dependencies]
 sdl2 = { version="0.35.2", features = ["gfx", "ttf"] }
 rand = "0.8.5"

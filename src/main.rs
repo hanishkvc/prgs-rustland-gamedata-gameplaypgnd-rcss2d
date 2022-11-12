@@ -11,9 +11,17 @@ mod playdata;
 use playdata::rcg::Rcg;
 use playdata::PlayData;
 
+fn identify() {
+    println!("Playback Playground");
+    if cfg!(feature = "inbetween_frames") {
+        println!("INFO:PPGND:Mode: InBetween Frames");
+    } else {
+        println!("INFO:PPGND:Mode: OnlyProvided Frames");
+    }
+}
 
 fn main() {
-    println!("Hello, world!");
+    identify();
     let ttfx = sdl2::ttf::init().unwrap();
     let font = ttfx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
@@ -65,7 +73,7 @@ fn main() {
         if !bpause {
             let rcg = rcg.as_mut().unwrap();
             if !rcg.bdone {
-                if cfg!(inbetween_frames) {
+                if cfg!(feature = "inbetween_frames") {
                     if rcg.next_frame_is_record_ready() {
                         let tu = rcg.next_record();
                         print!("DBUG:{:?}\n", tu);
