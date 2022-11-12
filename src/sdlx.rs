@@ -55,3 +55,75 @@ impl SdlX {
 pub fn text_surface<'a>(font: &'a Font, text: &str, color: Color) -> Surface<'a> {
     return font.render(text).blended(color).unwrap();
 }
+
+
+type XPoint = (f32,f32);
+type XRect = (XPoint,XPoint);
+
+pub struct XSpaces {
+    drect: XRect,
+    orect: XRect,
+    d2o: XPoint,
+    o2d: XPoint,
+}
+
+impl XSpaces {
+
+    pub fn new(drect: XRect, orect: XRect) -> XSpaces {
+        let ddx = drect.1.0 - drect.0.0;
+        let odx = orect.1.0 - orect.0.0;
+        let d2ox = odx/ddx;
+        let o2dx = ddx/odx;
+        let ddy = drect.1.1 - drect.0.1;
+        let ody = orect.1.1 - orect.0.1;
+        let d2oy = ody/ddy;
+        let o2dy = ddy/ody;
+        XSpaces {
+            drect: drect,
+            orect: orect,
+            d2o: (d2ox, d2oy),
+            o2d: (o2dx, o2dy),
+        }
+    }
+
+}
+
+impl XSpaces {
+
+    pub fn d2ox(&self, dx: f32) -> f32 {
+        let ddx = dx - self.drect.0.0;
+        let odx = ddx * self.d2o.0;
+        return self.orect.0.0 + odx;
+    }
+
+    pub fn d2oy(&self, dy: f32) -> f32 {
+        let ddy = dy - self.drect.0.1;
+        let ody = ddy * self.d2o.1;
+        return self.orect.0.1 + ody;
+    }
+
+    pub fn d2o(&self, d: XPoint) -> XPoint {
+        return (self.d2ox(d.0), self.d2oy(d.1));
+    }
+
+}
+
+impl XSpaces {
+
+    pub fn o2dx(&self, ox: f32) -> f32 {
+        let odx = ox - self.orect.0.0;
+        let ddx = odx * self.o2d.0;
+        return self.drect.0.0 + ddx;
+    }
+
+    pub fn o2dy(&self, oy: f32) -> f32 {
+        let ody = oy - self.orect.0.1;
+        let ddy = ody * self.o2d.1;
+        return self.drect.0.1 + ddy;
+    }
+
+    pub fn o2d(&self, o: XPoint) -> XPoint {
+        return (self.o2dx(o.0), self.o2dy(o.1));
+    }
+
+}
