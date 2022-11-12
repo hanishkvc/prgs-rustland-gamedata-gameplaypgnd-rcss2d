@@ -6,7 +6,7 @@
 use std::{fs::File, io::Read};
 use tokensk::TStr;
 
-use crate::playdata::PlayUpdate;
+use crate::playdata::PositionsUpdate;
 
 pub struct Rcg {
     _fname: String,
@@ -36,9 +36,9 @@ impl Rcg {
         }
     }
 
-    pub fn next_record(&mut self) -> PlayUpdate {
+    pub fn next_record(&mut self) -> PositionsUpdate {
         let bcontinue = true;
-        let mut tu = PlayUpdate::new();
+        let mut pu = PositionsUpdate::new();
         while bcontinue {
             self.iline += 1;
             if self.iline >= self.lines.len() as isize {
@@ -75,11 +75,11 @@ impl Rcg {
                     if steam == "l" {
                         let fx = (fx + 56.0)*7.0;
                         let fy = (fy + 50.0)*6.0;
-                        tu.ateampositions.push((iplayer-1, fx, fy));
+                        pu.ateampositions.push((iplayer-1, fx, fy));
                     } else {
                         let fx = (fx + 56.0)*9.0;
                         let fy = (fy + 50.0)*6.0;
-                        tu.bteampositions.push((iplayer-1, fx, fy));
+                        pu.bteampositions.push((iplayer-1, fx, fy));
                     }
                 }
                 break;
@@ -87,7 +87,7 @@ impl Rcg {
                 print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
             }
         }
-        return tu;
+        return pu;
     }
 
 }
