@@ -15,6 +15,8 @@ pub struct Rcg {
     lines: Vec<String>,
     iline: isize,
     pub bdone: bool,
+    framesper_record: f32,
+    framesafter_lastrecord: f32,
 }
 
 impl Rcg {
@@ -34,12 +36,27 @@ impl Rcg {
             lines: vline,
             iline: -1,
             bdone: false,
+            framesper_record: 1.0,
+            framesafter_lastrecord: 0.0,
         }
     }
 
 }
 
 impl PlayData for Rcg {
+
+    fn setup(&mut self, fps: f32) {
+        self.framesper_record = 1.0;
+        self.framesafter_lastrecord = 0.0;
+    }
+
+    fn next_frame_is_record_ready(&mut self) -> bool {
+        self.framesafter_lastrecord += 1.0;
+        if self.framesafter_lastrecord >= self.framesper_record {
+            return true;
+        }
+        return false;
+    }
 
     fn next_record(&mut self) -> PositionsUpdate {
         let bcontinue = true;

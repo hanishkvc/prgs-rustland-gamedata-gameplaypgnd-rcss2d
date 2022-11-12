@@ -16,6 +16,10 @@ impl PositionsUpdate {
 
 pub trait PlayData {
 
+    fn setup(&mut self, fps: f32);
+
+    fn next_frame_is_record_ready(&mut self) -> bool;
+
     fn next_record(&mut self) -> PositionsUpdate;
 
 }

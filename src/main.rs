@@ -63,9 +63,9 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            if frame % entities::FRAMES_PER_SEC == 0 {
-                let rcg = rcg.as_mut().unwrap();
-                if !rcg.bdone {
+            let rcg = rcg.as_mut().unwrap();
+            if !rcg.bdone {
+                if rcg.next_frame_is_record_ready() {
                     let tu = rcg.next_record();
                     print!("DBUG:{:?}\n", tu);
                     pgentities.update(tu);
