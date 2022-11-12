@@ -22,6 +22,8 @@ pub trait PlayData {
 
     fn next_record(&mut self) -> PositionsUpdate;
 
+    fn bdone(&self) -> bool;
+
 }
 
 pub mod random;

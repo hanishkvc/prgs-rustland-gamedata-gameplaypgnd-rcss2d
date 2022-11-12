@@ -9,6 +9,7 @@ mod entities;
 mod sdlx;
 mod playdata;
 use playdata::rcg::Rcg;
+use playdata::random::RandomData;
 use playdata::PlayData;
 
 fn identify() {
@@ -29,10 +30,16 @@ fn main() {
     let mut dcolor = 20;
     let mut pgentities = entities::Entities::new(11, 11, &font);
 
+    // Setup the playdata source
     let clargs = env::args().collect::<Vec<String>>();
-    let mut rcg: Option<Rcg> = None;
+    let mut pdrandom = RandomData::new(20.0, 11, 11);
+    let mut pdrcg;
+    let rcg: &mut dyn PlayData;
     if clargs.len() > 1 {
-        rcg = Some(Rcg::new(&clargs[1]));
+        pdrcg = Rcg::new(&clargs[1]);
+        rcg = &mut pdrcg;
+    } else {
+        rcg = &mut pdrandom;
     }
 
     let mut bpause = false;
@@ -71,8 +78,7 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            let rcg = rcg.as_mut().unwrap();
-            if !rcg.bdone {
+            if !rcg.bdone() {
                 if cfg!(feature = "inbetween_frames") {
                     if rcg.next_frame_is_record_ready() {
                         let tu = rcg.next_record();

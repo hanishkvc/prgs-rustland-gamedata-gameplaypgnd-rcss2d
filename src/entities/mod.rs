@@ -50,11 +50,6 @@ impl<'a> Entities<'a> {
         }
     }
 
-    pub fn update_dummy(&mut self, step: usize) {
-        self.ateam.update_dummy(step);
-        self.bteam.update_dummy(step);
-    }
-
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);

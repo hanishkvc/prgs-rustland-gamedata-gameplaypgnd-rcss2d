@@ -65,4 +65,8 @@ impl PlayData for RandomData {
         pu
     }
 
+    fn bdone(&self) -> bool {
+        return false;
+    }
+
 }

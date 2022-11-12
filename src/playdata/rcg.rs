@@ -112,4 +112,8 @@ impl PlayData for Rcg {
         return pu;
     }
 
+    fn bdone(&self) -> bool {
+        return self.bdone;
+    }
+
 }
