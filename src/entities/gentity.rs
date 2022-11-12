@@ -21,6 +21,7 @@ pub struct Entity<'a> {
     color: Color,
     onscreen: bool,
     ids: Surface<'a>,
+    mov: (f32, f32),
 }
 
 impl<'a> Entity<'a> {
@@ -33,6 +34,7 @@ impl<'a> Entity<'a> {
             color: color,
             onscreen: true,
             ids: ts,
+            mov: (0.0, 0.0)
         }
     }
 
