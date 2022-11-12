@@ -1,5 +1,5 @@
 //!
-//! 2D Playback of a captured game data
+//! 2D Playback and look at captured game data
 //! HanishKVC, 2022
 //!
 
@@ -9,6 +9,7 @@ mod entities;
 mod sdlx;
 mod playdata;
 use playdata::rcg::Rcg;
+use playdata::PlayData;
 
 
 fn main() {

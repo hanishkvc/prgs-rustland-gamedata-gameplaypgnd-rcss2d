@@ -14,4 +14,11 @@ impl PositionsUpdate {
 
 }
 
+pub trait PlayData {
+
+    fn next_record(&mut self) -> PositionsUpdate;
+
+}
+
+pub mod random;
 pub mod rcg;

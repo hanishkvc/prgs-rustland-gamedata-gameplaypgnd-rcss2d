@@ -7,6 +7,7 @@ use std::{fs::File, io::Read};
 use tokensk::TStr;
 
 use crate::playdata::PositionsUpdate;
+use crate::playdata::PlayData;
 
 pub struct Rcg {
     _fname: String,
@@ -36,7 +37,11 @@ impl Rcg {
         }
     }
 
-    pub fn next_record(&mut self) -> PositionsUpdate {
+}
+
+impl PlayData for Rcg {
+
+    fn next_record(&mut self) -> PositionsUpdate {
         let bcontinue = true;
         let mut pu = PositionsUpdate::new();
         while bcontinue {
