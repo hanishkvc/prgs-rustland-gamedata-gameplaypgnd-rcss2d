@@ -16,17 +16,30 @@ pub struct RandomData {
     next: f32,
     acnt: usize,
     bcnt: usize,
+    apos: Vec<(f32,f32)>,
+    bpos: Vec<(f32,f32)>,
 }
 
 impl RandomData {
 
     pub fn new(spr: f32, acnt: usize, bcnt: usize) -> RandomData {
+        let mut apos = Vec::new();
+        for _i in 0..acnt {
+            apos.push((0.0,0.0));
+        }
+        let mut bpos = Vec::new();
+        for _i in 0..bcnt {
+            bpos.push((0.0,0.0));
+        }
+
         RandomData {
             spr: spr,
             fpr: 0.0,
             next: 0.0,
             acnt: acnt,
             bcnt: bcnt,
+            apos: apos,
+            bpos: bpos,
         }
     }
 
@@ -53,14 +66,18 @@ impl PlayData for RandomData {
         for i in 0..self.acnt {
             let dx = (rand::random::<i32>() % 128) as f32;
             let dy = (rand::random::<i32>() % 128) as f32;
-            pu.ateampositions.push((i as i32, dx, dy));
+            self.apos[i].0 += dx;
+            self.apos[i].1 += dy;
+            pu.ateampositions.push((i as i32, self.apos[i].0, self.apos[i].1));
         }
         let maxx = 1 + rand::random::<u32>() % 256;
         for i in 0..self.bcnt {
             let maxy = 1 + rand::random::<u32>() % 256;
             let dx = (rand::random::<i32>() % maxx as i32) as f32;
             let dy = (rand::random::<i32>() % maxy as i32) as f32;
-            pu.bteampositions.push((i as i32, dx, dy));
+            self.bpos[i].0 += dx;
+            self.bpos[i].1 += dy;
+            pu.bteampositions.push((i as i32, self.bpos[i].0, self.bpos[i].1));
         }
         pu
     }
