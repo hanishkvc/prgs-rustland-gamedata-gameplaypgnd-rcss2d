@@ -10,6 +10,10 @@ use crate::entities;
 use super::PlayData;
 use super::PositionsUpdate;
 
+use crate::entities::SCREEN_WIDTH;
+use crate::entities::SCREEN_HEIGHT;
+
+
 pub struct RandomData {
     /// seconds per record
     spr: f32,
@@ -69,12 +73,42 @@ impl RandomData {
 
 }
 
+impl RandomData {
+
+    fn fpos_fix(mut pos: (f32, f32)) -> (f32, f32) {
+        if pos.0 < 0.0 {
+            pos.0 = SCREEN_WIDTH as f32;
+        }
+        if pos.0 > (SCREEN_WIDTH as f32) {
+            pos.0 = 0.0;
+        }
+        if pos.1 < 0.0 {
+            pos.1 = SCREEN_HEIGHT as f32;
+        }
+        if pos.1 > (SCREEN_HEIGHT as f32) {
+            pos.1 = 0.0;
+        }
+        return pos;
+    }
+
+    fn pos_fix(&mut self) {
+        for i in 0..self.acnt {
+            self.apos[i] = Self::fpos_fix(self.apos[i]);
+        }
+        for i in 0..self.bcnt {
+            self.bpos[i] = Self::fpos_fix(self.bpos[i]);
+        }
+    }
+
+}
+
 impl PlayData for RandomData {
 
     fn setup(&mut self, fps: f32) {
         self.fpr = fps*self.spr;
         self.next = 0.0;
     }
+
 
     fn next_frame_is_record_ready(&mut self) -> bool {
         self.next += 1.0;
@@ -136,6 +170,7 @@ impl PlayData for RandomData {
             self.bpos[i].1 += self.bmov[i].1;
             pu.bteampositions.push((i as i32, self.bpos[i].0, self.bpos[i].1));
         }
+        self.pos_fix();
         pu
     }
 
