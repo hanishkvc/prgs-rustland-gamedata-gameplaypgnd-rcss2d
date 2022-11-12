@@ -5,6 +5,8 @@
 
 use rand;
 
+use crate::entities;
+
 use super::PlayData;
 use super::PositionsUpdate;
 
@@ -25,11 +27,15 @@ impl RandomData {
     pub fn new(spr: f32, acnt: usize, bcnt: usize) -> RandomData {
         let mut apos = Vec::new();
         for _i in 0..acnt {
-            apos.push((0.0,0.0));
+            let fx = (rand::random::<u32>() % entities::SCREEN_WIDTH) as f32;
+            let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
+            apos.push((fx, fy));
         }
         let mut bpos = Vec::new();
         for _i in 0..bcnt {
-            bpos.push((0.0,0.0));
+            let fx = (rand::random::<u32>() % 400) as f32;
+            let fy = (rand::random::<u32>() % 400) as f32;
+            bpos.push((fx, fy));
         }
 
         RandomData {
