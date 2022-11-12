@@ -4,7 +4,7 @@ Playback Playground
 
 Author: HanishKVC
 Version: 20221111IST1745
-License: GPL
+License: GPL-3.0+
 
 
 Overview
