@@ -34,12 +34,12 @@ fn main() {
     let clargs = env::args().collect::<Vec<String>>();
     let mut pdrandom = RandomData::new(20.0, 11, 11);
     let mut pdrcg;
-    let rcg: &mut dyn PlayData;
+    let pdata: &mut dyn PlayData;
     if clargs.len() > 1 {
         pdrcg = Rcg::new(&clargs[1]);
-        rcg = &mut pdrcg;
+        pdata = &mut pdrcg;
     } else {
-        rcg = &mut pdrandom;
+        pdata = &mut pdrandom;
     }
 
     let mut bpause = false;
@@ -78,18 +78,18 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            if !rcg.bdone() {
+            if !pdata.bdone() {
                 if cfg!(feature = "inbetween_frames") {
-                    if rcg.next_frame_is_record_ready() {
-                        let tu = rcg.next_record();
-                        print!("DBUG:{:?}\n", tu);
-                        pgentities.update(tu, false);
+                    if pdata.next_frame_is_record_ready() {
+                        let pu = pdata.next_record();
+                        print!("DBUG:{:?}\n", pu);
+                        pgentities.update(pu, false);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
                     // Or Rcg needs to be udpated to set bdone after a second of ending or so ...
                     pgentities.next_frame();
                 } else {
-                    let pu = rcg.next_record();
+                    let pu = pdata.next_record();
                     pgentities.update(pu, true);
                 }
             }
