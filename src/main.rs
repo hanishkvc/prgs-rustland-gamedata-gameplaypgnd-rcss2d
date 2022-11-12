@@ -28,9 +28,9 @@ fn main() {
     }
 
     let mut bpause = false;
-    let mut step: i32 = -1;
+    let mut frame: usize = 0;
     'mainloop: loop {
-        step += 1;
+        frame += 1;
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
@@ -63,9 +63,7 @@ fn main() {
 
         // Update the entities
         if !bpause {
-            if rcg.is_none() {
-                pgentities.update_dummy(step as usize);
-            } else {
+            if frame % entities::FRAMES_PER_SEC == 0 {
                 let rcg = rcg.as_mut().unwrap();
                 if !rcg.bdone {
                     let tu = rcg.next_record();
@@ -73,6 +71,7 @@ fn main() {
                     pgentities.update(tu);
                 }
             }
+            pgentities.next_frame();
         }
 
         // Draw entities

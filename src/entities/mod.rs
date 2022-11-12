@@ -60,6 +60,11 @@ impl<'a> Entities<'a> {
         self.bteam.update(pu.bteampositions);
     }
 
+    pub fn next_frame(&mut self) {
+        self.ateam.next_frame();
+        self.bteam.next_frame();
+    }
+
     pub fn draw(&self, sx: &mut SdlX) {
         self.ateam.draw(sx);
         self.bteam.draw(sx);

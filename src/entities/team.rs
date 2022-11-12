@@ -63,7 +63,13 @@ impl<'a> Team<'a> {
         for ppos in tposs {
             let fx = ppos.1;
             let fy = ppos.2;
-            self.players[ppos.0 as usize].pos_set_abs(fx, fy);
+            self.players[ppos.0 as usize].move_to_in_frames((fx, fy), entities::FRAMES_PER_SEC as f32);
+        }
+    }
+
+    pub fn next_frame(&mut self) {
+        for i in 0..self.players.len() {
+            self.players[i].next_frame();
         }
     }
 
