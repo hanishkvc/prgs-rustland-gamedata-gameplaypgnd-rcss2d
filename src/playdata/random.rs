@@ -6,6 +6,7 @@
 use rand;
 
 use crate::entities;
+use crate::sdlx::XSpaces;
 
 use super::PlayData;
 use super::PositionsUpdate;
@@ -29,6 +30,7 @@ pub struct RandomData {
     achg: Vec<usize>,
     bchg: Vec<usize>,
     rcnt: usize,
+    s2n: XSpaces,
 }
 
 impl RandomData {
@@ -55,6 +57,9 @@ impl RandomData {
             bchg.push(rand::random::<usize>() % 128);
         }
 
+        let srect = ((-20.0, -20.0), (SCREEN_WIDTH as f32 + 20.0, SCREEN_HEIGHT as f32 + 20.0));
+        let nrect = ((0.0,0.0), (1.0,1.0));
+
         RandomData {
             spr: spr,
             fpr: 0.0,
@@ -68,6 +73,7 @@ impl RandomData {
             rcnt: 0,
             achg: achg,
             bchg: bchg,
+            s2n: XSpaces::new(srect, nrect)
         }
     }
 
@@ -158,7 +164,8 @@ impl PlayData for RandomData {
             }
             self.apos[i].0 += self.amov[i].0;
             self.apos[i].1 += self.amov[i].1;
-            pu.ateampositions.push((i as i32, self.apos[i].0, self.apos[i].1));
+            let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
+            pu.ateampositions.push((i as i32, fx, fy));
         }
         for i in 0..self.bcnt {
             if self.rcnt % self.bchg[i] == 0 {
@@ -168,7 +175,8 @@ impl PlayData for RandomData {
             }
             self.bpos[i].0 += self.bmov[i].0;
             self.bpos[i].1 += self.bmov[i].1;
-            pu.bteampositions.push((i as i32, self.bpos[i].0, self.bpos[i].1));
+            let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
+            pu.bteampositions.push((i as i32, fx, fy));
         }
         self.pos_fix();
         pu
