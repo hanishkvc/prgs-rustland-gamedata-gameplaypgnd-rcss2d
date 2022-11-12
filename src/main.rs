@@ -65,13 +65,20 @@ fn main() {
         if !bpause {
             let rcg = rcg.as_mut().unwrap();
             if !rcg.bdone {
-                if rcg.next_frame_is_record_ready() {
-                    let tu = rcg.next_record();
-                    print!("DBUG:{:?}\n", tu);
-                    pgentities.update(tu, false);
+                if cfg!(inbetween_frames) {
+                    if rcg.next_frame_is_record_ready() {
+                        let tu = rcg.next_record();
+                        print!("DBUG:{:?}\n", tu);
+                        pgentities.update(tu, false);
+                    }
+                    // TODO: Need to let this run for Fps frames ideally, even after bdone is set
+                    // Or Rcg needs to be udpated to set bdone after a second of ending or so ...
+                    pgentities.next_frame();
+                } else {
+                    let pu = rcg.next_record();
+                    pgentities.update(pu, true);
                 }
             }
-            pgentities.next_frame();
         }
 
         // Draw entities
