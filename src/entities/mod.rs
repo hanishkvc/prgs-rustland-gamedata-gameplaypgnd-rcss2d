@@ -17,6 +17,8 @@ pub const SCREEN_WIDTH: u32 = 1024;
 pub const SCREEN_HEIGHT: u32 = 600;
 pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 
+pub const FRAMES_PER_SEC: usize = 24;
+
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
@@ -64,4 +66,3 @@ impl<'a> Entities<'a> {
     }
 
 }
-

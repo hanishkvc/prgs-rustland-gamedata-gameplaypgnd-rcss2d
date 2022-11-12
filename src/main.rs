@@ -79,7 +79,7 @@ fn main() {
         pgentities.draw(&mut sx);
 
         sx.wc.present();
-        std::thread::sleep(std::time::Duration::from_millis(40));
+        std::thread::sleep(std::time::Duration::from_millis((1000/entities::FRAMES_PER_SEC) as u64));
     }
 
 }
