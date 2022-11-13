@@ -42,7 +42,7 @@ impl Ball {
 
 
 #[derive(Debug)]
-pub struct FixedMessage {
+pub struct FixedPosMessage {
     key: String,
     npos: (f32, f32),
     msg: String,
@@ -50,10 +50,10 @@ pub struct FixedMessage {
     allowemptyupdate: bool,
 }
 
-impl FixedMessage {
+impl FixedPosMessage {
 
-    pub fn new(key: &str, npos: (f32,f32), ballowemptyupdate: bool) -> FixedMessage {
-        FixedMessage {
+    pub fn new(key: &str, npos: (f32,f32), ballowemptyupdate: bool) -> FixedPosMessage {
+        FixedPosMessage {
             key: key.to_string(),
             npos: npos,
             msg: String::new(),

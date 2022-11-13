@@ -38,12 +38,12 @@ pub mod gentity;
 pub mod team;
 pub mod objects;
 use objects::Ball;
-use objects::FixedMessage;
+use objects::FixedPosMessage;
 
 
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
-    vfpmsgs: Vec<FixedMessage>,
+    vfpmsgs: Vec<FixedPosMessage>,
     pub showball: bool,
     ball: Ball,
     ateam: team::Team<'a>,
@@ -54,11 +54,11 @@ impl<'a> Entities<'a> {
 
     pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         let mut vfpmsgs = Vec::new();
-        let scoremsg = FixedMessage::new("score", MSG_SCORE_POS, false);
+        let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false);
         vfpmsgs.push(scoremsg);
-        let stimemsg = FixedMessage::new("stime", MSG_STIME_POS, false);
+        let stimemsg = FixedPosMessage::new("stime", MSG_STIME_POS, false);
         vfpmsgs.push(stimemsg);
-        let gamemsg = FixedMessage::new("game", MSG_GAME_POS, false);
+        let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false);
         vfpmsgs.push(gamemsg);
         Entities {
             vfpmsgs: vfpmsgs,
