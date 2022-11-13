@@ -86,7 +86,7 @@ impl PlayData for Rcg {
             }
             tstr.peel_bracket('(').unwrap();
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
-            pu.sstep = toks[1].to_string();
+            pu.stimemsg = toks[1].to_string();
             if toks[0].starts_with("show") {
                 for tok in toks {
                     if !tok.starts_with("((l") && !tok.starts_with("((r") && !tok.starts_with("((b") {

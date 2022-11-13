@@ -8,6 +8,7 @@ use crate::sdlx::SdlX;
 
 pub const BALL_SIZE: u32 = 6;
 pub const BALL_COLOR: Color = Color::WHITE;
+pub const MSG_COLOR: Color = Color::RED;
 
 
 #[derive(Debug)]
@@ -34,6 +35,34 @@ impl Ball {
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
         sx.ns_fill_rect(self.npos.0, self.npos.1, self.ssize, self.ssize);
+    }
+
+}
+
+
+#[derive(Debug)]
+pub struct FixedMessage {
+    npos: (f32, f32),
+    msg: String,
+    color: Color,
+}
+
+impl FixedMessage {
+
+    pub fn new(npos: (f32,f32)) -> FixedMessage {
+        FixedMessage {
+            npos: npos,
+            msg: String::new(),
+            color: MSG_COLOR,
+        }
+    }
+
+    pub fn update(&mut self, msg: &str) {
+        self.msg = msg.to_string();
+    }
+
+    pub fn draw(&self, sx: &mut SdlX) {
+        sx.n_string(self.npos.0, self.npos.1, &self.msg, self.color);
     }
 
 }
