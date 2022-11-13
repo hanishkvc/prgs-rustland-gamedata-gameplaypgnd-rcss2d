@@ -64,6 +64,9 @@ fn main() {
                         Keycode::P => {
                             bpause = !bpause;
                         }
+                        Keycode::B => {
+                            pgentities.showball = !pgentities.showball;
+                        }
                         Keycode::D => {
                             print!("DBUG:PGND:Main:Entities:{:#?}\n", pgentities);
                         }

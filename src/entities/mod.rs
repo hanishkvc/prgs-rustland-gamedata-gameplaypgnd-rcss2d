@@ -41,6 +41,7 @@ pub mod team;
 pub(crate) struct Entities<'a> {
     sstep: String,
     ball: (f32,f32),
+    pub showball: bool,
     ateam: team::Team<'a>,
     bteam: team::Team<'a>,
 }
@@ -51,6 +52,7 @@ impl<'a> Entities<'a> {
         Entities {
             sstep: String::new(),
             ball: (0.0,0.0),
+            showball: true,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
         }
@@ -81,6 +83,9 @@ impl<'a> Entities<'a> {
     }
 
     fn draw_ball(&self, sx: &mut SdlX) {
+        if !self.showball {
+            return;
+        }
         sx.wc.set_draw_color(Color::WHITE);
         sx.ns_fill_rect(self.ball.0, self.ball.1, BALL_SIZE, BALL_SIZE);
     }
