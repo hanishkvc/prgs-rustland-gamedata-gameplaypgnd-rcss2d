@@ -86,7 +86,7 @@ impl PlayData for Rcg {
             }
             tstr.peel_bracket('(').unwrap();
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
-            pu.stimemsg = toks[1].to_string();
+            pu.msgs.insert("stime".to_string(), toks[1].to_string());
             if toks[0].starts_with("show") {
                 for tok in toks {
                     if !tok.starts_with("((l") && !tok.starts_with("((r") && !tok.starts_with("((b") {
@@ -119,9 +119,9 @@ impl PlayData for Rcg {
                 }
                 break;
             } else if toks[0].starts_with("playmode") {
-                pu.gamemsg = self.lines[self.iline as usize].clone();
+                pu.msgs.insert("game".to_string(), self.lines[self.iline as usize].clone());
             } else if toks[0].starts_with("team") {
-                pu.scoremsg = self.lines[self.iline as usize].clone();
+                pu.msgs.insert("score".to_string(), self.lines[self.iline as usize].clone());
             } else {
                 print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
             }

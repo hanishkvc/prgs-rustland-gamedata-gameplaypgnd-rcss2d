@@ -56,9 +56,9 @@ impl<'a> Entities<'a> {
 
     pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         Entities {
-            scoremsg: FixedMessage::new(MSG_SCORE_POS, false),
-            stimemsg: FixedMessage::new(MSG_STIME_POS, false),
-            gamemsg: FixedMessage::new(MSG_GAME_POS, false),
+            scoremsg: FixedMessage::new("score", MSG_SCORE_POS, false),
+            stimemsg: FixedMessage::new("stime", MSG_STIME_POS, false),
+            gamemsg: FixedMessage::new("game", MSG_GAME_POS, false),
             ball: Ball::new(),
             showball: true,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
@@ -67,9 +67,9 @@ impl<'a> Entities<'a> {
     }
 
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
-        self.scoremsg.update(&pu.scoremsg);
-        self.stimemsg.update(&pu.stimemsg);
-        self.gamemsg.update(&pu.gamemsg);
+        self.scoremsg.update(&pu.msgs);
+        self.stimemsg.update(&pu.msgs);
+        self.gamemsg.update(&pu.msgs);
         self.ball.update(pu.ball);
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);

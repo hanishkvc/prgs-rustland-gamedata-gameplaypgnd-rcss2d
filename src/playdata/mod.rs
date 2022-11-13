@@ -3,12 +3,14 @@
 //! HanishKVC, 2022
 //!
 
+use std::collections::HashMap;
+
+
+pub type Messages = HashMap<String, String>;
 
 #[derive(Debug)]
 pub struct PositionsUpdate {
-    pub scoremsg: String,
-    pub stimemsg: String,
-    pub gamemsg: String,
+    pub msgs: Messages,
     pub ball: (f32, f32),
     pub ateampositions: Vec<(i32, f32, f32)>,
     pub bteampositions: Vec<(i32, f32, f32)>,
@@ -18,9 +20,7 @@ impl PositionsUpdate {
 
     pub fn new() -> PositionsUpdate {
         PositionsUpdate {
-            scoremsg: String::new(),
-            stimemsg: String::new(),
-            gamemsg: String::new(),
+            msgs: Messages::new(),
             ball: (0.0,0.0),
             ateampositions: Vec::new(),
             bteampositions: Vec::new(),
