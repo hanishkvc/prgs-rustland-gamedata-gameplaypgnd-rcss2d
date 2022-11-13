@@ -65,8 +65,10 @@ impl PlayData for Rcg {
         self.framesafter_lastrecord += 1.0;
         if self.framesafter_lastrecord >= self.framesper_record {
             self.framesafter_lastrecord = 0.0;
+            //eprintln!("DBUG:PPGND:Rcg:NextFrame:IsRecordReady:Yes");
             return true;
         }
+        //eprintln!("DBUG:PPGND:Rcg:NextFrame:IsRecordReady:No");
         return false;
     }
 

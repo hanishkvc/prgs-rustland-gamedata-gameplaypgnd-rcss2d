@@ -37,6 +37,7 @@ fn main() {
     let pdata: &mut dyn PlayData;
     if clargs.len() > 1 {
         pdrcg = Rcg::new(&clargs[1]);
+        pdrcg.setup(pgentities.fps());
         pdata = &mut pdrcg;
     } else {
         pdata = &mut pdrandom;
@@ -102,10 +103,12 @@ fn main() {
                         let pu = pdata.next_record();
                         print!("DBUG:{:?}\n", pu);
                         pgentities.update(pu, false);
+                        //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
                     // Or Rcg needs to be udpated to set bdone after a second of ending or so ...
                     pgentities.next_frame();
+                    //eprintln!("DBUG:PPGND:Main:{}:NextFrame called", _frame);
                 } else {
                     let pu = pdata.next_record();
                     pgentities.update(pu, true);
