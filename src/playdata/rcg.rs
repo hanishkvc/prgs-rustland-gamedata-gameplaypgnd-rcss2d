@@ -33,7 +33,7 @@ impl Rcg {
         for line in vdata {
             vline.push(line.to_string());
         }
-        let rrect = ((-56.0, -50.0), (56.0, 50.0));
+        let rrect = ((-56.0, -37.0), (56.0, 37.0));
         let drect = ((0.0,0.0), (1.0,1.0));
         Rcg {
             _fname: fname.to_string(),
