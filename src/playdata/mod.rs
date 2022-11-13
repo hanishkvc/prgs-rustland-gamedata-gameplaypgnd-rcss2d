@@ -7,6 +7,7 @@
 #[derive(Debug)]
 pub struct PositionsUpdate {
     pub stimemsg: String,
+    pub gamemsg: String,
     pub ball: (f32, f32),
     pub ateampositions: Vec<(i32, f32, f32)>,
     pub bteampositions: Vec<(i32, f32, f32)>,
@@ -17,6 +18,7 @@ impl PositionsUpdate {
     pub fn new() -> PositionsUpdate {
         PositionsUpdate {
             stimemsg: String::new(),
+            gamemsg: String::new(),
             ball: (0.0,0.0),
             ateampositions: Vec::new(),
             bteampositions: Vec::new(),

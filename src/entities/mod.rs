@@ -20,6 +20,7 @@ pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 pub const FRAMES_PER_SEC: usize = 24;
 
 pub const MSG_STIME_POS: (f32,f32) = (0.01,0.01);
+pub const MSG_GAME_POS: (f32,f32) = (0.01,0.98);
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
@@ -42,6 +43,7 @@ use objects::FixedMessage;
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
     stimemsg: FixedMessage,
+    gamemsg: FixedMessage,
     pub showball: bool,
     ball: Ball,
     ateam: team::Team<'a>,
@@ -52,7 +54,8 @@ impl<'a> Entities<'a> {
 
     pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         Entities {
-            stimemsg: FixedMessage::new(MSG_STIME_POS),
+            stimemsg: FixedMessage::new(MSG_STIME_POS, false),
+            gamemsg: FixedMessage::new(MSG_GAME_POS, false),
             ball: Ball::new(),
             showball: true,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
@@ -62,6 +65,7 @@ impl<'a> Entities<'a> {
 
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
         self.stimemsg.update(&pu.stimemsg);
+        self.gamemsg.update(&pu.gamemsg);
         self.ball.update(pu.ball);
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);
@@ -87,6 +91,7 @@ impl<'a> Entities<'a> {
     pub fn draw(&self, sx: &mut SdlX) {
         self.draw_pitch(sx);
         self.stimemsg.draw(sx);
+        self.gamemsg.draw(sx);
         self.ateam.draw(sx);
         self.bteam.draw(sx);
         if self.showball {

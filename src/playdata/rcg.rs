@@ -118,6 +118,8 @@ impl PlayData for Rcg {
                     }
                 }
                 break;
+            } else if toks[0].starts_with("playmode") {
+                pu.gamemsg = self.lines[self.iline as usize].clone();
             } else {
                 print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
             }
