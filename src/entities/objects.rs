@@ -45,29 +45,28 @@ pub struct FixedMessage {
     npos: (f32, f32),
     msg: String,
     color: Color,
-    showempty: bool,
+    allowemptyupdate: bool,
 }
 
 impl FixedMessage {
 
-    pub fn new(npos: (f32,f32), bshowempty: bool) -> FixedMessage {
+    pub fn new(npos: (f32,f32), ballowemptyupdate: bool) -> FixedMessage {
         FixedMessage {
             npos: npos,
             msg: String::new(),
             color: MSG_COLOR,
-            showempty: bshowempty,
+            allowemptyupdate: ballowemptyupdate,
         }
     }
 
     pub fn update(&mut self, msg: &str) {
+        if (msg.trim().len() == 0) && !self.allowemptyupdate {
+            return;
+        }
         self.msg = msg.to_string();
     }
 
     pub fn draw(&self, sx: &mut SdlX) {
-        if (self.msg.trim().len() == 0) && !self.showempty {
-            return;
-        }
-        println!("DBUG:FixedMsg:{}", self.msg);
         sx.n_string(self.npos.0, self.npos.1, &self.msg, self.color);
     }
 
