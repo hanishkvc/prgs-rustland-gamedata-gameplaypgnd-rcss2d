@@ -12,18 +12,13 @@ use crate::sdlx::{self, SdlX};
 
 use super::SCREEN_WIDTH;
 use super::SCREEN_HEIGHT;
-use super::ENTITY_WIDTH;
-use super::ENTITY_HEIGHT;
-use super::ENTITY_RADIUS;
-
-const ENTITY_WIDTH_MID: i32 = (ENTITY_WIDTH/2) as i32;
-const ENTITY_HEIGHT_MID: i32 = (ENTITY_HEIGHT/2) as i32;
 
 
 pub struct Entity<'a> {
     _id: String,
     /// Position of the entity in 0.0-1.0 space
     fpos: (f32, f32),
+    whr: (u32, u32, i16),
     color: Color,
     /// Should the entity be moved back into screen, if it goes out
     onscreen: bool,
@@ -32,19 +27,25 @@ pub struct Entity<'a> {
     /// Any motion vector that should be used to move entity,
     /// when next frame is called.
     mov: (f32, f32),
+    /// Helper members
+    hw: i32,
+    hh: i32,
 }
 
 impl<'a> Entity<'a> {
 
-    pub fn new(id: &str, fpos: (f32, f32), color: Color, font: &'a Font) -> Entity<'a> {
+    pub fn new(id: &str, fpos: (f32, f32), whr: (u32, u32, i16), color: Color, font: &'a Font) -> Entity<'a> {
         let ts = sdlx::text_surface(font, id, Color::WHITE);
         Entity {
             _id: id.to_string(),
             fpos: fpos,
+            whr: whr,
             color: color,
             onscreen: true,
             ids: ts,
-            mov: (0.0, 0.0)
+            mov: (0.0, 0.0),
+            hw: (whr.0/2) as i32,
+            hh: (whr.1/2) as i32,
         }
     }
 
@@ -97,12 +98,12 @@ impl<'a> Entity<'a> {
         sx.wc.set_draw_color(self.color);
         let ipos = self.ipos();
         if cfg!(feature="gentity_circle") {
-            sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, ENTITY_RADIUS, self.color).unwrap();
+            sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, self.whr.2, self.color).unwrap();
         } else {
-            sx.ns_fill_rect_mid(self.fpos.0, self.fpos.1, ENTITY_WIDTH, ENTITY_HEIGHT);
+            sx.ns_fill_rect_mid(self.fpos.0, self.fpos.1, self.whr.0, self.whr.1);
         }
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
-        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-ENTITY_WIDTH_MID, ipos.1-ENTITY_HEIGHT_MID, ENTITY_WIDTH, ENTITY_HEIGHT))).unwrap();
+        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-self.hw, ipos.1-self.hh, self.whr.0, self.whr.1))).unwrap();
     }
 
 }

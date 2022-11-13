@@ -25,7 +25,7 @@ impl<'a> Ball<'a> {
 
     pub fn new(font: &'a Font) -> Ball<'a> {
         Ball {
-            bge: Entity::new(" ", (0.0,0.0), BALL_COLOR, font)
+            bge: Entity::new(" ", (0.0,0.0), (BALL_SIZE, BALL_SIZE, (BALL_SIZE/2) as i16), BALL_COLOR, font)
         }
     }
 
