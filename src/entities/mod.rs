@@ -43,9 +43,7 @@ use objects::FixedMessage;
 
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
-    scoremsg: FixedMessage,
-    stimemsg: FixedMessage,
-    gamemsg: FixedMessage,
+    vfpmsgs: Vec<FixedMessage>,
     pub showball: bool,
     ball: Ball,
     ateam: team::Team<'a>,
@@ -55,10 +53,15 @@ pub(crate) struct Entities<'a> {
 impl<'a> Entities<'a> {
 
     pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
+        let mut vfpmsgs = Vec::new();
+        let scoremsg = FixedMessage::new("score", MSG_SCORE_POS, false);
+        vfpmsgs.push(scoremsg);
+        let stimemsg = FixedMessage::new("stime", MSG_STIME_POS, false);
+        vfpmsgs.push(stimemsg);
+        let gamemsg = FixedMessage::new("game", MSG_GAME_POS, false);
+        vfpmsgs.push(gamemsg);
         Entities {
-            scoremsg: FixedMessage::new("score", MSG_SCORE_POS, false),
-            stimemsg: FixedMessage::new("stime", MSG_STIME_POS, false),
-            gamemsg: FixedMessage::new("game", MSG_GAME_POS, false),
+            vfpmsgs: vfpmsgs,
             ball: Ball::new(),
             showball: true,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
@@ -67,9 +70,9 @@ impl<'a> Entities<'a> {
     }
 
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
-        self.scoremsg.update(&pu.msgs);
-        self.stimemsg.update(&pu.msgs);
-        self.gamemsg.update(&pu.msgs);
+        for fpmsg in &mut self.vfpmsgs {
+            fpmsg.update(&pu.msgs);
+        }
         self.ball.update(pu.ball);
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);
@@ -94,9 +97,9 @@ impl<'a> Entities<'a> {
 
     pub fn draw(&self, sx: &mut SdlX) {
         self.draw_pitch(sx);
-        self.scoremsg.draw(sx);
-        self.stimemsg.draw(sx);
-        self.gamemsg.draw(sx);
+        for fpmsg in &self.vfpmsgs {
+            fpmsg.draw(sx);
+        }
         self.ateam.draw(sx);
         self.bteam.draw(sx);
         if self.showball {
