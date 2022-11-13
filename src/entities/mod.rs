@@ -60,7 +60,16 @@ impl<'a> Entities<'a> {
         self.bteam.next_frame();
     }
 
+    fn draw_pitch(&self, sx: &mut SdlX) {
+        sx.nn_line(0.02, 0.02, 0.98, 0.02, Color::WHITE);
+        sx.nn_line(0.02, 0.02, 0.02, 0.98, Color::WHITE);
+        sx.nn_line(0.02, 0.98, 0.98, 0.98, Color::WHITE);
+        sx.nn_line(0.98, 0.02, 0.98, 0.98, Color::WHITE);
+        sx.nn_line(0.50, 0.02, 0.50, 0.98, Color::GRAY);
+    }
+
     pub fn draw(&self, sx: &mut SdlX) {
+        self.draw_pitch(sx);
         self.ateam.draw(sx);
         self.bteam.draw(sx);
     }

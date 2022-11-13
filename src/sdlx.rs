@@ -3,6 +3,8 @@
 //! HanishKVC, 2022
 //!
 
+use sdl2::gfx::primitives::DrawRenderer;
+use sdl2::rect::Rect;
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
 use sdl2::render::{WindowCanvas, TextureCreator, Texture};
 use sdl2::video::WindowContext;
@@ -15,6 +17,7 @@ pub struct SdlX {
     pub wc: WindowCanvas,
     pub ep: EventPump,
     pub wctc: TextureCreator<WindowContext>,
+    n2s: XSpaces,
 }
 
 impl SdlX {
@@ -30,12 +33,16 @@ impl SdlX {
         let ep = ctxt.event_pump().unwrap();
         // Font related
         //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
+        // Normal to Screen space
+        let drect = ((0.0,0.0), (1.0,1.0));
+        let orect = ((0.0,0.0), (width as f32, height as f32));
         SdlX {
             _ctxt: ctxt,
             _vs: vs,
             wc: wc,
             ep: ep,
             wctc: wctc,
+            n2s: XSpaces::new(drect, orect),
         }
     }
 
@@ -108,6 +115,7 @@ impl XSpaces {
 
 }
 
+#[allow(dead_code)]
 impl XSpaces {
 
     pub fn o2dx(&self, ox: f32) -> f32 {
@@ -124,6 +132,24 @@ impl XSpaces {
 
     pub fn o2d(&self, o: XPoint) -> XPoint {
         return (self.o2dx(o.0), self.o2dy(o.1));
+    }
+
+}
+
+
+impl SdlX {
+
+    pub fn ns_fill_rect(&mut self, nx: f32, ny: f32, sw: u32, sh: u32) {
+        let sorigin = self.n2s.d2o((nx,ny));
+        self.wc.fill_rect(Some(Rect::new(sorigin.0 as i32, sorigin.1 as i32, sw, sh))).unwrap();
+    }
+
+    pub fn nn_line(&mut self, nx1: f32, ny1: f32, nx2: f32, ny2: f32, color: Color) {
+        let x1 = self.n2s.d2ox(nx1).round() as i16;
+        let y1 = self.n2s.d2oy(ny1).round() as i16;
+        let x2 = self.n2s.d2ox(nx2).round() as i16;
+        let y2 = self.n2s.d2oy(ny2).round() as i16;
+        self.wc.line(x1, y1, x2, y2, color).unwrap();
     }
 
 }
