@@ -6,6 +6,7 @@
 
 #[derive(Debug)]
 pub struct PositionsUpdate {
+    pub scoremsg: String,
     pub stimemsg: String,
     pub gamemsg: String,
     pub ball: (f32, f32),
@@ -17,6 +18,7 @@ impl PositionsUpdate {
 
     pub fn new() -> PositionsUpdate {
         PositionsUpdate {
+            scoremsg: String::new(),
             stimemsg: String::new(),
             gamemsg: String::new(),
             ball: (0.0,0.0),
