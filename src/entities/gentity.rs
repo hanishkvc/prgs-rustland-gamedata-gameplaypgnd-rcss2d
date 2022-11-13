@@ -16,6 +16,9 @@ use super::ENTITY_WIDTH;
 use super::ENTITY_HEIGHT;
 use super::ENTITY_RADIUS;
 
+const ENTITY_WIDTH_MID: i32 = (ENTITY_WIDTH/2) as i32;
+const ENTITY_HEIGHT_MID: i32 = (ENTITY_HEIGHT/2) as i32;
+
 
 pub struct Entity<'a> {
     _id: String,
@@ -95,9 +98,8 @@ impl<'a> Entity<'a> {
         let ipos = self.ipos();
         //sx.wc.fill_rect(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
         sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, ENTITY_RADIUS, self.color).unwrap();
-        //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
-        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT))).unwrap();
+        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-ENTITY_WIDTH_MID, ipos.1-ENTITY_HEIGHT_MID, ENTITY_WIDTH, ENTITY_HEIGHT))).unwrap();
     }
 
 }
