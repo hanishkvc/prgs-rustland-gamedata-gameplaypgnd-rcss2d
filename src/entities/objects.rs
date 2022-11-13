@@ -4,8 +4,12 @@
 //!
 
 use sdl2::pixels::Color;
+use sdl2::ttf::Font;
+
 use crate::sdlx::SdlX;
 use crate::playdata::Messages;
+use crate::entities::FRAMES_PER_SEC;
+use crate::entities::gentity::Entity;
 
 pub const BALL_SIZE: u32 = 6;
 pub const BALL_COLOR: Color = Color::WHITE;
@@ -13,29 +17,34 @@ pub const MSG_COLOR: Color = Color::RED;
 
 
 #[derive(Debug)]
-pub struct Ball {
-    npos: (f32,f32),
-    ssize: u32,
-    color: Color,
+pub struct Ball<'a> {
+    bge: Entity<'a>,
 }
 
-impl Ball {
+impl<'a> Ball<'a> {
 
-    pub fn new() -> Ball {
+    pub fn new(font: &'a Font) -> Ball<'a> {
         Ball {
-            npos: (0.0,0.0),
-            ssize: BALL_SIZE,
-            color: BALL_COLOR,
+            bge: Entity::new(" ", (0.0,0.0), BALL_COLOR, font)
         }
     }
 
-    pub fn update(&mut self, pos: (f32,f32)) {
-        self.npos = pos;
+    pub fn update(&mut self, pos: (f32,f32), babsolute: bool) {
+        let fx = pos.0;
+        let fy = pos.1;
+        if babsolute {
+            self.bge.pos_set_abs(fx, fy);
+        } else {
+            self.bge.move_to_in_frames((fx, fy), FRAMES_PER_SEC as f32);
+        }
+    }
+
+    pub fn next_frame(&mut self) {
+        self.bge.next_frame();
     }
 
     pub fn draw(&self, sx: &mut SdlX) {
-        sx.wc.set_draw_color(self.color);
-        sx.ns_fill_rect_mid(self.npos.0, self.npos.1, self.ssize, self.ssize);
+        self.bge.draw(sx);
     }
 
 }

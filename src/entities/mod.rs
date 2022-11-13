@@ -49,7 +49,7 @@ pub(crate) struct Entities<'a> {
     fps: f32,
     vfpmsgs: Vec<FixedPosMessage>,
     pub showball: bool,
-    ball: Ball,
+    ball: Ball<'a>,
     ateam: team::Team<'a>,
     bteam: team::Team<'a>,
     pitch: XRect,
@@ -69,7 +69,7 @@ impl<'a> Entities<'a> {
         Entities {
             fps: FRAMES_PER_SEC as f32,
             vfpmsgs: vfpmsgs,
-            ball: Ball::new(),
+            ball: Ball::new(font),
             showball: true,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
@@ -91,12 +91,13 @@ impl<'a> Entities<'a> {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);
         }
-        self.ball.update(pu.ball);
+        self.ball.update(pu.ball, babsolute);
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);
     }
 
     pub fn next_frame(&mut self) {
+        self.ball.next_frame();
         self.ateam.next_frame();
         self.bteam.next_frame();
     }
