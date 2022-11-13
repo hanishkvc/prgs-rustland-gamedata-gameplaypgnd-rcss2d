@@ -1,7 +1,12 @@
+//!
+//! Data related to play
+//! HanishKVC, 2022
+//!
 
 
 #[derive(Debug)]
 pub struct PositionsUpdate {
+    pub sstep: String,
     pub ball: (f32, f32),
     pub ateampositions: Vec<(i32, f32, f32)>,
     pub bteampositions: Vec<(i32, f32, f32)>,
@@ -10,7 +15,12 @@ pub struct PositionsUpdate {
 impl PositionsUpdate {
 
     pub fn new() -> PositionsUpdate {
-        PositionsUpdate { ball: (0.0,0.0), ateampositions: Vec::new(), bteampositions: Vec::new() }
+        PositionsUpdate {
+            sstep: String::new(),
+            ball: (0.0,0.0),
+            ateampositions: Vec::new(),
+            bteampositions: Vec::new(),
+        }
     }
 
 }

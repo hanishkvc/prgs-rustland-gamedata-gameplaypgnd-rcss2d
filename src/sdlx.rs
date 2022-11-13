@@ -166,4 +166,10 @@ impl SdlX {
         self.wc.thick_line(x1, y1, x2, y2, sw, color).unwrap();
     }
 
+    pub fn n_string(&self, nx: f32, ny: f32, s: &str, color: Color) {
+        let sx = self.n2s.d2ox(nx).round() as i16;
+        let sy = self.n2s.d2oy(ny).round() as i16;
+        self.wc.string(sx, sy, s, color).unwrap();
+    }
+
 }
