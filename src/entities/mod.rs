@@ -19,6 +19,8 @@ pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 
 pub const FRAMES_PER_SEC: usize = 24;
 
+pub const BALL_SIZE: u32 = 6;
+
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
@@ -80,7 +82,7 @@ impl<'a> Entities<'a> {
 
     fn draw_ball(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(Color::WHITE);
-        sx.ns_fill_rect(self.ball.0, self.ball.1, 4, 4);
+        sx.ns_fill_rect(self.ball.0, self.ball.1, BALL_SIZE, BALL_SIZE);
     }
 
     pub fn draw(&self, sx: &mut SdlX) {

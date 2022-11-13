@@ -94,7 +94,7 @@ impl<'a> Entity<'a> {
         sx.wc.fill_rect(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
         //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
-        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0, ipos.1, 16, 16))).unwrap();
+        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT))).unwrap();
     }
 
 }
