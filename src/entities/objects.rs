@@ -35,7 +35,7 @@ impl Ball {
 
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
-        sx.ns_fill_rect(self.npos.0, self.npos.1, self.ssize, self.ssize);
+        sx.ns_fill_rect_mid(self.npos.0, self.npos.1, self.ssize, self.ssize);
     }
 
 }

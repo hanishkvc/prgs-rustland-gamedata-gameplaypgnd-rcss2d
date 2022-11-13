@@ -139,6 +139,7 @@ impl XSpaces {
 
 impl SdlX {
 
+    #[allow(dead_code)]
     pub fn ns_fill_rect(&mut self, nx: f32, ny: f32, sw: u32, sh: u32) {
         let sorigin = self.n2s.d2o((nx,ny));
         self.wc.fill_rect(Some(Rect::new(sorigin.0 as i32, sorigin.1 as i32, sw, sh))).unwrap();
