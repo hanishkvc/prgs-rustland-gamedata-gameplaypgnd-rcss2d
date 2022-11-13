@@ -152,4 +152,18 @@ impl SdlX {
         self.wc.line(x1, y1, x2, y2, color).unwrap();
     }
 
+    pub fn nn_thick_line(&mut self, nx1: f32, ny1: f32, nx2: f32, ny2: f32, nw: f32, color: Color) {
+        let x1 = self.n2s.d2ox(nx1).round() as i16;
+        let y1 = self.n2s.d2oy(ny1).round() as i16;
+        let x2 = self.n2s.d2ox(nx2).round() as i16;
+        let y2 = self.n2s.d2oy(ny2).round() as i16;
+        let sw;
+        if (x2-x1).abs() > (y2-y1).abs() {
+            sw = self.n2s.d2ox(nw).round() as u8;
+        } else {
+            sw = self.n2s.d2oy(nw).round() as u8;
+        }
+        self.wc.thick_line(x1, y1, x2, y2, sw, color).unwrap();
+    }
+
 }

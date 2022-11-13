@@ -61,14 +61,15 @@ impl<'a> Entities<'a> {
     }
 
     fn draw_pitch(&self, sx: &mut SdlX) {
-        let lightgrey = Color::RGB(230, 230, 230);
-        sx.nn_line(0.02, 0.02, 0.98, 0.02, Color::WHITE);
-        sx.nn_line(0.02, 0.02, 0.02, 0.98, Color::WHITE);
-        sx.nn_line(0.02, 0.98, 0.98, 0.98, Color::WHITE);
-        sx.nn_line(0.98, 0.02, 0.98, 0.98, Color::WHITE);
-        sx.nn_line(0.50, 0.02, 0.50, 0.98, lightgrey);
-        sx.nn_line(0.04, 0.40, 0.04, 0.60, lightgrey);
-        sx.nn_line(0.96, 0.40, 0.96, 0.60, lightgrey);
+        //let inbtwcolor = Color::RGB(230, 230, 230);
+        let inbtwcolor = Color::WHITE;
+        sx.nn_thick_line(0.02, 0.02, 0.98, 0.02, 0.002, Color::WHITE);
+        sx.nn_thick_line(0.02, 0.02, 0.02, 0.98, 0.004, Color::WHITE);
+        sx.nn_thick_line(0.02, 0.98, 0.98, 0.98, 0.002, Color::WHITE);
+        sx.nn_thick_line(0.98, 0.02, 0.98, 0.98, 0.004, Color::WHITE);
+        sx.nn_line(0.50, 0.02, 0.50, 0.98, inbtwcolor);
+        sx.nn_line(0.04, 0.40, 0.04, 0.60, inbtwcolor);
+        sx.nn_line(0.96, 0.40, 0.96, 0.60, inbtwcolor);
     }
 
     pub fn draw(&self, sx: &mut SdlX) {
