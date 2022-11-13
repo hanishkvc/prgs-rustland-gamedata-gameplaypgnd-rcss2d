@@ -144,6 +144,16 @@ impl SdlX {
         self.wc.fill_rect(Some(Rect::new(sorigin.0 as i32, sorigin.1 as i32, sw, sh))).unwrap();
     }
 
+    /// nx,ny represent the mid point of the required rect
+    pub fn ns_fill_rect_mid(&mut self, nx: f32, ny: f32, sw: u32, sh: u32) {
+        let sorigin = self.n2s.d2o((nx,ny));
+        let midw = (sw as f32)/2.0;
+        let midh = (sh as f32)/2.0;
+        let x = (sorigin.0 - midw).round() as i32;
+        let y = (sorigin.1 - midh).round() as i32;
+        self.wc.fill_rect(Some(Rect::new(x, y, sw, sh))).unwrap();
+    }
+
     pub fn nn_line(&mut self, nx1: f32, ny1: f32, nx2: f32, ny2: f32, color: Color) {
         let x1 = self.n2s.d2ox(nx1).round() as i16;
         let y1 = self.n2s.d2oy(ny1).round() as i16;

@@ -3,10 +3,10 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::{pixels::Color, rect::Rect};
 use sdl2::ttf::Font;
 use sdl2::surface::Surface;
+use sdl2::gfx::primitives::DrawRenderer;
 
 use crate::sdlx::{self, SdlX};
 
@@ -96,8 +96,11 @@ impl<'a> Entity<'a> {
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
         let ipos = self.ipos();
-        //sx.wc.fill_rect(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
-        sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, ENTITY_RADIUS, self.color).unwrap();
+        if cfg!(feature="gentity_circle") {
+            sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, ENTITY_RADIUS, self.color).unwrap();
+        } else {
+            sx.ns_fill_rect_mid(self.fpos.0, self.fpos.1, ENTITY_WIDTH, ENTITY_HEIGHT);
+        }
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
         sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-ENTITY_WIDTH_MID, ipos.1-ENTITY_HEIGHT_MID, ENTITY_WIDTH, ENTITY_HEIGHT))).unwrap();
     }
