@@ -3,6 +3,7 @@
 //! HanishKVC, 2022
 //!
 
+use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::{pixels::Color, rect::Rect};
 use sdl2::ttf::Font;
 use sdl2::surface::Surface;
@@ -13,6 +14,7 @@ use super::SCREEN_WIDTH;
 use super::SCREEN_HEIGHT;
 use super::ENTITY_WIDTH;
 use super::ENTITY_HEIGHT;
+use super::ENTITY_RADIUS;
 
 
 pub struct Entity<'a> {
@@ -91,7 +93,8 @@ impl<'a> Entity<'a> {
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
         let ipos = self.ipos();
-        sx.wc.fill_rect(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
+        //sx.wc.fill_rect(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT)).unwrap();
+        sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, ENTITY_RADIUS, self.color).unwrap();
         //wc.string(self.pos.0 as i16, self.pos.1 as i16, &self.id, Color::RGB(0, 0, 200)).unwrap();
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
         sx.wc.copy(&tx, None, Some(Rect::new(ipos.0, ipos.1, ENTITY_WIDTH, ENTITY_HEIGHT))).unwrap();

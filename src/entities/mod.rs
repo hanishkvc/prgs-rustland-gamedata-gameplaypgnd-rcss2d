@@ -12,6 +12,7 @@ use crate::playdata::PositionsUpdate;
 
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
+const ENTITY_RADIUS: i16 = 8;
 
 pub const SCREEN_WIDTH: u32 = 1024;
 pub const SCREEN_HEIGHT: u32 = 600;
