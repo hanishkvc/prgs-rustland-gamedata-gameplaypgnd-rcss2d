@@ -49,14 +49,16 @@ fn main() {
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
+        sx.n_string(0.49, 0.01, &pgentities.fps().round().to_string(), sdlx::Color::BLUE);
 
         // handle any pending events
         for ev in sx.ep.poll_iter() {
             use sdl2::event::Event;
             use sdl2::keyboard::Keycode;
+            use sdl2::keyboard::Mod;
             match ev {
                 Event::Quit { timestamp: _ } => break 'mainloop,
-                Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod: _, repeat: _ } => {
+                Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
                     match keycode.unwrap() {
                         Keycode::C => {
                             dcolor += 20;
@@ -73,8 +75,15 @@ fn main() {
                         Keycode::Right => {
                             pdata.seek(50);
                         }
+                        Keycode::F => {
+                            if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
+                                pgentities.fps_adjust(1.20);
+                            } else {
+                                pgentities.fps_adjust(0.80);
+                            }
+                        }
                         Keycode::D => {
-                            print!("DBUG:PGND:Main:Entities:{:#?}\n", pgentities);
+                            eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities);
                         }
                         _ => {
 
@@ -108,7 +117,7 @@ fn main() {
         pgentities.draw(&mut sx);
 
         sx.wc.present();
-        std::thread::sleep(std::time::Duration::from_millis((1000/entities::FRAMES_PER_SEC) as u64));
+        std::thread::sleep(std::time::Duration::from_millis((1000.0/pgentities.fps()).round() as u64));
     }
 
 }

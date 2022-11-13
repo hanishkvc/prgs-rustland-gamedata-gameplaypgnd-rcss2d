@@ -46,6 +46,7 @@ use objects::FixedPosMessage;
 
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
+    fps: f32,
     vfpmsgs: Vec<FixedPosMessage>,
     pub showball: bool,
     ball: Ball,
@@ -66,6 +67,7 @@ impl<'a> Entities<'a> {
         let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false);
         vfpmsgs.push(gamemsg);
         Entities {
+            fps: FRAMES_PER_SEC as f32,
             vfpmsgs: vfpmsgs,
             ball: Ball::new(),
             showball: true,
@@ -74,6 +76,15 @@ impl<'a> Entities<'a> {
             pitch: pitch,
             showxtrapitchmarkers: true,
         }
+    }
+
+    pub fn fps(&self) -> f32 {
+        return self.fps;
+    }
+
+    pub fn fps_adjust(&mut self, ratio: f32) -> f32 {
+        self.fps *= ratio;
+        return self.fps;
     }
 
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {

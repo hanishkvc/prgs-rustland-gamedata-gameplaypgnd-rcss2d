@@ -47,6 +47,12 @@ One can use the following keys to control the behaviour as noted below.
 
   * left arrow key -> to seek/jump backward
 
+* FPS - frames per second
+
+  * f -> to reduce the current fps
+
+  * F -> to increase the current fps
+
 * c -> to change the background color
 
 * Internal debug cmds

@@ -8,7 +8,7 @@ use sdl2::rect::Rect;
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
 use sdl2::render::{WindowCanvas, TextureCreator, Texture};
 use sdl2::video::WindowContext;
-use sdl2::pixels::Color;
+pub use sdl2::pixels::Color;
 
 
 pub struct SdlX {
