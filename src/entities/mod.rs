@@ -19,9 +19,6 @@ pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 
 pub const FRAMES_PER_SEC: usize = 24;
 
-pub const BALL_SIZE: u32 = 6;
-pub const BALL_COLOR: Color = Color::WHITE;
-
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
@@ -36,13 +33,15 @@ type _PosInt = i32;
 
 pub mod gentity;
 pub mod team;
+pub mod objects;
+use objects::Ball;
 
 
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
     sstep: String,
-    ball: (f32,f32),
     pub showball: bool,
+    ball: Ball,
     ateam: team::Team<'a>,
     bteam: team::Team<'a>,
 }
@@ -52,7 +51,7 @@ impl<'a> Entities<'a> {
     pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         Entities {
             sstep: String::new(),
-            ball: (0.0,0.0),
+            ball: Ball::new(),
             showball: true,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
@@ -61,7 +60,7 @@ impl<'a> Entities<'a> {
 
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
         self.sstep = pu.sstep;
-        self.ball = pu.ball;
+        self.ball.update(pu.ball);
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);
     }
@@ -83,20 +82,14 @@ impl<'a> Entities<'a> {
         sx.nn_line(0.96, 0.40, 0.96, 0.60, inbtwcolor);
     }
 
-    fn draw_ball(&self, sx: &mut SdlX) {
-        if !self.showball {
-            return;
-        }
-        sx.wc.set_draw_color(BALL_COLOR);
-        sx.ns_fill_rect(self.ball.0, self.ball.1, BALL_SIZE, BALL_SIZE);
-    }
-
     pub fn draw(&self, sx: &mut SdlX) {
         sx.n_string(0.01, 0.01, &self.sstep, Color::RED);
         self.draw_pitch(sx);
         self.ateam.draw(sx);
         self.bteam.draw(sx);
-        self.draw_ball(sx);
+        if self.showball {
+            self.ball.draw(sx);
+        }
     }
 
 }
