@@ -28,3 +28,30 @@ the game or later). This can include
 * overlapping of past games data wrt movements/actions/performance in useful
   ways.
 
+
+Usage
+#######
+
+Pass the rcss rcg file as the 1st and only argument to the program.
+This will playback the contents of the rcg file.
+
+One can use the following keys to control the behaviour as noted below.
+
+* p -> to pause/unpause the playback
+
+* b -> to hide/unhide the ball
+
+* Seeking
+
+  * right arrow key -> to seek/jump forward
+
+  * left arrow key -> to seek/jump backward
+
+* c -> to change the background color
+
+* Internal debug cmds
+
+  * d -> to dump current data associated with entities in the playground
+
+    * ie players, ball, msgs
+
