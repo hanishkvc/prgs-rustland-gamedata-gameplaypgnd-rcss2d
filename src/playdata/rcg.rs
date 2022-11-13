@@ -33,7 +33,7 @@ impl Rcg {
         for line in vdata {
             vline.push(line.to_string());
         }
-        let rrect = ((-56.0, -37.0), (56.0, 37.0));
+        let rrect = ((-55.0, -37.0), (55.0, 37.0));
         let drect = ((0.0,0.0), (1.0,1.0));
         Rcg {
             _fname: fname.to_string(),
@@ -96,10 +96,13 @@ impl PlayData for Rcg {
                     tstr.peel_bracket('(').unwrap();
                     let vdata = tstr.tokens_vec(' ', true, true).unwrap();
                     if vdata[0].starts_with("(b") {
-                        let fx: f32 = vdata[1].parse().unwrap();
-                        let fy: f32 = vdata[2].parse().unwrap();
-                        let fx = self.r2d.d2ox(fx);
-                        let fy = self.r2d.d2oy(fy);
+                        let fxin: f32 = vdata[1].parse().unwrap();
+                        let fyin: f32 = vdata[2].parse().unwrap();
+                        let fx = self.r2d.d2ox(fxin);
+                        let fy = self.r2d.d2oy(fyin);
+                        if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
+                            eprintln!("DBUG:Rcg:Ball:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+                        }
                         pu.ball = (fx, fy);
                         continue;
                     }
@@ -107,10 +110,13 @@ impl PlayData for Rcg {
                     tstr.peel_bracket('(').unwrap();
                     let (steam, splayer) = tstr.split_once(' ').unwrap();
                     let iplayer: i32 = splayer.parse().unwrap();
-                    let fx: f32 = vdata[3].parse().unwrap();
-                    let fy: f32 = vdata[4].parse().unwrap();
-                    let fx = self.r2d.d2ox(fx);
-                    let fy = self.r2d.d2oy(fy);
+                    let fxin: f32 = vdata[3].parse().unwrap();
+                    let fyin: f32 = vdata[4].parse().unwrap();
+                    let fx = self.r2d.d2ox(fxin);
+                    let fy = self.r2d.d2oy(fyin);
+                    if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
+                        eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+                    }
                     if steam == "l" {
                         pu.ateampositions.push((iplayer-1, fx, fy));
                     } else {
