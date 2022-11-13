@@ -2,6 +2,7 @@
 
 #[derive(Debug)]
 pub struct PositionsUpdate {
+    pub ball: (f32, f32),
     pub ateampositions: Vec<(i32, f32, f32)>,
     pub bteampositions: Vec<(i32, f32, f32)>,
 }
@@ -9,7 +10,7 @@ pub struct PositionsUpdate {
 impl PositionsUpdate {
 
     pub fn new() -> PositionsUpdate {
-        PositionsUpdate { ateampositions: Vec::new(), bteampositions: Vec::new() }
+        PositionsUpdate { ball: (0.0,0.0), ateampositions: Vec::new(), bteampositions: Vec::new() }
     }
 
 }

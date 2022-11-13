@@ -88,12 +88,20 @@ impl PlayData for Rcg {
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
             if toks[0].starts_with("show") {
                 for tok in toks {
-                    if !tok.starts_with("((l") && !tok.starts_with("((r") {
+                    if !tok.starts_with("((l") && !tok.starts_with("((r") && !tok.starts_with("((b") {
                         continue;
                     }
                     let mut tstr = TStr::from_str(&tok, true);
                     tstr.peel_bracket('(').unwrap();
                     let vdata = tstr.tokens_vec(' ', true, true).unwrap();
+                    if vdata[0].starts_with("(b") {
+                        let fx: f32 = vdata[1].parse().unwrap();
+                        let fy: f32 = vdata[2].parse().unwrap();
+                        let fx = self.r2d.d2ox(fx);
+                        let fy = self.r2d.d2oy(fy);
+                        pu.ball = (fx, fy);
+                        continue;
+                    }
                     let mut tstr = TStr::from_str(&vdata[0], true);
                     tstr.peel_bracket('(').unwrap();
                     let (steam, splayer) = tstr.split_once(' ').unwrap();

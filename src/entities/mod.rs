@@ -37,6 +37,7 @@ pub mod team;
 
 #[derive(Debug)]
 pub(crate) struct Entities<'a> {
+    ball: (f32,f32),
     ateam: team::Team<'a>,
     bteam: team::Team<'a>,
 }
@@ -45,12 +46,14 @@ impl<'a> Entities<'a> {
 
     pub fn new(anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         Entities {
+            ball: (0.0,0.0),
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
         }
     }
 
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
+        self.ball = pu.ball;
         self.ateam.update(pu.ateampositions, babsolute);
         self.bteam.update(pu.bteampositions, babsolute);
     }
@@ -72,8 +75,13 @@ impl<'a> Entities<'a> {
         sx.nn_line(0.96, 0.40, 0.96, 0.60, inbtwcolor);
     }
 
+    fn draw_ball(&self, sx: &mut SdlX) {
+        sx.ns_fill_rect(self.ball.0, self.ball.1, 4, 4);
+    }
+
     pub fn draw(&self, sx: &mut SdlX) {
         self.draw_pitch(sx);
+        self.draw_ball(sx);
         self.ateam.draw(sx);
         self.bteam.draw(sx);
     }
