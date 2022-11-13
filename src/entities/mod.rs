@@ -101,10 +101,10 @@ impl<'a> Entities<'a> {
         let rightmidx = nx2-0.02;
         sx.nn_line(rightmidx, 0.40, rightmidx, 0.60, inbtwcolor); // Right mid
         // Additional markers
-        sx.nn_line(0.25, 0.45, 0.25, 0.55, inbtwcolor); // Horizontal left quarter
-        sx.nn_line(0.75, 0.45, 0.75, 0.55, inbtwcolor); // Horizontal right quarter
-        sx.nn_line(0.45, 0.25, 0.55, 0.25, inbtwcolor); // Vertical top quarter
-        sx.nn_line(0.45, 0.75, 0.55, 0.75, inbtwcolor); // Vertical bottom quarter
+        sx.nn_line(0.25, 0.48, 0.25, 0.52, inbtwcolor); // Horizontal left quarter
+        sx.nn_line(0.75, 0.48, 0.75, 0.52, inbtwcolor); // Horizontal right quarter
+        sx.nn_line(0.48, 0.25, 0.52, 0.25, inbtwcolor); // Vertical top quarter
+        sx.nn_line(0.48, 0.75, 0.52, 0.75, inbtwcolor); // Vertical bottom quarter
         sx.nn_line(0.49, 0.50, 0.51, 0.50, inbtwcolor); // Center horizontal
     }
 
