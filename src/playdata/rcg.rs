@@ -51,14 +51,20 @@ impl Rcg {
 
 impl PlayData for Rcg {
 
-    fn setup(&mut self, _fps: f32) {
-        self.framesper_record = 1.0;
-        self.framesafter_lastrecord = 0.0;
+    fn setup(&mut self, fps: f32) {
+        if cfg!(feature="inbetween_frames") {
+            self.framesper_record = fps;
+            self.framesafter_lastrecord = 0.0;
+        } else {
+            self.framesper_record = 1.0;
+            self.framesafter_lastrecord = 0.0;
+        }
     }
 
     fn next_frame_is_record_ready(&mut self) -> bool {
         self.framesafter_lastrecord += 1.0;
         if self.framesafter_lastrecord >= self.framesper_record {
+            self.framesafter_lastrecord = 0.0;
             return true;
         }
         return false;
