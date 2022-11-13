@@ -37,6 +37,8 @@ pub trait PlayData {
 
     fn next_record(&mut self) -> PositionsUpdate;
 
+    fn seek(&mut self, seekdelta: isize);
+
     fn bdone(&self) -> bool;
 
 }

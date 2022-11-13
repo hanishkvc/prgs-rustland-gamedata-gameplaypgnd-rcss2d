@@ -58,7 +58,7 @@ fn main() {
                 Event::Quit { timestamp: _ } => break 'mainloop,
                 Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod: _, repeat: _ } => {
                     match keycode.unwrap() {
-                        Keycode::W => {
+                        Keycode::C => {
                             dcolor += 20;
                         }
                         Keycode::P => {
@@ -66,6 +66,12 @@ fn main() {
                         }
                         Keycode::B => {
                             pgentities.showball = !pgentities.showball;
+                        }
+                        Keycode::Left => {
+                            pdata.seek(-50);
+                        }
+                        Keycode::Right => {
+                            pdata.seek(50);
                         }
                         Keycode::D => {
                             print!("DBUG:PGND:Main:Entities:{:#?}\n", pgentities);

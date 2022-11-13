@@ -184,6 +184,11 @@ impl PlayData for RandomData {
         pu
     }
 
+    fn seek(&mut self, seekdelta: isize) {
+        self.rcnt = (self.rcnt as isize + seekdelta) as usize;
+        return;
+    }
+
     fn bdone(&self) -> bool {
         return false;
     }

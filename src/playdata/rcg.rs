@@ -135,6 +135,15 @@ impl PlayData for Rcg {
         return pu;
     }
 
+    fn seek(&mut self, seekdelta: isize) {
+        self.iline += seekdelta;
+        if self.iline < 0 {
+            self.iline = 0;
+        } else if self.iline as usize > self.lines.len() {
+            self.iline = (self.lines.len() - 1) as isize;
+        }
+    }
+
     fn bdone(&self) -> bool {
         return self.bdone;
     }
