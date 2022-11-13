@@ -76,14 +76,15 @@ impl<'a> Entities<'a> {
     }
 
     fn draw_ball(&self, sx: &mut SdlX) {
+        sx.wc.set_draw_color(Color::WHITE);
         sx.ns_fill_rect(self.ball.0, self.ball.1, 4, 4);
     }
 
     pub fn draw(&self, sx: &mut SdlX) {
         self.draw_pitch(sx);
-        self.draw_ball(sx);
         self.ateam.draw(sx);
         self.bteam.draw(sx);
+        self.draw_ball(sx);
     }
 
 }
