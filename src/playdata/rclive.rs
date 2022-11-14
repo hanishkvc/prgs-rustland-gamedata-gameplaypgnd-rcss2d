@@ -7,12 +7,15 @@ use std::net::UdpSocket;
 
 use tokensk::{TStr, TStrX};
 
+use crate::sdlx::XSpaces;
+
 use super::{PlayData, PlayUpdate};
 
 pub struct RCLive {
     skt: UdpSocket,
     srvraddr: String,
     stx: TStrX,
+    r2n: XSpaces,
 }
 
 impl RCLive {
@@ -22,10 +25,13 @@ impl RCLive {
         let sinit = "(dispinit version 5)\r\n";
         skt.send_to(sinit.as_bytes(), addr).unwrap();
         eprintln!("DBUG:PPGND:RCLive:New:{:?}", skt);
+        let rrect = ((-55.0, -37.0), (55.0, 37.0));
+        let nrect = ((0.0,0.0), (1.0,1.0));
         RCLive {
             skt: skt,
             srvraddr: addr.to_string(),
             stx: TStrX::new(),
+            r2n: XSpaces::new(rrect, nrect),
         }
     }
 
@@ -86,6 +92,7 @@ impl PlayData for RCLive {
                     fy = v.parse().unwrap();
                 }
             }
+            let (fx,fy) = self.r2n.d2o((fx,fy));
             if side.chars().nth(1).unwrap() == 'l' {
                 pu.ateampositions.push((pnum-1, fx, fy));
             } else {
