@@ -183,4 +183,13 @@ impl SdlX {
         self.wc.string(sx, sy, s, color).unwrap();
     }
 
+    /// Show multiple lines on the screen
+    /// nlh: gives the height to be used wrt each line
+    pub fn n_strings(&self, nx: f32, ny: f32, nlh: f32, ss: Vec<&str>, color: Color) {
+        for i in 0..ss.len() {
+            let y = ny + (i as f32 * nlh);
+            self.n_string(nx, y, ss[i], color);
+        }
+    }
+
 }
