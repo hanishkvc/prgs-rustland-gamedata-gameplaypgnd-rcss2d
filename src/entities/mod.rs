@@ -25,6 +25,7 @@ pub const PITCH_RECT: XRect = ((0.02,0.04), (0.98,0.96));
 pub const MSG_SCORE_POS: (f32,f32) = (0.01,0.01);
 pub const MSG_STIME_POS: (f32,f32) = (0.90,0.01);
 pub const MSG_GAME_POS: (f32,f32) = (0.01,0.98);
+pub const MSG_UNKNOWN_POS: (f32,f32) = (0.50,0.98);
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
@@ -85,6 +86,8 @@ impl<'a> PGEntities<'a> {
         vfpmsgs.push(stimemsg);
         let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false, -1);
         vfpmsgs.push(gamemsg);
+        let unknownmsg = FixedPosMessage::new("unknown", MSG_UNKNOWN_POS, false, -1);
+        vfpmsgs.push(unknownmsg);
         PGEntities {
             fps: FRAMES_PER_SEC as f32,
             vfpmsgs: vfpmsgs,

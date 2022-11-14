@@ -138,6 +138,7 @@ impl PlayData for Rcg {
             } else if toks[0].starts_with("team") {
                 pu.msgs.insert("score".to_string(), self.lines[self.iline as usize].clone());
             } else {
+                pu.msgs.insert("unknown".to_string(), self.lines[self.iline as usize].clone());
                 print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
             }
         }
