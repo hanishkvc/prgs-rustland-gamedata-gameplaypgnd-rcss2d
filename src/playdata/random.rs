@@ -196,4 +196,8 @@ impl PlayData for RandomData {
         return false;
     }
 
+    fn send_record(&mut self, buf: &[u8]) {
+        todo!()
+    }
+
 }

@@ -76,7 +76,11 @@ pub trait PlayData {
     /// no more data available with it.
     fn bdone(&self) -> bool;
 
+    /// A generic send record
+    fn send_record(&mut self, buf: &[u8]);
+
 }
 
 pub mod random;
 pub mod rcg;
+pub mod rclive;

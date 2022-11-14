@@ -13,6 +13,7 @@ mod playdata;
 use playdata::rcg::Rcg;
 use playdata::random::RandomData;
 use playdata::PlayData;
+use playdata::rclive::RCLive;
 use sdlx::SdlX;
 
 fn show_help(sx: &mut SdlX) {
@@ -55,10 +56,16 @@ fn main() {
     let clargs = env::args().collect::<Vec<String>>();
     let mut pdrandom = RandomData::new(20.0, 11, 11);
     let mut pdrcg;
+    let mut pdrcl;
     let pdata: &mut dyn PlayData;
     if clargs.len() > 1 {
-        pdrcg = Rcg::new(&clargs[1], pgentities.fps());
-        pdata = &mut pdrcg;
+        if clargs[1] == "live" {
+            pdrcl = RCLive::new("0.0.0.0:6000");
+            pdata = &mut pdrcl;
+        } else {
+            pdrcg = Rcg::new(&clargs[1], pgentities.fps());
+            pdata = &mut pdrcg;
+        }
     } else {
         pdata = &mut pdrandom;
     }
@@ -113,6 +120,9 @@ fn main() {
                                 pgentities.fps_adjust(0.80);
                             }
                             pdata.fps_changed(pgentities.fps());
+                        }
+                        Keycode::Num5 => {
+                            pdata.send_record("(dispstart)".as_bytes());
                         }
                         Keycode::H => {
                             bhelp = !bhelp;
