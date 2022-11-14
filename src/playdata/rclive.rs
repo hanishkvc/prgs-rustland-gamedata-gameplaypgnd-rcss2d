@@ -43,7 +43,7 @@ impl PlayData for RCLive {
         let pu = PlayUpdate::new();
         let mut buf = [0u8; 2048];
         let gotr = self.skt.recv_from(&mut buf);
-        eprintln!("DBUG:PPGND:RCLive:Got:{:?}", gotr);
+        eprintln!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, String::from_utf8_lossy(&buf));
         pu
     }
 
@@ -57,6 +57,7 @@ impl PlayData for RCLive {
 
     fn send_record(&mut self, buf: &[u8]) {
         self.skt.send_to(buf, &self.srvraddr).unwrap();
+        eprintln!("DBUG:PPGND:RCLive:Sent:{:?}:To:{:?}-{:?}", buf, self.skt, self.srvraddr);
     }
 
 }
