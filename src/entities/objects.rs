@@ -8,7 +8,6 @@ use sdl2::ttf::Font;
 
 use crate::sdlx::SdlX;
 use crate::playdata::Messages;
-use crate::entities::FRAMES_PER_SEC;
 use crate::entities::gentity::Entity;
 
 pub const BALL_SIZE: u32 = 6;
@@ -42,13 +41,15 @@ impl<'a> Ball<'a> {
     /// * if true, sets the ball to the given position immidiately,
     /// * if false, it uses multi-frame interpolated updating of the ball
     ///   to the given position.
-    pub fn update(&mut self, pos: (f32,f32), babsolute: bool) {
+    ///   * inframes - specifies as to in how many frames the ball should
+    ///     be moved to the new location being specified.
+    pub fn update(&mut self, pos: (f32,f32), babsolute: bool, inframes: f32) {
         let fx = pos.0;
         let fy = pos.1;
         if babsolute {
             self.bge.pos_set_abs(fx, fy);
         } else {
-            self.bge.move_to_in_frames((fx, fy), FRAMES_PER_SEC as f32);
+            self.bge.move_to_in_frames((fx, fy), inframes);
         }
     }
 

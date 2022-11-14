@@ -87,13 +87,13 @@ impl<'a> Entities<'a> {
         return self.fps;
     }
 
-    pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool) {
+    pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool, inframes: f32) {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);
         }
-        self.ball.update(pu.ball, babsolute);
-        self.ateam.update(pu.ateampositions, babsolute);
-        self.bteam.update(pu.bteampositions, babsolute);
+        self.ball.update(pu.ball, babsolute, inframes);
+        self.ateam.update(pu.ateampositions, babsolute, inframes);
+        self.bteam.update(pu.bteampositions, babsolute, inframes);
     }
 
     pub fn next_frame(&mut self) {

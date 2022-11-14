@@ -103,7 +103,7 @@ fn main() {
                     if pdata.next_frame_is_record_ready() {
                         let pu = pdata.next_record();
                         print!("DBUG:{:?}\n", pu);
-                        pgentities.update(pu, false);
+                        pgentities.update(pu, false, pgentities.fps());
                         //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
@@ -112,7 +112,7 @@ fn main() {
                     //eprintln!("DBUG:PPGND:Main:{}:NextFrame called", _frame);
                 } else {
                     let pu = pdata.next_record();
-                    pgentities.update(pu, true);
+                    pgentities.update(pu, true, 0.0);
                 }
             }
         }

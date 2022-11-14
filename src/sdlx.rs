@@ -183,6 +183,7 @@ impl SdlX {
         self.wc.string(sx, sy, s, color).unwrap();
     }
 
+    #[allow(dead_code)]
     /// Show multiple lines on the screen
     /// nlh: gives the height to be used wrt each line
     pub fn n_strings(&self, nx: f32, ny: f32, nlh: f32, ss: Vec<&str>, color: Color) {
