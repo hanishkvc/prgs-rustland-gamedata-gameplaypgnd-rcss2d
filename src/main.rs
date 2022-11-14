@@ -63,7 +63,7 @@ fn main() {
                 Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
                     match keycode.unwrap() {
                         Keycode::C => {
-                            dcolor += 20;
+                            dcolor = dcolor.wrapping_add(20);
                         }
                         Keycode::P => {
                             bpause = !bpause;

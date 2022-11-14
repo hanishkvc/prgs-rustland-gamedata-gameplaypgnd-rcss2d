@@ -28,9 +28,9 @@ pub const MSG_GAME_POS: (f32,f32) = (0.01,0.98);
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
-        r: SCREEN_COLOR_BG.r+r,
-        g: SCREEN_COLOR_BG.g+g,
-        b: SCREEN_COLOR_BG.b+b,
+        r: SCREEN_COLOR_BG.r.saturating_add(r),
+        g: SCREEN_COLOR_BG.g.saturating_add(g),
+        b: SCREEN_COLOR_BG.b.saturating_add(b),
         a: SCREEN_COLOR_BG.a,
     }
 }
