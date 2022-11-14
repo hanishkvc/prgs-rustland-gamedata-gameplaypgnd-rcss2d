@@ -5,11 +5,14 @@
 
 use std::net::UdpSocket;
 
+use tokensk::{TStr, TStrX};
+
 use super::{PlayData, PlayUpdate};
 
 pub struct RCLive {
     skt: UdpSocket,
     srvraddr: String,
+    stx: TStrX,
 }
 
 impl RCLive {
@@ -22,6 +25,7 @@ impl RCLive {
         RCLive {
             skt: skt,
             srvraddr: addr.to_string(),
+            stx: TStrX::new(),
         }
     }
 
@@ -40,10 +44,46 @@ impl PlayData for RCLive {
     }
 
     fn next_record(&mut self) -> super::PlayUpdate {
-        let pu = PlayUpdate::new();
-        let mut buf = [0u8; 2048];
+        let mut pu = PlayUpdate::new();
+        let mut buf = [0u8; 8196];
         let gotr = self.skt.recv_from(&mut buf);
-        eprintln!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, String::from_utf8_lossy(&buf));
+        let sbuf = String::from_utf8_lossy(&buf);
+        eprintln!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, &sbuf);
+        let mut tstr = TStr::from_str(&sbuf, true);
+        tstr.delims.bracket_begin = '{';
+        tstr.delims.bracket_end = '}';
+        tstr.delims.string = '^';
+        tstr.peel_bracket('{').unwrap();
+        let toks = tstr.tokens_vec(',', true, true).unwrap();
+        //eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
+        for tok in toks {
+            if !tok.starts_with("{\"side\"") {
+                continue;
+            }
+            let mut tstr = TStr::from_str(&tok, true);
+            tstr.delims.bracket_begin = '{';
+            tstr.delims.bracket_end = '}';
+            tstr.delims.string = '^';
+            tstr.peel_bracket('{').unwrap();
+            let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
+            eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toksl2);
+            let mut pnum = 0;
+            let mut fx = 0.0;
+            let mut fy = 0.0;
+            for tokl2 in toksl2 {
+                let (k,v) = tokl2.split_once(':').unwrap();
+                if k == "\"unum\"" {
+                    pnum = v.parse().unwrap();
+                }
+                if k == "\"x\"" {
+                    fx = v.parse().unwrap();
+                }
+                if k == "\"y\"" {
+                    fy = v.parse().unwrap();
+                }
+            }
+            pu.ateampositions.push((pnum, fx, fy));
+        }
         pu
     }
 
