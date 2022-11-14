@@ -14,7 +14,12 @@ use super::SCREEN_WIDTH;
 use super::SCREEN_HEIGHT;
 
 
-pub struct Entity<'a> {
+/// Represents a Graphical entity, with support
+/// * for drawing itself, with any associated cached id text
+/// * for being moved around explicitly or doing interpolated movement
+///
+/// Can be configured at compile time to either be a filled rect/circle.
+pub struct GEntity<'a> {
     /// A textual id of the entity, the same is cached in a image form
     /// in the ids member.
     _id: String,
@@ -36,11 +41,12 @@ pub struct Entity<'a> {
     hh: i32,
 }
 
-impl<'a> Entity<'a> {
+impl<'a> GEntity<'a> {
 
-    pub fn new(id: &str, npos: (f32, f32), whr: (u32, u32, i16), color: Color, font: &'a Font) -> Entity<'a> {
+    /// Create a new instance of the Graphical Entity
+    pub fn new(id: &str, npos: (f32, f32), whr: (u32, u32, i16), color: Color, font: &'a Font) -> GEntity<'a> {
         let ts = sdlx::text_surface(font, id, Color::WHITE);
-        Entity {
+        GEntity {
             _id: id.to_string(),
             npos,
             whr: whr,
@@ -53,7 +59,7 @@ impl<'a> Entity<'a> {
         }
     }
 
-    /// Ensure that the entity remains within the 0.0-1.0 normal space,
+    /// Ensure that the gentity remains within the 0.0-1.0 normal space,
     /// by wrapping it around to the other end, if required.
     ///
     /// NOTE: It only wraps around to the other end, any movement required
@@ -75,24 +81,24 @@ impl<'a> Entity<'a> {
         }
     }
 
-    /// Convert the entity's position into screen space from normal space
+    /// Convert the gentity's position into screen space from normal space
     pub fn ipos(&self) -> (i32, i32) {
         ((self.npos.0 * SCREEN_WIDTH as f32).round() as i32, (self.npos.1 * SCREEN_HEIGHT as f32).round() as i32)
     }
 
-    /// Set absolute position of the entity in normal 0.0-1.0 space
+    /// Set absolute position of the gentity in normal 0.0-1.0 space
     pub fn pos_set_abs(&mut self, fx: f32, fy: f32) {
         self.npos = (fx, fy);
         self.npos_fix();
     }
 
-    /// Set relative position of the entity in normal 0.0-1.0 space
+    /// Set relative position of the gentity in normal 0.0-1.0 space
     pub fn pos_set_rel(&mut self, fx: f32, fy: f32) {
         self.npos = (self.npos.0 + fx, self.npos.1 + fy);
         self.npos_fix();
     }
 
-    /// Set position of the entity in normal 0.0-1.0 space, but to be
+    /// Set position of the gentity in normal 0.0-1.0 space, but to be
     /// applied/reached over a specified number of frames, as and when
     /// next_frame will be called, as required.
     ///
@@ -103,14 +109,14 @@ impl<'a> Entity<'a> {
         self.mov = (dx, dy);
     }
 
-    /// Update the position of the entity, wrt interpolated movement.
+    /// Update the position of the gentity, wrt interpolated movement.
     /// It uses the move vector setup using move_to_in_frames call,
     /// to update the position.
     pub fn next_frame(&mut self) {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
 
-    /// Draw the entity on passed canvas
+    /// Draw the gentity on passed canvas
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color);
         let ipos = self.ipos();
@@ -125,9 +131,9 @@ impl<'a> Entity<'a> {
 
 }
 
-impl std::fmt::Debug for Entity<'_> {
+impl std::fmt::Debug for GEntity<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Entity")
+        f.debug_struct("GEntity")
             .field("_id", &self._id)
             .field("pos", &self.npos)
             .field("whr", &self.whr)

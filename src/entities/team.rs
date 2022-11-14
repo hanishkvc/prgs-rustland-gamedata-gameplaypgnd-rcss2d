@@ -7,7 +7,7 @@ use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT, ENTITY_RADIUS};
-use crate::entities::gentity::Entity;
+use crate::entities::gentity::GEntity;
 use crate::sdlx::SdlX;
 
 
@@ -16,7 +16,7 @@ use crate::sdlx::SdlX;
 pub struct Team<'a> {
     name: String,
     color: Color,
-    players: Vec<Entity<'a>>,
+    players: Vec<GEntity<'a>>,
     pmoves: Vec<(f32,f32)>,
     pchgmovs: Vec<i32>,
 }
@@ -35,7 +35,7 @@ impl<'a> Team<'a> {
         for i in 0..nplayers {
             let fx = (rand::random::<u32>() % (entities::SCREEN_WIDTH/4)) as f32;
             let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
-            team.players.push(Entity::new(i.to_string().as_str(), (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT, ENTITY_RADIUS), team.color, font));
+            team.players.push(GEntity::new(i.to_string().as_str(), (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT, ENTITY_RADIUS), team.color, font));
             team.pmoves.push((0.0,0.0));
             let mut chgmov = fx.round() as i32;
             if chgmov == 0 {

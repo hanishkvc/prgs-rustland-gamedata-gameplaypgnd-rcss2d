@@ -8,7 +8,7 @@ use sdl2::ttf::Font;
 
 use crate::sdlx::SdlX;
 use crate::playdata::Messages;
-use crate::entities::gentity::Entity;
+use crate::entities::gentity::GEntity;
 
 pub const BALL_SIZE: u32 = 6;
 pub const BALL_COLOR: Color = Color::WHITE;
@@ -22,7 +22,7 @@ pub const MSG_COLOR: Color = Color::RED;
 /// direct immidiate updating of the position of the ball on the screen OR
 /// interpolated multi frame based updating of the ball to the provided position.
 pub struct Ball<'a> {
-    bge: Entity<'a>,
+    bge: GEntity<'a>,
 }
 
 impl<'a> Ball<'a> {
@@ -31,7 +31,7 @@ impl<'a> Ball<'a> {
     /// NOTE: The position is set using update call.
     pub fn new(font: &'a Font) -> Ball<'a> {
         Ball {
-            bge: Entity::new(" ", (0.0,0.0), (BALL_SIZE, BALL_SIZE, (BALL_SIZE/2) as i16), BALL_COLOR, font)
+            bge: GEntity::new(" ", (0.0,0.0), (BALL_SIZE, BALL_SIZE, (BALL_SIZE/2) as i16), BALL_COLOR, font)
         }
     }
 
