@@ -20,7 +20,7 @@ pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 
 pub const FRAMES_PER_SEC: usize = 24;
 
-pub const PITCH_RECT: XRect = ((0.02,0.04), (0.98,0.96));
+pub const PITCH_RECT: XRect = ((0.03,0.04), (0.97,0.96));
 
 pub const MSG_SCORE_POS: (f32,f32) = (0.01,0.01);
 pub const MSG_STIME_POS: (f32,f32) = (0.90,0.01);
@@ -147,9 +147,9 @@ impl<'a> PGEntities<'a> {
         sx.nn_thick_line(nx1, ny2, nx2, ny2, 0.002, Color::WHITE);
         sx.nn_thick_line(nx2, ny1, nx2, ny2, 0.004, Color::WHITE);
         sx.nn_line(0.50, 0.02, 0.50, 0.98, inbtwcolor); // Center vertical
-        let leftmidx = nx1+0.02;
+        let leftmidx = nx1-0.01;
         sx.nn_line(leftmidx, 0.40, leftmidx, 0.60, inbtwcolor); // Left mid
-        let rightmidx = nx2-0.02;
+        let rightmidx = nx2+0.01;
         sx.nn_line(rightmidx, 0.40, rightmidx, 0.60, inbtwcolor); // Right mid
         // Additional markers
         if self.showxtrapitchmarkers {
