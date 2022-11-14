@@ -66,12 +66,16 @@ impl PlayData for RCLive {
             tstr.delims.string = '^';
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
-            eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toksl2);
+            //eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toksl2);
             let mut pnum = 0;
             let mut fx = 0.0;
             let mut fy = 0.0;
+            let mut side = String::new();
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
+                if k == "\"side\"" {
+                    side = v.to_string();
+                }
                 if k == "\"unum\"" {
                     pnum = v.parse().unwrap();
                 }
@@ -82,8 +86,13 @@ impl PlayData for RCLive {
                     fy = v.parse().unwrap();
                 }
             }
-            pu.ateampositions.push((pnum, fx, fy));
+            if side.chars().nth(1).unwrap() == 'l' {
+                pu.ateampositions.push((pnum-1, fx, fy));
+            } else {
+                pu.bteampositions.push((pnum-1, fx, fy));
+            }
         }
+        eprintln!("DBUG:PPGND:RCLive:Got:Pu:{:?}", pu);
         pu
     }
 
