@@ -110,11 +110,14 @@ impl RandomData {
 
 impl PlayData for RandomData {
 
-    fn setup(&mut self, fps: f32) {
+    fn fps_changed(&mut self, fps: f32) {
         self.fpr = fps*self.spr;
         self.next = 0.0;
     }
 
+    fn seconds_per_record(&self) -> f32 {
+        self.spr
+    }
 
     fn next_frame_is_record_ready(&mut self) -> bool {
         self.next += 1.0;

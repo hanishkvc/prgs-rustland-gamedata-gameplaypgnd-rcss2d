@@ -10,6 +10,9 @@ use crate::playdata::PositionsUpdate;
 use crate::playdata::PlayData;
 use crate::sdlx::XSpaces;
 
+/// Currently the time in terms of seconds (could be a fraction),
+/// between the records maintained in the rcg file, is hard coded, here.
+const SECONDS_PER_RECORD: f32 = 1.0;
 
 pub struct Rcg {
     _fname: String,
@@ -17,14 +20,15 @@ pub struct Rcg {
     lines: Vec<String>,
     iline: isize,
     pub bdone: bool,
-    framesper_record: f32,
-    framesafter_lastrecord: f32,
+    secondsper_record: f32,
+    secondsafter_lastrecord: f32,
+    secondsperframe: f32,
     r2d: XSpaces,
 }
 
 impl Rcg {
 
-    pub fn new(fname: &str) -> Rcg {
+    pub fn new(fname: &str, fps: f32) -> Rcg {
         let mut file = File::open(fname).unwrap();
         let mut sdata = String::new();
         let _gotr = file.read_to_string(&mut sdata).unwrap();
@@ -41,8 +45,9 @@ impl Rcg {
             lines: vline,
             iline: -1,
             bdone: false,
-            framesper_record: 1.0,
-            framesafter_lastrecord: 0.0,
+            secondsper_record: SECONDS_PER_RECORD,
+            secondsafter_lastrecord: 0.0,
+            secondsperframe: 1.0/fps,
             r2d: XSpaces::new(rrect, drect)
         }
     }
@@ -51,24 +56,20 @@ impl Rcg {
 
 impl PlayData for Rcg {
 
-    fn setup(&mut self, fps: f32) {
-        if cfg!(feature="inbetween_frames") {
-            self.framesper_record = fps;
-            self.framesafter_lastrecord = 0.0;
-        } else {
-            self.framesper_record = 1.0;
-            self.framesafter_lastrecord = 0.0;
-        }
+    fn fps_changed(&mut self, fps: f32) {
+        self.secondsperframe = 1.0/fps;
+    }
+
+    fn seconds_per_record(&self) -> f32 {
+        self.secondsper_record
     }
 
     fn next_frame_is_record_ready(&mut self) -> bool {
-        self.framesafter_lastrecord += 1.0;
-        if self.framesafter_lastrecord >= self.framesper_record {
-            self.framesafter_lastrecord = 0.0;
-            //eprintln!("DBUG:PPGND:Rcg:NextFrame:IsRecordReady:Yes");
+        self.secondsafter_lastrecord += self.secondsperframe;
+        if self.secondsafter_lastrecord >= self.secondsper_record {
+            self.secondsafter_lastrecord = 0.0;
             return true;
         }
-        //eprintln!("DBUG:PPGND:Rcg:NextFrame:IsRecordReady:No");
         return false;
     }
 

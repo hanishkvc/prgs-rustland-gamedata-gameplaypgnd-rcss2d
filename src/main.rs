@@ -37,8 +37,7 @@ fn main() {
     let mut pdrcg;
     let pdata: &mut dyn PlayData;
     if clargs.len() > 1 {
-        pdrcg = Rcg::new(&clargs[1]);
-        pdrcg.setup(pgentities.fps());
+        pdrcg = Rcg::new(&clargs[1], pgentities.fps());
         pdata = &mut pdrcg;
     } else {
         pdata = &mut pdrandom;
@@ -83,6 +82,7 @@ fn main() {
                             } else {
                                 pgentities.fps_adjust(0.80);
                             }
+                            pdata.fps_changed(pgentities.fps());
                         }
                         Keycode::D => {
                             eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities);
@@ -103,7 +103,7 @@ fn main() {
                     if pdata.next_frame_is_record_ready() {
                         let pu = pdata.next_record();
                         print!("DBUG:{:?}\n", pu);
-                        pgentities.update(pu, false, pgentities.fps());
+                        pgentities.update(pu, false, pdata.seconds_per_record() * pgentities.fps());
                         //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
