@@ -32,8 +32,14 @@ the game or later). This can include
 Usage
 #######
 
+Cmdline arg
+============
+
 Pass the rcss rcg file as the 1st and only argument to the program.
 This will playback the contents of the rcg file.
+
+Keys
+======
 
 One can use the following keys to control the behaviour as noted below.
 
@@ -73,4 +79,20 @@ One can use the following keys to control the behaviour as noted below.
   * d -> to dump current data associated with entities in the playground
 
     * ie players, ball, msgs
+
+Msgs
+=====
+
+One can see the following messages on the screen in addition to the
+player movements.
+
+* the score, at the top left
+
+* the game time as represented by the playdata source, at the top right
+
+* game related messages in the play data, at the bottom left.
+
+* any unknown/unhandled messages in the play data, at the bottom mid
+
+* the set and actual fps, at the top mid
 
