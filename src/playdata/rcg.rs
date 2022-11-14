@@ -12,7 +12,7 @@ use crate::sdlx::XSpaces;
 
 /// Currently the time in terms of seconds (could be a fraction),
 /// between the records maintained in the rcg file, is hard coded, here.
-const SECONDS_PER_RECORD: f32 = 1.0;
+const SECONDS_PER_RECORD: f32 = 0.2;
 
 pub struct Rcg {
     _fname: String,
@@ -150,6 +150,9 @@ impl PlayData for Rcg {
             self.iline = 0;
         } else if self.iline as usize > self.lines.len() {
             self.iline = (self.lines.len() - 1) as isize;
+        }
+        if self.lines.len() > self.iline as usize {
+            self.bdone = false;
         }
     }
 
