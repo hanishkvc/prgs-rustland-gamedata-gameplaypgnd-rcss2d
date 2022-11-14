@@ -16,17 +16,19 @@ use playdata::PlayData;
 use sdlx::SdlX;
 
 fn show_help(sx: &mut SdlX) {
-    let shelp = "
-    *====     Help     ====*\n\
+    let shelp = "** Help **\n\
     \n\
     larrow: seek back\n\
     rarrow: seek forward\n\
     f/F:    change fps\n\
     p:      pause playback\n\
-    b:      hide/unhide ball\n";
+    b:      hide/unhide ball\n\
+    h:      hide/unhide help\n\
+    \n\
+    playbackpgnd path/file.rcg";
 
     let vhelp: Vec<&str> = shelp.split('\n').collect();
-    sx.n_msgbox((0.2, 0.2,0.6,0.6), vhelp, Color::BLUE);
+    sx.n_msgbox((0.3, 0.3,0.4,0.4), vhelp, Color::BLUE);
 
 }
 

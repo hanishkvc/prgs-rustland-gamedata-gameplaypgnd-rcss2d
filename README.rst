@@ -39,6 +39,8 @@ One can use the following keys to control the behaviour as noted below.
 
 * p -> to pause/unpause the playback
 
+* h -> to hide/unhide the help msg box
+
 * b -> to hide/unhide the ball
 
 * Seeking

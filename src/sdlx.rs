@@ -11,6 +11,9 @@ use sdl2::video::WindowContext;
 pub use sdl2::pixels::Color;
 
 
+const STRING_CHAR_PIXEL_WIDTH: f32 = 8.0;
+
+
 pub struct SdlX {
     _ctxt: Sdl,
     _vs: VideoSubsystem,
@@ -198,10 +201,29 @@ impl SdlX {
         }
     }
 
-    pub fn n_msgbox(&mut self, nr: (f32, f32, f32, f32), ss: Vec<&str>, color: Color) {
-        self.wc.set_draw_color(Color::RGBA(180, 180, 180, 80));
+    /// Show a message box.
+    /// * nr: (x,y,w,h) of the message box in normal space.
+    /// * ss: a vector of strings
+    ///   * 0th string will be treated has the heading and centered at the top.
+    ///     The heading will be colored blackish grey, with white text.
+    ///   * remaining strings will be treated has the message to show,
+    ///     offset by 4 char space.
+    /// * color: color of the message text shown. Background will be light grey.
+    pub fn n_msgbox(&mut self, nr: (f32, f32, f32, f32), mut ss: Vec<&str>, color: Color) {
+        let nlh = nr.3/((ss.len()+2) as f32);
+        self.wc.set_draw_color(Color::RGBA(200, 200, 200, 80));
         self.nn_fill_rect(nr.0, nr.1, nr.2, nr.3);
-        self.n_strings(nr.0, nr.1, 0.05, ss, color);
+        // Heading rectangle
+        self.wc.set_draw_color(Color::RGBA(80, 80, 80, 80));
+        self.nn_fill_rect(nr.0, nr.1, nr.2, nlh*(2 as f32));
+        // Heading text
+        let ncw = self.n2s.o2dx(STRING_CHAR_PIXEL_WIDTH);
+        let hlen = ss[0].len() as f32*ncw;
+        let hbefore = (nr.3 - hlen)/2.0;
+        self.n_string(nr.0+hbefore, nr.1+nlh, ss[0], Color::WHITE);
+        // The message
+        ss.remove(0);
+        self.n_strings(nr.0+4.0*ncw, nr.1+3.0*nlh, nlh, ss, color);
     }
 
 }
