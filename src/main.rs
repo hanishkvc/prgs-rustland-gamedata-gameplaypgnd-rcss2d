@@ -63,14 +63,23 @@ fn main() {
     }
 
     let mut bpause = false;
-    let mut _frame: usize = 0;
+    let mut frame: usize = 0;
     let mut bhelp = false;
+    let mut ptime = std::time::Instant::now();
+    let mut pframe = 0;
+    let mut actualfps = 0;
     'mainloop: loop {
-        _frame += 1;
+        frame += 1;
+        let dtime = std::time::Instant::now().duration_since(ptime);
+        if dtime > std::time::Duration::from_millis(1000) {
+            ptime = std::time::Instant::now();
+            actualfps = frame - pframe;
+            pframe = frame;
+        }
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
-        sx.n_string(0.49, 0.01, &pgentities.fps().round().to_string(), sdlx::Color::BLUE);
+        sx.n_string(0.48, 0.01, &format!("{},{}",&pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
 
         // handle any pending events
         for ev in sx.ep.poll_iter() {
