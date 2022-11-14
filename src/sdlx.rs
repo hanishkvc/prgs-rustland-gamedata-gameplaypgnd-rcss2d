@@ -6,7 +6,7 @@
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::rect::Rect;
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
-use sdl2::render::{WindowCanvas, TextureCreator, Texture};
+use sdl2::render::{WindowCanvas, TextureCreator, Texture, BlendMode};
 use sdl2::video::WindowContext;
 pub use sdl2::pixels::Color;
 
@@ -211,10 +211,11 @@ impl SdlX {
     /// * color: color of the message text shown. Background will be light grey.
     pub fn n_msgbox(&mut self, nr: (f32, f32, f32, f32), mut ss: Vec<&str>, color: Color) {
         let nlh = nr.3/((ss.len()+2) as f32);
-        self.wc.set_draw_color(Color::RGBA(200, 200, 200, 80));
+        self.wc.set_blend_mode(BlendMode::Blend);
+        self.wc.set_draw_color(Color::RGBA(200, 200, 200, 180));
         self.nn_fill_rect(nr.0, nr.1, nr.2, nr.3);
         // Heading rectangle
-        self.wc.set_draw_color(Color::RGBA(80, 80, 80, 80));
+        self.wc.set_draw_color(Color::RGBA(80, 80, 80, 180));
         self.nn_fill_rect(nr.0, nr.1, nr.2, nlh*(2 as f32));
         // Heading text
         let ncw = self.n2s.o2dx(STRING_CHAR_PIXEL_WIDTH);

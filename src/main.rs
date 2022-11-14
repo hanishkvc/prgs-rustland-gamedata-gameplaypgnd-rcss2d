@@ -25,7 +25,8 @@ fn show_help(sx: &mut SdlX) {
     b:      hide/unhide ball\n\
     h:      hide/unhide help\n\
     \n\
-    playbackpgnd path/file.rcg";
+    playbackpgnd path/file.rcg\n\
+    ...                   Save Nature Save Earth";
 
     let vhelp: Vec<&str> = shelp.split('\n').collect();
     sx.n_msgbox((0.3, 0.3,0.4,0.4), vhelp, Color::BLUE);
