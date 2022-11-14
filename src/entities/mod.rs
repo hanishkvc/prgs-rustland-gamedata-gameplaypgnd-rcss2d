@@ -60,11 +60,11 @@ impl<'a> Entities<'a> {
 
     pub fn new(pitch: XRect, anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
         let mut vfpmsgs = Vec::new();
-        let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false);
+        let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
-        let stimemsg = FixedPosMessage::new("stime", MSG_STIME_POS, false);
+        let stimemsg = FixedPosMessage::new("stime", MSG_STIME_POS, false, -1);
         vfpmsgs.push(stimemsg);
-        let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false);
+        let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false, -1);
         vfpmsgs.push(gamemsg);
         Entities {
             fps: FRAMES_PER_SEC as f32,
@@ -125,9 +125,9 @@ impl<'a> Entities<'a> {
         }
     }
 
-    pub fn draw(&self, sx: &mut SdlX) {
+    pub fn draw(&mut self, sx: &mut SdlX) {
         self.draw_pitch(sx);
-        for fpmsg in &self.vfpmsgs {
+        for fpmsg in &mut self.vfpmsgs {
             fpmsg.draw(sx);
         }
         self.ateam.draw(sx);
