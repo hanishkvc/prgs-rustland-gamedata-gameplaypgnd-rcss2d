@@ -38,6 +38,10 @@ Cmdline arg
 Pass the rcss rcg file as the 1st and only argument to the program.
 This will playback the contents of the rcg file.
 
+WIP: Initial skeleton of acting like a dumb robocup soccer sim monitor.
+One needs to pass live as the argument to the program. it doesnt handle
+things properly yet.
+
 Keys
 ======
 

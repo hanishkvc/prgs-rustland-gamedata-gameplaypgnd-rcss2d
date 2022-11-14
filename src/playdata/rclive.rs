@@ -64,7 +64,7 @@ impl PlayData for RCLive {
         eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
         for tok in toks {
             if tok.starts_with("\"ball\"") {
-                let (b,d) = tok.split_once(':').unwrap();
+                let (_b,d) = tok.split_once(':').unwrap();
                 let mut tstr = TStr::from_str(d, true);
                 tstr.delims.bracket_begin = '{';
                 tstr.delims.bracket_end = '}';
@@ -86,10 +86,15 @@ impl PlayData for RCLive {
                 pu.ball = (fx, fy);
                 continue;
             }
-            if !tok.starts_with("{\"side\"") {
+            let mut tstr;
+            if tok.starts_with("\"players\"") {
+                let (_p,d) = tok.split_once('[').unwrap();
+                tstr = TStr::from_str(d, true);
+            } else if !tok.starts_with("{\"side\"") {
                 continue;
+            } else {
+                tstr = TStr::from_str(&tok, true);
             }
-            let mut tstr = TStr::from_str(&tok, true);
             tstr.delims.bracket_begin = '{';
             tstr.delims.bracket_end = '}';
             tstr.delims.string = '^';

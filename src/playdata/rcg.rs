@@ -161,7 +161,7 @@ impl PlayData for Rcg {
         return self.bdone;
     }
 
-    fn send_record(&mut self, buf: &[u8]) {
+    fn send_record(&mut self, _buf: &[u8]) {
         todo!()
     }
 
