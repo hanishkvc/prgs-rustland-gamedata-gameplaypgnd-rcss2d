@@ -6,7 +6,7 @@
 use std::{fs::File, io::Read};
 use tokensk::TStr;
 
-use crate::playdata::PositionsUpdate;
+use crate::playdata::PlayUpdate;
 use crate::playdata::PlayData;
 use crate::sdlx::XSpaces;
 
@@ -73,9 +73,9 @@ impl PlayData for Rcg {
         return false;
     }
 
-    fn next_record(&mut self) -> PositionsUpdate {
+    fn next_record(&mut self) -> PlayUpdate {
         let bcontinue = true;
-        let mut pu = PositionsUpdate::new();
+        let mut pu = PlayUpdate::new();
         while bcontinue {
             self.iline += 1;
             if self.iline >= self.lines.len() as isize {

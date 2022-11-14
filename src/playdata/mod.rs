@@ -9,17 +9,17 @@ use std::collections::HashMap;
 pub type Messages = HashMap<String, String>;
 
 #[derive(Debug)]
-pub struct PositionsUpdate {
+pub struct PlayUpdate {
     pub msgs: Messages,
     pub ball: (f32, f32),
     pub ateampositions: Vec<(i32, f32, f32)>,
     pub bteampositions: Vec<(i32, f32, f32)>,
 }
 
-impl PositionsUpdate {
+impl PlayUpdate {
 
-    pub fn new() -> PositionsUpdate {
-        PositionsUpdate {
+    pub fn new() -> PlayUpdate {
+        PlayUpdate {
             msgs: Messages::new(),
             ball: (0.0,0.0),
             ateampositions: Vec::new(),
@@ -37,7 +37,7 @@ pub trait PlayData {
 
     fn next_frame_is_record_ready(&mut self) -> bool;
 
-    fn next_record(&mut self) -> PositionsUpdate;
+    fn next_record(&mut self) -> PlayUpdate;
 
     fn seek(&mut self, seekdelta: isize);
 

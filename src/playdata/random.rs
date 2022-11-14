@@ -9,7 +9,7 @@ use crate::entities;
 use crate::sdlx::XSpaces;
 
 use super::PlayData;
-use super::PositionsUpdate;
+use super::PlayUpdate;
 
 use crate::entities::SCREEN_WIDTH;
 use crate::entities::SCREEN_HEIGHT;
@@ -129,8 +129,8 @@ impl PlayData for RandomData {
     }
 
     #[cfg(feature="inbetween_frames")]
-    fn next_record(&mut self) -> PositionsUpdate {
-        let mut pu = PositionsUpdate::new();
+    fn next_record(&mut self) -> PlayUpdate {
+        let mut pu = PlayUpdate::new();
         for i in 0..self.acnt {
             let dx = (rand::random::<i32>() % 8) as f32;
             let dy = (rand::random::<i32>() % 8) as f32;
@@ -158,9 +158,9 @@ impl PlayData for RandomData {
     }
 
     #[cfg(not(feature="inbetween_frames"))]
-    fn next_record(&mut self) -> PositionsUpdate {
+    fn next_record(&mut self) -> PlayUpdate {
         self.rcnt += 1;
-        let mut pu = PositionsUpdate::new();
+        let mut pu = PlayUpdate::new();
         for i in 0..self.acnt {
             if self.rcnt % self.achg[i] == 0 {
                 let dx = (rand::random::<i32>() % 4) as f32;

@@ -7,7 +7,7 @@ use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
 use crate::sdlx::{SdlX, XRect};
-use crate::playdata::PositionsUpdate;
+use crate::playdata::PlayUpdate;
 
 
 const ENTITY_WIDTH: u32 = 16;
@@ -117,7 +117,7 @@ impl<'a> PGEntities<'a> {
     ///   to the given position.
     ///   * inframes - specifies as to in how many frames the object should
     ///     be moved to the new location being specified.
-    pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool, inframes: f32) {
+    pub fn update(&mut self, pu: PlayUpdate, babsolute: bool, inframes: f32) {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);
         }
