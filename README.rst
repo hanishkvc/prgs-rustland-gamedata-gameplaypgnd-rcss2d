@@ -47,13 +47,24 @@ One can use the following keys to control the behaviour as noted below.
 
   * right arrow key -> to seek/jump forward
 
+    * NOTE: Any messages in the skipped records, wont be shown.
+
   * left arrow key -> to seek/jump backward
+
+    * NOTE: The messages shown dont get reverted back wrt time.
+
+    * NOTE: Seeking back after reaching end, will bring back the source
+      to be alive.
 
 * FPS - frames per second
 
   * f -> to reduce the current fps
 
   * F -> to increase the current fps
+
+  NOTE: This helps change the rate of playback in the default one record per
+  frame mode. However in the interpolated movement mode, changing fps, doesnt
+  allow one to change the rate of playback.
 
 * c -> to change the background color
 
