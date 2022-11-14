@@ -76,7 +76,9 @@ pub struct FixedPosMessage {
     key: String,
     /// The position is specified in the normalised space of 0.0-1.0
     npos: (f32, f32),
+    /// The message that is shown
     msg: String,
+    /// Color to use wrt the message.
     color: Color,
     /// Control whether empty string is allowed to be set using update call.
     allowemptyupdate: bool,
@@ -94,7 +96,7 @@ impl FixedPosMessage {
         FixedPosMessage {
             key: key.to_string(),
             npos: npos,
-            msg: String::new(),
+            msg: key.to_string(),
             color: MSG_COLOR,
             allowemptyupdate: ballowemptyupdate,
             autoclearchk: autoclearchk,
