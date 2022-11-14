@@ -29,7 +29,7 @@ fn main() {
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
 
     let mut dcolor = 20;
-    let mut pgentities = entities::Entities::new(entities::PITCH_RECT, 11, 11, &font);
+    let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, &font);
 
     // Setup the playdata source
     let clargs = env::args().collect::<Vec<String>>();

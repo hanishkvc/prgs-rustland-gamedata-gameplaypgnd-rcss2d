@@ -35,7 +35,7 @@ pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     }
 }
 
-type _PosInt = i32;
+type _PosType = f32;
 
 pub mod gentity;
 pub mod team;
@@ -45,20 +45,39 @@ use objects::FixedPosMessage;
 
 
 #[derive(Debug)]
-pub(crate) struct Entities<'a> {
+/// Manage the entities in the playground.
+pub(crate) struct PGEntities<'a> {
+    /// The frames per second, wrt movements on the screen
     fps: f32,
+    /// The fixed position based messages on the screen
     vfpmsgs: Vec<FixedPosMessage>,
+    /// Whether to show the ball or not
     pub showball: bool,
+    /// The ball in the playground
     ball: Ball<'a>,
+    /// One of the two teams in the playground
     ateam: team::Team<'a>,
+    /// The other team in the playground.
     bteam: team::Team<'a>,
+    /// The pitch boundry within the screen, in normalised 0.0-1.0 space.
     pitch: XRect,
+    /// If extra pitch markers should be shown or not.
     pub showxtrapitchmarkers: bool,
 }
 
-impl<'a> Entities<'a> {
+impl<'a> PGEntities<'a> {
 
-    pub fn new(pitch: XRect, anplayers: i32, bnplayers: i32, font: &'a Font) -> Entities<'a> {
+    /// Create a playground instance with
+    /// * pitch: the dimensions of the pitch with in the screen,
+    ///   in normalised 0.0-1.0 space.
+    /// * [a/b]nplayers: the number of players on both sides.
+    /// * font: the font used for creating the cached text image datas if any
+    ///
+    /// The following fixed position messages are supported on the screen
+    /// * score: Give the current score, if any.
+    /// * stime: Provide any time related info wrt the game.
+    /// * game: show any game related messages.
+    pub fn new(pitch: XRect, anplayers: i32, bnplayers: i32, font: &'a Font) -> PGEntities<'a> {
         let mut vfpmsgs = Vec::new();
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
@@ -66,7 +85,7 @@ impl<'a> Entities<'a> {
         vfpmsgs.push(stimemsg);
         let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false, -1);
         vfpmsgs.push(gamemsg);
-        Entities {
+        PGEntities {
             fps: FRAMES_PER_SEC as f32,
             vfpmsgs: vfpmsgs,
             ball: Ball::new(font),
@@ -82,11 +101,22 @@ impl<'a> Entities<'a> {
         return self.fps;
     }
 
+    /// Allow one to increase or decrease the fps, relative to the current fps.
     pub fn fps_adjust(&mut self, ratio: f32) -> f32 {
         self.fps *= ratio;
         return self.fps;
     }
 
+    /// Allow contents of the playground to be updated, based on got play data.
+    ///
+    /// pu: contains the play data with info for objects on the playground.
+    ///
+    /// babsolute (for objects that move)
+    /// * if true, sets the object to the given position immidiately,
+    /// * if false, it uses multi-frame interpolated updating of the object
+    ///   to the given position.
+    ///   * inframes - specifies as to in how many frames the object should
+    ///     be moved to the new location being specified.
     pub fn update(&mut self, pu: PositionsUpdate, babsolute: bool, inframes: f32) {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);
@@ -96,12 +126,15 @@ impl<'a> Entities<'a> {
         self.bteam.update(pu.bteampositions, babsolute, inframes);
     }
 
+    /// If using interpolated updating of object positions,
+    /// request them to generate their next interpolated position.
     pub fn next_frame(&mut self) {
         self.ball.next_frame();
         self.ateam.next_frame();
         self.bteam.next_frame();
     }
 
+    /// Draw the pitch on the screen, along with the boundries and any markers.
     fn draw_pitch(&self, sx: &mut SdlX) {
         //let inbtwcolor = Color::RGB(230, 230, 230);
         let inbtwcolor = Color::WHITE;
@@ -125,6 +158,7 @@ impl<'a> Entities<'a> {
         }
     }
 
+    /// Draw all the objects in the playground.
     pub fn draw(&mut self, sx: &mut SdlX) {
         self.draw_pitch(sx);
         for fpmsg in &mut self.vfpmsgs {
