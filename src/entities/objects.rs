@@ -1,5 +1,5 @@
 //!
-//! The ball
+//! Some of the objects required wrt the playground.
 //! HanishKVC, 2022
 //!
 

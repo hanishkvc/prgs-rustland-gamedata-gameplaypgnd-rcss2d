@@ -15,9 +15,12 @@ use super::SCREEN_HEIGHT;
 
 
 pub struct Entity<'a> {
+    /// A textual id of the entity, the same is cached in a image form
+    /// in the ids member.
     _id: String,
-    /// Position of the entity in 0.0-1.0 space
-    fpos: (f32, f32),
+    /// Position of the entity in normal 0.0-1.0 space
+    npos: (f32, f32),
+    /// width, height and radius in screen space dimensions
     whr: (u32, u32, i16),
     color: Color,
     /// Should the entity be moved back into screen, if it goes out
@@ -27,18 +30,19 @@ pub struct Entity<'a> {
     /// Any motion vector that should be used to move entity,
     /// when next frame is called.
     mov: (f32, f32),
-    /// Helper members
+    /// Internal member - half width
     hw: i32,
+    /// Internal member - half height
     hh: i32,
 }
 
 impl<'a> Entity<'a> {
 
-    pub fn new(id: &str, fpos: (f32, f32), whr: (u32, u32, i16), color: Color, font: &'a Font) -> Entity<'a> {
+    pub fn new(id: &str, npos: (f32, f32), whr: (u32, u32, i16), color: Color, font: &'a Font) -> Entity<'a> {
         let ts = sdlx::text_surface(font, id, Color::WHITE);
         Entity {
             _id: id.to_string(),
-            fpos: fpos,
+            npos,
             whr: whr,
             color: color,
             onscreen: true,
@@ -49,46 +53,59 @@ impl<'a> Entity<'a> {
         }
     }
 
-    fn fpos_fix(&mut self) {
+    /// Ensure that the entity remains within the 0.0-1.0 normal space,
+    /// by wrapping it around to the other end, if required.
+    ///
+    /// NOTE: It only wraps around to the other end, any movement required
+    /// within the other end, is not done.
+    fn npos_fix(&mut self) {
         if self.onscreen {
-            if self.fpos.0 < 0.0 {
-                self.fpos.0 = 1.0;
+            if self.npos.0 < 0.0 {
+                self.npos.0 = 1.0;
             }
-            if self.fpos.0 > 1.0 {
-                self.fpos.0 = 0.0;
+            if self.npos.0 > 1.0 {
+                self.npos.0 = 0.0;
             }
-            if self.fpos.1 < 0.0 {
-                self.fpos.1 = 1.0;
+            if self.npos.1 < 0.0 {
+                self.npos.1 = 1.0;
             }
-            if self.fpos.1 > 1.0 {
-                self.fpos.1 = 0.0;
+            if self.npos.1 > 1.0 {
+                self.npos.1 = 0.0;
             }
         }
     }
 
     /// Convert the entity's position into screen space from normal space
     pub fn ipos(&self) -> (i32, i32) {
-        ((self.fpos.0 * SCREEN_WIDTH as f32).round() as i32, (self.fpos.1 * SCREEN_HEIGHT as f32).round() as i32)
+        ((self.npos.0 * SCREEN_WIDTH as f32).round() as i32, (self.npos.1 * SCREEN_HEIGHT as f32).round() as i32)
     }
 
-    /// Set absolute position of the entity
+    /// Set absolute position of the entity in normal 0.0-1.0 space
     pub fn pos_set_abs(&mut self, fx: f32, fy: f32) {
-        self.fpos = (fx, fy);
-        self.fpos_fix();
+        self.npos = (fx, fy);
+        self.npos_fix();
     }
 
-    /// Set relative position of the entity
+    /// Set relative position of the entity in normal 0.0-1.0 space
     pub fn pos_set_rel(&mut self, fx: f32, fy: f32) {
-        self.fpos = (self.fpos.0 + fx, self.fpos.1 + fy);
-        self.fpos_fix();
+        self.npos = (self.npos.0 + fx, self.npos.1 + fy);
+        self.npos_fix();
     }
 
+    /// Set position of the entity in normal 0.0-1.0 space, but to be
+    /// applied/reached over a specified number of frames, as and when
+    /// next_frame will be called, as required.
+    ///
+    /// NOTE: THis is for use in the interpolated movements mode.
     pub fn move_to_in_frames(&mut self, fpos: (f32, f32), frames: f32) {
-        let dx = (fpos.0 - self.fpos.0)/frames;
-        let dy = (fpos.1 - self.fpos.1)/frames;
+        let dx = (fpos.0 - self.npos.0)/frames;
+        let dy = (fpos.1 - self.npos.1)/frames;
         self.mov = (dx, dy);
     }
 
+    /// Update the position of the entity, wrt interpolated movement.
+    /// It uses the move vector setup using move_to_in_frames call,
+    /// to update the position.
     pub fn next_frame(&mut self) {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
@@ -100,7 +117,7 @@ impl<'a> Entity<'a> {
         if cfg!(feature="gentity_circle") {
             sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, self.whr.2, self.color).unwrap();
         } else {
-            sx.ns_fill_rect_mid(self.fpos.0, self.fpos.1, self.whr.0, self.whr.1);
+            sx.ns_fill_rect_mid(self.npos.0, self.npos.1, self.whr.0, self.whr.1);
         }
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
         sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-self.hw, ipos.1-self.hh, self.whr.0, self.whr.1))).unwrap();
@@ -112,9 +129,11 @@ impl std::fmt::Debug for Entity<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Entity")
             .field("_id", &self._id)
-            .field("pos", &self.fpos)
+            .field("pos", &self.npos)
+            .field("whr", &self.whr)
             .field("color", &self.color)
             .field("onscreen", &self.onscreen)
+            .field("move", &self.mov)
             .finish()
     }
 }
