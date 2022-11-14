@@ -61,8 +61,31 @@ impl PlayData for RCLive {
         tstr.delims.string = '^';
         tstr.peel_bracket('{').unwrap();
         let toks = tstr.tokens_vec(',', true, true).unwrap();
-        //eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
+        eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
         for tok in toks {
+            if tok.starts_with("\"ball\"") {
+                let (b,d) = tok.split_once(':').unwrap();
+                let mut tstr = TStr::from_str(d, true);
+                tstr.delims.bracket_begin = '{';
+                tstr.delims.bracket_end = '}';
+                tstr.delims.string = '^';
+                tstr.peel_bracket('{').unwrap();
+                let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
+                let mut fx = 0.0;
+                let mut fy = 0.0;
+                for tokl2 in toksl2 {
+                    let (k,v) = tokl2.split_once(':').unwrap();
+                    if k == "\"x\"" {
+                        fx = v.parse().unwrap();
+                    }
+                    if k == "\"y\"" {
+                        fy = v.parse().unwrap();
+                    }
+                }
+                let (fx,fy) = self.r2n.d2o((fx,fy));
+                pu.ball = (fx, fy);
+                continue;
+            }
             if !tok.starts_with("{\"side\"") {
                 continue;
             }
