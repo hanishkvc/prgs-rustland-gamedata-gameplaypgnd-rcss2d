@@ -139,10 +139,16 @@ impl XSpaces {
 
 impl SdlX {
 
-    #[allow(dead_code)]
     pub fn ns_fill_rect(&mut self, nx: f32, ny: f32, sw: u32, sh: u32) {
         let sorigin = self.n2s.d2o((nx,ny));
         self.wc.fill_rect(Some(Rect::new(sorigin.0 as i32, sorigin.1 as i32, sw, sh))).unwrap();
+    }
+
+    pub fn nn_fill_rect(&mut self, nx: f32, ny: f32, nw: f32, nh: f32) {
+        let (sw, sh) = self.n2s.d2o((nw,nh));
+        let sw = sw.round() as u32;
+        let sh = sh.round() as u32;
+        self.ns_fill_rect(nx, ny, sw, sh);
     }
 
     /// nx,ny represent the mid point of the required rect
@@ -183,7 +189,6 @@ impl SdlX {
         self.wc.string(sx, sy, s, color).unwrap();
     }
 
-    #[allow(dead_code)]
     /// Show multiple lines on the screen
     /// nlh: gives the height to be used wrt each line
     pub fn n_strings(&self, nx: f32, ny: f32, nlh: f32, ss: Vec<&str>, color: Color) {
@@ -191,6 +196,12 @@ impl SdlX {
             let y = ny + (i as f32 * nlh);
             self.n_string(nx, y, ss[i], color);
         }
+    }
+
+    pub fn n_msgbox(&mut self, nr: (f32, f32, f32, f32), ss: Vec<&str>, color: Color) {
+        self.wc.set_draw_color(Color::RGBA(180, 180, 180, 80));
+        self.nn_fill_rect(nr.0, nr.1, nr.2, nr.3);
+        self.n_strings(nr.0, nr.1, 0.05, ss, color);
     }
 
 }

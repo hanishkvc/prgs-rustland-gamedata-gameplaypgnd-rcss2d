@@ -5,13 +5,30 @@
 
 use std::env;
 
+use sdl2::pixels::Color;
+
 mod entities;
 mod sdlx;
 mod playdata;
 use playdata::rcg::Rcg;
 use playdata::random::RandomData;
 use playdata::PlayData;
+use sdlx::SdlX;
 
+fn show_help(sx: &mut SdlX) {
+    let shelp = "
+    *====     Help     ====*\n\
+    \n\
+    larrow: seek back\n\
+    rarrow: seek forward\n\
+    f/F:    change fps\n\
+    p:      pause playback\n\
+    b:      hide/unhide ball\n";
+
+    let vhelp: Vec<&str> = shelp.split('\n').collect();
+    sx.n_msgbox((0.2, 0.2,0.6,0.6), vhelp, Color::BLUE);
+
+}
 
 fn identify() {
     println!("Playback Playground");
@@ -45,6 +62,7 @@ fn main() {
 
     let mut bpause = false;
     let mut _frame: usize = 0;
+    let mut bhelp = false;
     'mainloop: loop {
         _frame += 1;
         // Clear the background
@@ -84,6 +102,9 @@ fn main() {
                             }
                             pdata.fps_changed(pgentities.fps());
                         }
+                        Keycode::H => {
+                            bhelp = !bhelp;
+                        }
                         Keycode::D => {
                             eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities);
                         }
@@ -119,6 +140,9 @@ fn main() {
 
         // Draw entities
         pgentities.draw(&mut sx);
+        if bhelp {
+            show_help(&mut sx);
+        }
 
         sx.wc.present();
         std::thread::sleep(std::time::Duration::from_millis((1000.0/pgentities.fps()).round() as u64));
