@@ -14,6 +14,7 @@ pub use sdl2::pixels::Color;
 const STRING_CHAR_PIXEL_WIDTH: f32 = 8.0;
 
 
+/// Initialises and maintains the SDL contexts wrt Video and Events.
 pub struct SdlX {
     _ctxt: Sdl,
     _vs: VideoSubsystem,
@@ -25,6 +26,17 @@ pub struct SdlX {
 
 impl SdlX {
 
+    /// Initialise SDL
+    ///
+    /// Initialise its Video subsystem and create a Window
+    /// * Get a canvas and inturn the renderer wrt this window
+    ///   * texture creator for creating textures for this window
+    ///
+    /// Get a event pump, to access input events
+    ///
+    /// Create a data space conversion mapper between
+    /// * a normalised space (0.0-1.0) and
+    /// * the screen space
     pub fn init_plus(width: u32, height: u32) -> SdlX {
         let ctxt = sdl2::init().unwrap();
         // Setup window
@@ -62,6 +74,7 @@ impl SdlX {
 
 }
 
+/// Create a surface with a image of the passed text
 pub fn text_surface<'a>(font: &'a Font, text: &str, color: Color) -> Surface<'a> {
     return font.render(text).blended(color).unwrap();
 }
@@ -70,10 +83,16 @@ pub fn text_surface<'a>(font: &'a Font, text: &str, color: Color) -> Surface<'a>
 pub type XPoint = (f32,f32);
 pub type XRect = (XPoint,XPoint);
 
+
+/// Allow conversion between two different 2d spaces
 pub struct XSpaces {
+    /// The 1st/Data 2d space ((dx1,dy1), (dx2,dy2))
     drect: XRect,
+    /// The 2nd/Other 2d space ((ox1,oy1), (ox2,oy2))
     orect: XRect,
+    /// The conversion ratio from Data to Other
     d2o: XPoint,
+    /// The conversion ratio from Other to Data
     o2d: XPoint,
 }
 
@@ -100,18 +119,21 @@ impl XSpaces {
 
 impl XSpaces {
 
+    /// Convert from Data to Other space along/wrt x-axis
     pub fn d2ox(&self, dx: f32) -> f32 {
         let ddx = dx - self.drect.0.0;
         let odx = ddx * self.d2o.0;
         return self.orect.0.0 + odx;
     }
 
+    /// Convert from Data to Other space along/wrt y-axis
     pub fn d2oy(&self, dy: f32) -> f32 {
         let ddy = dy - self.drect.0.1;
         let ody = ddy * self.d2o.1;
         return self.orect.0.1 + ody;
     }
 
+    /// Convert from Data to Other space wrt both x and y axis
     pub fn d2o(&self, d: XPoint) -> XPoint {
         return (self.d2ox(d.0), self.d2oy(d.1));
     }
@@ -121,18 +143,21 @@ impl XSpaces {
 #[allow(dead_code)]
 impl XSpaces {
 
+    /// Convert from Other to Data space along/wrt x-axis
     pub fn o2dx(&self, ox: f32) -> f32 {
         let odx = ox - self.orect.0.0;
         let ddx = odx * self.o2d.0;
         return self.drect.0.0 + ddx;
     }
 
+    /// Convert from Other to Data space along/wrt y-axis
     pub fn o2dy(&self, oy: f32) -> f32 {
         let ody = oy - self.orect.0.1;
         let ddy = ody * self.o2d.1;
         return self.drect.0.1 + ddy;
     }
 
+    /// Convert from Other to Data space wrt both x and y axis
     pub fn o2d(&self, o: XPoint) -> XPoint {
         return (self.o2dx(o.0), self.o2dy(o.1));
     }
@@ -142,11 +167,17 @@ impl XSpaces {
 
 impl SdlX {
 
+    /// Draw a filled rect, which takes
+    /// * x,y in normal space, and it represents the top-left of the rect
+    /// * w,h in screen space
     pub fn ns_fill_rect(&mut self, nx: f32, ny: f32, sw: u32, sh: u32) {
         let sorigin = self.n2s.d2o((nx,ny));
         self.wc.fill_rect(Some(Rect::new(sorigin.0 as i32, sorigin.1 as i32, sw, sh))).unwrap();
     }
 
+    /// Draw a filled rect, which takes
+    /// * x,y in normal space, and it represents the top-left of the rect
+    /// * w,h in normal space
     pub fn nn_fill_rect(&mut self, nx: f32, ny: f32, nw: f32, nh: f32) {
         let (sw, sh) = self.n2s.d2o((nw,nh));
         let sw = sw.round() as u32;
@@ -154,7 +185,9 @@ impl SdlX {
         self.ns_fill_rect(nx, ny, sw, sh);
     }
 
-    /// nx,ny represent the mid point of the required rect
+    /// Draw a filled rect, which takes
+    /// * x,y in normal space, and it represents the mid point of the rect
+    /// * w,h in screen space
     pub fn ns_fill_rect_mid(&mut self, nx: f32, ny: f32, sw: u32, sh: u32) {
         let sorigin = self.n2s.d2o((nx,ny));
         let midw = (sw as f32)/2.0;
@@ -164,6 +197,7 @@ impl SdlX {
         self.wc.fill_rect(Some(Rect::new(x, y, sw, sh))).unwrap();
     }
 
+    /// Draw a line, it takes the end points of the line in normal space
     pub fn nn_line(&mut self, nx1: f32, ny1: f32, nx2: f32, ny2: f32, color: Color) {
         let x1 = self.n2s.d2ox(nx1).round() as i16;
         let y1 = self.n2s.d2oy(ny1).round() as i16;
@@ -172,6 +206,7 @@ impl SdlX {
         self.wc.line(x1, y1, x2, y2, color).unwrap();
     }
 
+    /// Draw a thick line. It takes the end points as well as the width wrt normal space
     pub fn nn_thick_line(&mut self, nx1: f32, ny1: f32, nx2: f32, ny2: f32, nw: f32, color: Color) {
         let x1 = self.n2s.d2ox(nx1).round() as i16;
         let y1 = self.n2s.d2oy(ny1).round() as i16;
@@ -186,13 +221,16 @@ impl SdlX {
         self.wc.thick_line(x1, y1, x2, y2, sw, color).unwrap();
     }
 
+    /// Draw a string.
+    /// Takes the starting point for drawing in normal space.
     pub fn n_string(&self, nx: f32, ny: f32, s: &str, color: Color) {
         let sx = self.n2s.d2ox(nx).round() as i16;
         let sy = self.n2s.d2oy(ny).round() as i16;
         self.wc.string(sx, sy, s, color).unwrap();
     }
 
-    /// Show multiple lines on the screen
+    /// Draw/Show multiple lines on the screen.
+    /// The starting point as well as the gap between lines is given in normal space.
     /// nlh: gives the height to be used wrt each line
     pub fn n_strings(&self, nx: f32, ny: f32, nlh: f32, ss: Vec<&str>, color: Color) {
         for i in 0..ss.len() {
