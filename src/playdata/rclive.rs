@@ -26,6 +26,10 @@ pub struct RCLive {
     tstrx: TStrX,
     /// Help convert from Robocups pitch space to normal space.
     r2n: XSpaces,
+    /// Track whether the server addr has been updated to
+    /// the one over which server sent data to the monitor.
+    /// ie after the initial handshake.
+    bsrvraddr_updated: bool,
 }
 
 impl RCLive {
@@ -49,6 +53,7 @@ impl RCLive {
             srvraddr: addr.to_string(),
             tstrx: tstrx,
             r2n: XSpaces::new(rrect, nrect),
+            bsrvraddr_updated: false,
         }
     }
 
@@ -78,6 +83,10 @@ impl PlayData for RCLive {
             } else {
                 panic!("ERRR:PPGND:RCLive:Unexpected error:{}", err);
             }
+        }
+        if !self.bsrvraddr_updated {
+            self.srvraddr = gotr.as_ref().unwrap().1.to_string();
+            self.bsrvraddr_updated = true;
         }
         let sbuf = String::from_utf8_lossy(&buf);
         ldebug!(&format!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, &sbuf));

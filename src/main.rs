@@ -27,6 +27,7 @@ fn show_help(sx: &mut SdlX) {
     p:      pause playback\n\
     b:      hide/unhide ball\n\
     h:      hide/unhide help\n\
+    5:      kick-off (RCLive)\n\
     \n\
     playbackpgnd path/file.rcg\n\
     ...                   Save Nature Save Earth";

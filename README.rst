@@ -35,12 +35,18 @@ Usage
 Cmdline arg
 ============
 
+Rcg Playback
+--------------
+
 Pass the rcss rcg file as the 1st and only argument to the program.
 This will playback the contents of the rcg file.
 
-WIP: Initial skeleton of acting like a dumb robocup soccer sim monitor.
-One needs to pass live as the argument to the program. it doesnt handle
-things properly yet.
+Live
+------
+
+By passing live as the 1st and only argument to the program, one can make the
+program work as a simple and currently very minimal robocup soccer sim monitor.
+
 
 Keys
 ======
@@ -77,6 +83,9 @@ One can use the following keys to control the behaviour as noted below.
   allow one to change the rate of playback.
 
 * c -> to change the background color
+
+* 5 -> If working in the RobocupSoccerSim monitor mode, this allows to send
+  the kick-off command to the server.
 
 * Internal debug cmds
 
