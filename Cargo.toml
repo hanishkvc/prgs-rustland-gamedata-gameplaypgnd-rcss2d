@@ -13,4 +13,5 @@ inbetween_frames = []
 sdl2 = { version="0.35.2", features = ["gfx", "ttf"] }
 rand = "0.8.5"
 tokensk = { git="https://github.com/hanishkvc/prgs-rustland-libs-tokensk" }
+loggerk = { git="https://github.com/hanishkvc/prgs-rustland-libs-loggerk" }
 

@@ -7,6 +7,7 @@ use std::net::UdpSocket;
 use std::time;
 
 use tokensk::TStrX;
+use loggerk::{ldebug,log_d};
 
 use crate::sdlx::XSpaces;
 
@@ -79,11 +80,11 @@ impl PlayData for RCLive {
             }
         }
         let sbuf = String::from_utf8_lossy(&buf);
-        eprintln!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, &sbuf);
+        ldebug!(&format!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, &sbuf));
         let mut tstr = self.tstrx.from_str(&sbuf, true);
         tstr.peel_bracket('{').unwrap();
         let toks = tstr.tokens_vec(',', true, true).unwrap();
-        eprintln!("DBUG:PPGND:RCLive:Got:Toks:Full:{:#?}", toks);
+        ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Full:{:#?}", toks));
         let mut stime = String::new();
         for tok in toks {
             if tok.starts_with("\"time\"") {
@@ -128,7 +129,7 @@ impl PlayData for RCLive {
             }
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
-            eprintln!("DBUG:PPGND:RCLive:Got:Toks:Side:{:#?}", toksl2);
+            ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Side:{:#?}", toksl2));
             if toksl2.len() < 10 {
                 continue;
             }
@@ -158,7 +159,7 @@ impl PlayData for RCLive {
                 pu.bteampositions.push((pnum-1, fx, fy));
             }
         }
-        eprintln!("DBUG:PPGND:RCLive:Got:Pu:{:?}", pu);
+        ldebug!(&format!("DBUG:PPGND:RCLive:Got:Pu:{:?}", pu));
         pu
     }
 

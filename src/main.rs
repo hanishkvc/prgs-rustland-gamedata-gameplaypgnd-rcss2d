@@ -7,6 +7,8 @@ use std::env;
 
 use sdl2::pixels::Color;
 
+use loggerk::log_init;
+
 mod entities;
 mod sdlx;
 mod playdata;
@@ -44,6 +46,7 @@ fn identify() {
 }
 
 fn main() {
+    log_init();
     identify();
     let ttfx = sdl2::ttf::init().unwrap();
     let font = ttfx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
