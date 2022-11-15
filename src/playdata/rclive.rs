@@ -5,7 +5,7 @@
 
 use std::net::UdpSocket;
 
-use tokensk::{TStr, TStrX};
+use tokensk::TStrX;
 
 use crate::sdlx::XSpaces;
 
@@ -14,7 +14,7 @@ use super::{PlayData, PlayUpdate};
 pub struct RCLive {
     skt: UdpSocket,
     srvraddr: String,
-    stx: TStrX,
+    tstrx: TStrX,
     r2n: XSpaces,
 }
 
@@ -27,10 +27,15 @@ impl RCLive {
         eprintln!("DBUG:PPGND:RCLive:New:{:?}", skt);
         let rrect = ((-55.0, -37.0), (55.0, 37.0));
         let nrect = ((0.0,0.0), (1.0,1.0));
+        let mut tstrx = TStrX::new();
+        tstrx.flags.string_canbe_asubpart = true;
+        tstrx.delims.bracket_begin = '{';
+        tstrx.delims.bracket_end = '}';
+        tstrx.delims.string = '^';
         RCLive {
             skt: skt,
             srvraddr: addr.to_string(),
-            stx: TStrX::new(),
+            tstrx: tstrx,
             r2n: XSpaces::new(rrect, nrect),
         }
     }
@@ -55,20 +60,14 @@ impl PlayData for RCLive {
         let gotr = self.skt.recv_from(&mut buf);
         let sbuf = String::from_utf8_lossy(&buf);
         eprintln!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, &sbuf);
-        let mut tstr = TStr::from_str(&sbuf, true);
-        tstr.delims.bracket_begin = '{';
-        tstr.delims.bracket_end = '}';
-        tstr.delims.string = '^';
+        let mut tstr = self.tstrx.from_str(&sbuf, true);
         tstr.peel_bracket('{').unwrap();
         let toks = tstr.tokens_vec(',', true, true).unwrap();
-        eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
+        //eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
         for tok in toks {
             if tok.starts_with("\"ball\"") {
                 let (_b,d) = tok.split_once(':').unwrap();
-                let mut tstr = TStr::from_str(d, true);
-                tstr.delims.bracket_begin = '{';
-                tstr.delims.bracket_end = '}';
-                tstr.delims.string = '^';
+                let mut tstr = self.tstrx.from_str(d, true);
                 tstr.peel_bracket('{').unwrap();
                 let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
                 let mut fx = 0.0;
@@ -89,15 +88,12 @@ impl PlayData for RCLive {
             let mut tstr;
             if tok.starts_with("\"players\"") {
                 let (_p,d) = tok.split_once('[').unwrap();
-                tstr = TStr::from_str(d, true);
+                tstr = self.tstrx.from_str(d, true);
             } else if !tok.starts_with("{\"side\"") {
                 continue;
             } else {
-                tstr = TStr::from_str(&tok, true);
+                tstr = self.tstrx.from_str(&tok, true);
             }
-            tstr.delims.bracket_begin = '{';
-            tstr.delims.bracket_end = '}';
-            tstr.delims.string = '^';
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
             //eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toksl2);
