@@ -91,7 +91,8 @@ impl PlayData for RCLive {
                 let (_t,d) = tok.split_once(':').unwrap();
                 if d != "\"show\"" {
                     eprintln!("DBUG:PPGND:RCLive:UnhandledTypeMsg:{}", sbuf);
-                    pu.msgs.insert("unknown".to_string(), sbuf.to_string());
+                    let ilen = sbuf.trim().len().min(32);
+                    pu.msgs.insert("unknown".to_string(), sbuf[0..ilen].to_string());
                     return pu;
                 }
                 continue;
