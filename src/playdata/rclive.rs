@@ -83,7 +83,7 @@ impl PlayData for RCLive {
         let mut tstr = self.tstrx.from_str(&sbuf, true);
         tstr.peel_bracket('{').unwrap();
         let toks = tstr.tokens_vec(',', true, true).unwrap();
-        eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toks);
+        eprintln!("DBUG:PPGND:RCLive:Got:Toks:Full:{:#?}", toks);
         for tok in toks {
             if tok.starts_with("\"ball\"") {
                 let (_b,d) = tok.split_once(':').unwrap();
@@ -116,7 +116,10 @@ impl PlayData for RCLive {
             }
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
-            //eprintln!("DBUG:PPGND:RCLive:Got:Toks:{:#?}", toksl2);
+            eprintln!("DBUG:PPGND:RCLive:Got:Toks:Side:{:#?}", toksl2);
+            if toksl2.len() < 10 {
+                continue;
+            }
             let mut pnum = 0;
             let mut fx = 0.0;
             let mut fy = 0.0;
