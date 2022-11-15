@@ -12,18 +12,26 @@ use crate::sdlx::XSpaces;
 
 use super::{PlayData, PlayUpdate};
 
+const OWN_ADDRESS: &str = "0.0.0.0:6600";
+const READ_TIMEOUT_MS: u64 = 500;
+
+
+/// Help act as a simple monitor client for RoboCup Sim
 pub struct RCLive {
     skt: UdpSocket,
+    /// The robocup server address to communicate to.
     srvraddr: String,
+    /// Help tokenise recieved data.
     tstrx: TStrX,
+    /// Help convert from Robocups pitch space to normal space.
     r2n: XSpaces,
 }
 
 impl RCLive {
 
     pub fn new(addr: &str) -> RCLive {
-        let skt = UdpSocket::bind("0.0.0.0:6600").unwrap();
-        skt.set_read_timeout(Some(time::Duration::from_millis(500))).unwrap();
+        let skt = UdpSocket::bind(OWN_ADDRESS).unwrap();
+        skt.set_read_timeout(Some(time::Duration::from_millis(READ_TIMEOUT_MS))).unwrap();
         let sinit = "(dispinit version 5)\r\n";
         skt.send_to(sinit.as_bytes(), addr).unwrap();
         eprintln!("DBUG:PPGND:RCLive:New:{:?}", skt);
