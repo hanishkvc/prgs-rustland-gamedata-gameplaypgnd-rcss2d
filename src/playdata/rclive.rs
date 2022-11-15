@@ -4,6 +4,7 @@
 //!
 
 use std::net::UdpSocket;
+use std::time;
 
 use tokensk::TStrX;
 
@@ -22,6 +23,7 @@ impl RCLive {
 
     pub fn new(addr: &str) -> RCLive {
         let skt = UdpSocket::bind("0.0.0.0:6600").unwrap();
+        skt.set_read_timeout(Some(time::Duration::from_millis(500))).unwrap();
         let sinit = "(dispinit version 5)\r\n";
         skt.send_to(sinit.as_bytes(), addr).unwrap();
         eprintln!("DBUG:PPGND:RCLive:New:{:?}", skt);
@@ -58,6 +60,15 @@ impl PlayData for RCLive {
         let mut pu = PlayUpdate::new();
         let mut buf = [0u8; 8196];
         let gotr = self.skt.recv_from(&mut buf);
+        if gotr.is_err() {
+            let err = gotr.unwrap_err();
+            if err.kind() == std::io::ErrorKind::WouldBlock {
+                eprintln!("WARN:PPGND:RCLive:No data...");
+                return pu;
+            } else {
+                panic!("ERRR:PPGND:RCLive:Unexpected error:{}", err);
+            }
+        }
         let sbuf = String::from_utf8_lossy(&buf);
         eprintln!("DBUG:PPGND:RCLive:Got:{:?}:{}", gotr, &sbuf);
         let mut tstr = self.tstrx.from_str(&sbuf, true);
