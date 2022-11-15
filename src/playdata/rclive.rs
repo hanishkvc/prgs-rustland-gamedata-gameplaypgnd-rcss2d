@@ -85,6 +85,16 @@ impl PlayData for RCLive {
         let toks = tstr.tokens_vec(',', true, true).unwrap();
         eprintln!("DBUG:PPGND:RCLive:Got:Toks:Full:{:#?}", toks);
         for tok in toks {
+            if tok.starts_with("\"time\"") {
+                let (_t,d) = tok.split_once(':').unwrap();
+                pu.msgs.insert("stime".to_string(), d.to_string());
+                continue;
+            }
+            if tok.starts_with("\"mode\"") {
+                let (_t,d) = tok.split_once(':').unwrap();
+                pu.msgs.insert("game".to_string(), d.to_string());
+                continue;
+            }
             if tok.starts_with("\"ball\"") {
                 let (_b,d) = tok.split_once(':').unwrap();
                 let mut tstr = self.tstrx.from_str(d, true);
