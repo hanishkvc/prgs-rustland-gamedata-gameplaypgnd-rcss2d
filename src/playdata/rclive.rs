@@ -87,6 +87,15 @@ impl PlayData for RCLive {
         ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Full:{:#?}", toks));
         let mut stime = String::new();
         for tok in toks {
+            if tok.starts_with("\"type\"") {
+                let (_t,d) = tok.split_once(':').unwrap();
+                if d != "\"show\"" {
+                    eprintln!("DBUG:PPGND:RCLive:UnhandledTypeMsg:{}", sbuf);
+                    pu.msgs.insert("unknown".to_string(), sbuf.to_string());
+                    return pu;
+                }
+                continue;
+            }
             if tok.starts_with("\"time\"") {
                 let (_,d) = tok.split_once(':').unwrap();
                 pu.msgs.insert("stime".to_string(), d.to_string());
