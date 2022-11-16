@@ -125,10 +125,9 @@ impl<'a> GEntity<'a> {
 
     fn color_adjust(&self) -> Color {
         let (r,g,b) = self.color.rgb();
-        let fr = ((r as f32)*0.5) + (127.0 * self.fcolor);
-        let r = fr.min(255.0) as u8;
-        let g = (((g as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;
-        let b = (((b as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;
+        let r = (((r as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+        let g = (((g as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+        let b = (((b as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
         return Color::RGB(r, g, b);
     }
 
