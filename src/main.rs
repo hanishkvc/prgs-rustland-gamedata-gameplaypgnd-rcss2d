@@ -126,7 +126,7 @@ fn main() {
                             pdata.fps_changed(pgentities.fps());
                         }
                         Keycode::Num5 => {
-                            pdata.send_record("(dispstart)".as_bytes());
+                            pdata.send_record("(dispstart)\x00".as_bytes());
                         }
                         Keycode::H => {
                             bhelp = !bhelp;
