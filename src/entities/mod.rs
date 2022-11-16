@@ -125,8 +125,8 @@ impl<'a> PGEntities<'a> {
             fpmsg.update(&pu.msgs);
         }
         self.ball.update(pu.ball, babsolute, inframes);
-        self.ateam.update(pu.ateampositions, babsolute, inframes);
-        self.bteam.update(pu.bteampositions, babsolute, inframes);
+        self.ateam.update(pu.ateamfcoded, babsolute, inframes);
+        self.bteam.update(pu.bteamfcoded, babsolute, inframes);
     }
 
     /// If using interpolated updating of object positions,

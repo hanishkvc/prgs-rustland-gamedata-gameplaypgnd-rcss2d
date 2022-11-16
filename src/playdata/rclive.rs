@@ -176,9 +176,9 @@ impl RCLive {
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateampositions.push((pnum-1, fx, fy));
+                pu.ateamfcoded.push((pnum-1, fx, fy));
             } else {
-                pu.bteampositions.push((pnum-1, fx, fy));
+                pu.bteamfcoded.push((pnum-1, fx, fy));
             }    
         }
 

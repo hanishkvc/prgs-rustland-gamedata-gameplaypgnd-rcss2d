@@ -127,9 +127,9 @@ impl PlayData for Rcg {
                         eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
                     }
                     if steam == "l" {
-                        pu.ateampositions.push((iplayer-1, fx, fy));
+                        pu.ateamfcoded.push((iplayer-1, fx, fy));
                     } else {
-                        pu.bteampositions.push((iplayer-1, fx, fy));
+                        pu.bteamfcoded.push((iplayer-1, fx, fy));
                     }
                 }
                 break;

@@ -170,7 +170,7 @@ impl PlayData for RandomData {
             self.apos[i].0 += self.amov[i].0;
             self.apos[i].1 += self.amov[i].1;
             let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
-            pu.ateampositions.push((i as i32, fx, fy));
+            pu.ateamfcoded.push((i as i32, fx, fy));
         }
         for i in 0..self.bcnt {
             if self.rcnt % self.bchg[i] == 0 {
@@ -181,7 +181,7 @@ impl PlayData for RandomData {
             self.bpos[i].0 += self.bmov[i].0;
             self.bpos[i].1 += self.bmov[i].1;
             let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
-            pu.bteampositions.push((i as i32, fx, fy));
+            pu.bteamfcoded.push((i as i32, fx, fy));
         }
         self.pos_fix();
         pu

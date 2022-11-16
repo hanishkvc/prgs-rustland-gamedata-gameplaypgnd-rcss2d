@@ -17,8 +17,8 @@ pub type Messages = HashMap<String, String>;
 pub struct PlayUpdate {
     pub msgs: Messages,
     pub ball: (f32, f32),
-    pub ateampositions: Vec<(i32, f32, f32)>,
-    pub bteampositions: Vec<(i32, f32, f32)>,
+    pub ateamfcoded: Vec<(i32, f32, f32)>,
+    pub bteamfcoded: Vec<(i32, f32, f32)>,
 }
 
 impl PlayUpdate {
@@ -27,8 +27,8 @@ impl PlayUpdate {
         PlayUpdate {
             msgs: Messages::new(),
             ball: (0.0,0.0),
-            ateampositions: Vec::new(),
-            bteampositions: Vec::new(),
+            ateamfcoded: Vec::new(),
+            bteamfcoded: Vec::new(),
         }
     }
 
