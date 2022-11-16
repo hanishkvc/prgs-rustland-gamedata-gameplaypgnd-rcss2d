@@ -45,8 +45,7 @@ impl RCLive {
         let mut tstrx = TStrX::new();
         tstrx.flags.string_canbe_asubpart = true;
         tstrx.flags.blocktok_dlimuser_endreqd = false;
-        tstrx.delims.bracket_begin = '{';
-        tstrx.delims.bracket_end = '}';
+        tstrx.delims.bracket = ('{','}');
         tstrx.delims.string = '"';
         RCLive {
             skt: skt,
