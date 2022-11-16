@@ -102,18 +102,20 @@ impl RCLive {
                 }
                 if tok.starts_with("\"name\"") {
                     let (_,d) = tok.split_once(':').unwrap();
-                    name = d.to_string();
+                    let mut tstr = self.tstrx.from_str(d, true);
+                    tstr.peel_string('"').unwrap();
+                    name = tstr.to_string();
                 }
                 if tok.starts_with("\"score\"") {
                     let (_,d) = tok.split_once(':').unwrap();
                     score = d.to_string();
                 }
             }
+            let ts = format!("{} [{}]", name, score);
             if side == 'l' {
-                self.ateam = format!("{}[{}]", name, score);
-            }
-            if side == 'r' {
-                self.bteam = format!("{}[{}]", name, score);
+                self.ateam = ts;
+            } else if side == 'r' {
+                self.bteam = ts;
             }
         }
         pu.msgs.insert("score".to_string(), format!("{} vs {}", self.ateam, self.bteam));
