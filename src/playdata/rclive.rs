@@ -75,6 +75,11 @@ impl RCLive {
         pu.msgs.insert("game".to_string(), format!("{}:{}", self.stime, d));
     }
 
+    fn handle_teams(&mut self, tok: &str, pu: &mut PlayUpdate) {
+        let (_t,d) = tok.split_once(':').unwrap();
+        pu.msgs.insert("score".to_string(), d.to_string());
+    }
+
     fn handle_ball(&mut self, tok: &str, pu: &mut PlayUpdate) {
         let (_b,d) = tok.split_once(':').unwrap();
         let mut tstr = self.tstrx.from_str(d, true);
@@ -102,6 +107,9 @@ impl RCLive {
         let toks = tstr.tokens_vec(',', true, false).unwrap();
         ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Players:{:#?}", toks));
         for tok in toks {
+            if tok.trim().len() == 0 {
+                continue;
+            }
             let mut tstr = self.tstrx.from_str(&tok, true);
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
@@ -189,6 +197,10 @@ impl PlayData for RCLive {
             }
             if tok.starts_with("\"mode\"") {
                 self.handle_mode(&tok, &mut pu);
+                continue;
+            }
+            if tok.starts_with("\"teams\"") {
+                self.handle_teams(&tok, &mut pu);
                 continue;
             }
             if tok.starts_with("\"ball\"") {
