@@ -47,7 +47,7 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn update(&mut self, tposs: Vec<(i32, f32, f32)>, babsolute: bool, inframes: f32) {
+    pub fn update(&mut self, tposs: Vec<(i32, f32, f32, f32)>, babsolute: bool, inframes: f32) {
         for ppos in tposs {
             let fx = ppos.1;
             let fy = ppos.2;

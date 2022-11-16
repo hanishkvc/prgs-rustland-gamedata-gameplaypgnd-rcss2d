@@ -159,6 +159,7 @@ impl RCLive {
             let mut fx = 0.0;
             let mut fy = 0.0;
             let mut side = String::new();
+            let mut istamina = 1.0;
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
                 if k == "\"side\"" {
@@ -173,12 +174,16 @@ impl RCLive {
                 if k == "\"y\"" {
                     fy = v.parse().unwrap();
                 }
+                if k == "\"stamina\"" {
+                    istamina = v.parse().unwrap();
+                }
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
+            let fstamina = (istamina as f32)/8000.0;
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateamfcoded.push((pnum-1, fx, fy));
+                pu.ateamfcoded.push((pnum-1, fx, fy, fstamina));
             } else {
-                pu.bteamfcoded.push((pnum-1, fx, fy));
+                pu.bteamfcoded.push((pnum-1, fx, fy, fstamina));
             }    
         }
 

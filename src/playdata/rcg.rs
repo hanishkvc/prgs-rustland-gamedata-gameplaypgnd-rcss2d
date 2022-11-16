@@ -126,10 +126,11 @@ impl PlayData for Rcg {
                     if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
                         eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
                     }
+                    // TODO: Need to add stamina info here, currently set to 0.0
                     if steam == "l" {
-                        pu.ateamfcoded.push((iplayer-1, fx, fy));
+                        pu.ateamfcoded.push((iplayer-1, fx, fy, 0.0));
                     } else {
-                        pu.bteamfcoded.push((iplayer-1, fx, fy));
+                        pu.bteamfcoded.push((iplayer-1, fx, fy, 0.0));
                     }
                 }
                 break;

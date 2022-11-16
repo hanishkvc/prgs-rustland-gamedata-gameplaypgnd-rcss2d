@@ -14,11 +14,12 @@ pub type Messages = HashMap<String, String>;
 /// * messages if any, like score, time info, game actions, ...
 /// * position of the ball
 /// * positiono f the players.
+/// * stamina of the players
 pub struct PlayUpdate {
     pub msgs: Messages,
     pub ball: (f32, f32),
-    pub ateamfcoded: Vec<(i32, f32, f32)>,
-    pub bteamfcoded: Vec<(i32, f32, f32)>,
+    pub ateamfcoded: Vec<(i32, f32, f32, f32)>,
+    pub bteamfcoded: Vec<(i32, f32, f32, f32)>,
 }
 
 impl PlayUpdate {
