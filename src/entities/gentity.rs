@@ -130,13 +130,13 @@ impl<'a> GEntity<'a> {
     fn color_adjust(&self) -> Color {
         let (mut r, mut g, mut b, mut a) = self.color.rgba();
         if (self.colorsel & 0x08) == 0x08 {
-            r = (((r as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+            r = (((r as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;
         }
         if (self.colorsel & 0x04) == 0x04 {
-            g = (((g as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+            g = (((g as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;
         }
         if (self.colorsel & 0x02) == 0x02 {
-            b = (((b as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+            b = (((b as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;
         }
         if (self.colorsel & 0x01) == 0x01 {
             a = (((a as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;

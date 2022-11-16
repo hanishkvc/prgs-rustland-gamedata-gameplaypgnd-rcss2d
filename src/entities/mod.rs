@@ -179,8 +179,8 @@ impl<'a> PGEntities<'a> {
 impl<'a> PGEntities<'a> {
 
     pub fn adjust_teams(&mut self) {
-        self.ateam.adjust_players(0x0f); //9
-        self.ateam.adjust_players(0x0f); //3
+        self.ateam.adjust_players(0x0e); //9
+        self.bteam.adjust_players(0x0e); //3
     }
 
 }
