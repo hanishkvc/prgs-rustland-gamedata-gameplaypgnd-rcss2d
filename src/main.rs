@@ -55,6 +55,7 @@ fn main() {
 
     let mut dcolor = 20;
     let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, &font);
+    pgentities.adjust_teams();
 
     // Setup the playdata source
     let clargs = env::args().collect::<Vec<String>>();

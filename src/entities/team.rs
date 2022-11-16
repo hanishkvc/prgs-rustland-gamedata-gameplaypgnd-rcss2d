@@ -74,3 +74,13 @@ impl<'a> Team<'a> {
     }
 
 }
+
+impl<'a> Team<'a> {
+
+    pub fn adjust_players(&mut self, colorsel: u8) {
+        for i in 0..self.players.len() {
+            self.players[i].colorsel = colorsel;
+        }
+    }
+
+}
