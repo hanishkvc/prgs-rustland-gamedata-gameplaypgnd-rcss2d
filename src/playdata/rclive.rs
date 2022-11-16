@@ -30,6 +30,8 @@ pub struct RCLive {
     /// the one over which server sent data to the monitor.
     /// ie after the initial handshake.
     bsrvraddr_updated: bool,
+    /// Time wrt last message seen from server
+    stime: String,
 }
 
 impl RCLive {
@@ -46,6 +48,7 @@ impl RCLive {
         tstrx.flags.string_canbe_asubpart = true;
         tstrx.flags.blocktok_dlimuser_endreqd = false;
         tstrx.delims.bracket = ('{','}');
+        tstrx.delims.obracket = Some(('[',']'));
         tstrx.delims.string = '"';
         RCLive {
             skt: skt,
@@ -53,7 +56,83 @@ impl RCLive {
             tstrx: tstrx,
             r2n: XSpaces::new(rrect, nrect),
             bsrvraddr_updated: false,
+            stime: String::new(),
         }
+    }
+
+}
+
+impl RCLive {
+
+    fn handle_time(&mut self, tok: &str, pu: &mut PlayUpdate) {
+        let (_,d) = tok.split_once(':').unwrap();
+        pu.msgs.insert("stime".to_string(), d.to_string());
+        self.stime = d.to_string();
+    }
+
+    fn handle_mode(&mut self, tok: &str, pu: &mut PlayUpdate) {
+        let (_t,d) = tok.split_once(':').unwrap();
+        pu.msgs.insert("game".to_string(), format!("{}:{}", self.stime, d));
+    }
+
+    fn handle_ball(&mut self, tok: &str, pu: &mut PlayUpdate) {
+        let (_b,d) = tok.split_once(':').unwrap();
+        let mut tstr = self.tstrx.from_str(d, true);
+        tstr.peel_bracket('{').unwrap();
+        let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
+        let mut fx = 0.0;
+        let mut fy = 0.0;
+        for tokl2 in toksl2 {
+            let (k,v) = tokl2.split_once(':').unwrap();
+            if k == "\"x\"" {
+                fx = v.parse().unwrap();
+            }
+            if k == "\"y\"" {
+                fy = v.parse().unwrap();
+            }
+        }
+        let (fx,fy) = self.r2n.d2o((fx,fy));
+        pu.ball = (fx, fy);
+    }
+
+    fn handle_players(&mut self, tok: &str, pu: &mut PlayUpdate) {
+        let (_p,d) = tok.split_once(':').unwrap();
+        let mut tstr = self.tstrx.from_str(d, true);
+        tstr.peel_bracket('[').unwrap();
+        let toks = tstr.tokens_vec(',', true, false).unwrap();
+        ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Players:{:#?}", toks));
+        for tok in toks {
+            let mut tstr = self.tstrx.from_str(&tok, true);
+            tstr.peel_bracket('{').unwrap();
+            let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
+            ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Player:{:#?}", toksl2));
+            let mut pnum = 0;
+            let mut fx = 0.0;
+            let mut fy = 0.0;
+            let mut side = String::new();
+            for tokl2 in toksl2 {
+                let (k,v) = tokl2.split_once(':').unwrap();
+                if k == "\"side\"" {
+                    side = v.to_string();
+                }
+                if k == "\"unum\"" {
+                    pnum = v.parse().unwrap();
+                }
+                if k == "\"x\"" {
+                    fx = v.parse().unwrap();
+                }
+                if k == "\"y\"" {
+                    fy = v.parse().unwrap();
+                }
+            }
+            let (fx,fy) = self.r2n.d2o((fx,fy));
+            if side.chars().nth(1).unwrap() == 'l' {
+                pu.ateampositions.push((pnum-1, fx, fy));
+            } else {
+                pu.bteampositions.push((pnum-1, fx, fy));
+            }    
+        }
+
     }
 
 }
@@ -93,7 +172,6 @@ impl PlayData for RCLive {
         tstr.peel_bracket('{').unwrap();
         let toks = tstr.tokens_vec(',', true, true).unwrap();
         ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Full:{:#?}", toks));
-        let mut stime = String::new();
         for tok in toks {
             if tok.starts_with("\"type\"") {
                 let (_t,d) = tok.split_once(':').unwrap();
@@ -106,75 +184,20 @@ impl PlayData for RCLive {
                 continue;
             }
             if tok.starts_with("\"time\"") {
-                let (_,d) = tok.split_once(':').unwrap();
-                pu.msgs.insert("stime".to_string(), d.to_string());
-                stime = d.to_string();
+                self.handle_time(&tok, &mut pu);
                 continue;
             }
             if tok.starts_with("\"mode\"") {
-                let (_t,d) = tok.split_once(':').unwrap();
-                pu.msgs.insert("game".to_string(), format!("{}:{}", stime, d));
+                self.handle_mode(&tok, &mut pu);
                 continue;
             }
             if tok.starts_with("\"ball\"") {
-                let (_b,d) = tok.split_once(':').unwrap();
-                let mut tstr = self.tstrx.from_str(d, true);
-                tstr.peel_bracket('{').unwrap();
-                let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
-                let mut fx = 0.0;
-                let mut fy = 0.0;
-                for tokl2 in toksl2 {
-                    let (k,v) = tokl2.split_once(':').unwrap();
-                    if k == "\"x\"" {
-                        fx = v.parse().unwrap();
-                    }
-                    if k == "\"y\"" {
-                        fy = v.parse().unwrap();
-                    }
-                }
-                let (fx,fy) = self.r2n.d2o((fx,fy));
-                pu.ball = (fx, fy);
+                self.handle_ball(&tok, &mut pu);
                 continue;
             }
-            let mut tstr;
             if tok.starts_with("\"players\"") {
-                let (_p,d) = tok.split_once('[').unwrap();
-                tstr = self.tstrx.from_str(d, true);
-            } else if !tok.starts_with("{\"side\"") {
+                self.handle_players(&tok, &mut pu);
                 continue;
-            } else {
-                tstr = self.tstrx.from_str(&tok, true);
-            }
-            tstr.peel_bracket('{').unwrap();
-            let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
-            ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Side:{:#?}", toksl2));
-            if toksl2.len() < 10 {
-                continue;
-            }
-            let mut pnum = 0;
-            let mut fx = 0.0;
-            let mut fy = 0.0;
-            let mut side = String::new();
-            for tokl2 in toksl2 {
-                let (k,v) = tokl2.split_once(':').unwrap();
-                if k == "\"side\"" {
-                    side = v.to_string();
-                }
-                if k == "\"unum\"" {
-                    pnum = v.parse().unwrap();
-                }
-                if k == "\"x\"" {
-                    fx = v.parse().unwrap();
-                }
-                if k == "\"y\"" {
-                    fy = v.parse().unwrap();
-                }
-            }
-            let (fx,fy) = self.r2n.d2o((fx,fy));
-            if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateampositions.push((pnum-1, fx, fy));
-            } else {
-                pu.bteampositions.push((pnum-1, fx, fy));
             }
         }
         ldebug!(&format!("DBUG:PPGND:RCLive:Got:Pu:{:?}", pu));
