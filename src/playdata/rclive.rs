@@ -32,6 +32,9 @@ pub struct RCLive {
     bsrvraddr_updated: bool,
     /// Time wrt last message seen from server
     stime: String,
+    /// Team name and Score
+    ateam: String,
+    bteam: String,
 }
 
 impl RCLive {
@@ -57,6 +60,8 @@ impl RCLive {
             r2n: XSpaces::new(rrect, nrect),
             bsrvraddr_updated: false,
             stime: String::new(),
+            ateam: String::new(),
+            bteam: String::new(),
         }
     }
 
@@ -77,7 +82,41 @@ impl RCLive {
 
     fn handle_teams(&mut self, tok: &str, pu: &mut PlayUpdate) {
         let (_t,d) = tok.split_once(':').unwrap();
-        pu.msgs.insert("score".to_string(), d.to_string());
+        let mut tstr = self.tstrx.from_str(d, true);
+        tstr.peel_bracket('[').unwrap();
+        let teams = tstr.tokens_vec(',', true, false).unwrap();
+        for team in teams {
+            if team.trim().len() == 0 {
+                continue;
+            }
+            let mut tstr = self.tstrx.from_str(&team, true);
+            tstr.peel_bracket('{').unwrap();
+            let toks = tstr.tokens_vec(',', true, false).unwrap();
+            let mut side = '?';
+            let mut name = String::new();
+            let mut score = String::new();
+            for tok in toks {
+                if tok.starts_with("\"side\"") {
+                    let (_,d) = tok.split_once(':').unwrap();
+                    side = d.chars().nth(1).unwrap();
+                }
+                if tok.starts_with("\"name\"") {
+                    let (_,d) = tok.split_once(':').unwrap();
+                    name = d.to_string();
+                }
+                if tok.starts_with("\"score\"") {
+                    let (_,d) = tok.split_once(':').unwrap();
+                    score = d.to_string();
+                }
+            }
+            if side == 'l' {
+                self.ateam = format!("{}[{}]", name, score);
+            }
+            if side == 'r' {
+                self.bteam = format!("{}[{}]", name, score);
+            }
+        }
+        pu.msgs.insert("score".to_string(), format!("{} vs {}", self.ateam, self.bteam));
     }
 
     fn handle_ball(&mut self, tok: &str, pu: &mut PlayUpdate) {
