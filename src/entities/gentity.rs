@@ -28,6 +28,8 @@ pub struct GEntity<'a> {
     /// width, height and radius in screen space dimensions
     whr: (u32, u32, i16),
     color: Color,
+    /// Color adjust
+    fcolor: f32,
     /// Should the entity be moved back into screen, if it goes out
     onscreen: bool,
     /// A cache of the Id string, as a SDL surface
@@ -51,6 +53,7 @@ impl<'a> GEntity<'a> {
             npos,
             whr: whr,
             color: color,
+            fcolor: 1.0,
             onscreen: true,
             ids: ts,
             mov: (0.0, 0.0),
@@ -116,9 +119,22 @@ impl<'a> GEntity<'a> {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
 
+    pub fn set_fcolor(&mut self, fval1: f32, fval2: f32) {
+        self.fcolor = fval1 * fval2;
+    }
+
+    fn color_adjust(&self) -> Color {
+        let (r,g,b) = self.color.rgb();
+        let fr = (r as f32) * self.fcolor;
+        let r = fr.min(255.0) as u8;
+        let g = ((g as f32) * self.fcolor).min(255.0) as u8;
+        let b = ((b as f32) * self.fcolor).min(255.0) as u8;
+        return Color::RGB(r, g, b);
+    }
+
     /// Draw the gentity on passed canvas
     pub fn draw(&self, sx: &mut SdlX) {
-        sx.wc.set_draw_color(self.color);
+        sx.wc.set_draw_color(self.color_adjust());
         let ipos = self.ipos();
         if cfg!(feature="gentity_circle") {
             sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, self.whr.2, self.color).unwrap();

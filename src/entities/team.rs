@@ -51,6 +51,8 @@ impl<'a> Team<'a> {
         for ppos in tposs {
             let fx = ppos.1;
             let fy = ppos.2;
+            let fstamina = ppos.3;
+            self.players[ppos.0 as usize].set_fcolor(fstamina, 1.0);
             if babsolute {
                 self.players[ppos.0 as usize].pos_set_abs(fx, fy);
             } else {
