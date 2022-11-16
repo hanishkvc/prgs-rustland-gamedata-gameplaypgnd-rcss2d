@@ -15,6 +15,7 @@ use super::{PlayData, PlayUpdate};
 
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
+const STAMINA_BASE: f32 = 8000.0;
 
 
 /// Help act as a simple monitor client for RoboCup Sim
@@ -159,7 +160,7 @@ impl RCLive {
             let mut fx = 0.0;
             let mut fy = 0.0;
             let mut side = String::new();
-            let mut istamina = 1.0;
+            let mut fstamina = 1.0f32;
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
                 if k == "\"side\"" {
@@ -175,11 +176,11 @@ impl RCLive {
                     fy = v.parse().unwrap();
                 }
                 if k == "\"stamina\"" {
-                    istamina = v.parse().unwrap();
+                    fstamina = v.parse().unwrap();
                 }
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
-            let fstamina = (istamina as f32)/8000.0;
+            fstamina = (fstamina/STAMINA_BASE).min(1.0);
             if side.chars().nth(1).unwrap() == 'l' {
                 pu.ateamfcoded.push((pnum-1, fx, fy, fstamina));
             } else {

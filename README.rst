@@ -111,3 +111,9 @@ player movements.
 
 * the set and actual fps, at the top mid
 
+Augumenting
+=============
+
+The color of the player is set based on the player's stamina info.
+A darker shade indicates more stamina and lighter shade less stamina.
+

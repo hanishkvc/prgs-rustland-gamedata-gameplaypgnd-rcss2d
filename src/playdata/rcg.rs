@@ -130,7 +130,7 @@ impl PlayData for Rcg {
                     let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
                     ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
                     let mut fstamina: f32 = staminatoks[1].parse().unwrap();
-                    fstamina = fstamina/STAMINA_BASE;
+                    fstamina = (fstamina/STAMINA_BASE).min(1.0);
                     let fx = self.r2d.d2ox(fxin);
                     let fy = self.r2d.d2oy(fyin);
                     if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
