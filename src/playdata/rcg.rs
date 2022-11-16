@@ -4,6 +4,7 @@
 //!
 
 use std::{fs::File, io::Read};
+use loggerk::{ldebug, log_d};
 use tokensk::TStr;
 
 use crate::playdata::PlayUpdate;
@@ -13,6 +14,7 @@ use crate::sdlx::XSpaces;
 /// Currently the time in terms of seconds (could be a fraction),
 /// between the records maintained in the rcg file, is hard coded, here.
 const SECONDS_PER_RECORD: f32 = 0.2;
+const STAMINA_BASE: f32 = 8000.0;
 
 pub struct Rcg {
     _fname: String,
@@ -104,6 +106,7 @@ impl PlayData for Rcg {
                     let mut tstr = TStr::from_str(&tok, true);
                     tstr.peel_bracket('(').unwrap();
                     let vdata = tstr.tokens_vec(' ', true, true).unwrap();
+                    ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Full:{:?}", vdata));
                     if vdata[0].starts_with("(b") {
                         let fxin: f32 = vdata[1].parse().unwrap();
                         let fyin: f32 = vdata[2].parse().unwrap();
@@ -121,16 +124,22 @@ impl PlayData for Rcg {
                     let iplayer: i32 = splayer.parse().unwrap();
                     let fxin: f32 = vdata[3].parse().unwrap();
                     let fyin: f32 = vdata[4].parse().unwrap();
+                    let sstamina = &vdata[10];
+                    let mut tstr = TStr::from_str(sstamina, true);
+                    tstr.peel_bracket('(').unwrap();
+                    let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
+                    ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
+                    let mut fstamina: f32 = staminatoks[1].parse().unwrap();
+                    fstamina = fstamina/STAMINA_BASE;
                     let fx = self.r2d.d2ox(fxin);
                     let fy = self.r2d.d2oy(fyin);
                     if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
                         eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
                     }
-                    // TODO: Need to add stamina info here, currently set to 0.0
                     if steam == "l" {
-                        pu.ateamfcoded.push((iplayer-1, fx, fy, 0.0));
+                        pu.ateamfcoded.push((iplayer-1, fx, fy, fstamina));
                     } else {
-                        pu.bteamfcoded.push((iplayer-1, fx, fy, 0.0));
+                        pu.bteamfcoded.push((iplayer-1, fx, fy, fstamina));
                     }
                 }
                 break;
