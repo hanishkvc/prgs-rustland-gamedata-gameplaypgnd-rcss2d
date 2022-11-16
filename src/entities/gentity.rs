@@ -7,6 +7,7 @@ use sdl2::{pixels::Color, rect::Rect};
 use sdl2::ttf::Font;
 use sdl2::surface::Surface;
 use sdl2::gfx::primitives::DrawRenderer;
+use sdl2::render::BlendMode;
 
 use crate::sdlx::{self, SdlX};
 
@@ -138,7 +139,7 @@ impl<'a> GEntity<'a> {
             b = (((b as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
         }
         if (self.colorsel & 0x01) == 0x01 {
-            a = (((a as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+            a = (((a as f32)*0.5) + (127.0*self.fcolor)).min(255.0) as u8;
         }
         return Color::RGBA(r, g, b, a);
     }
@@ -146,6 +147,7 @@ impl<'a> GEntity<'a> {
     /// Draw the gentity on passed canvas
     pub fn draw(&self, sx: &mut SdlX) {
         sx.wc.set_draw_color(self.color_adjust());
+        sx.wc.set_blend_mode(BlendMode::Blend);
         let ipos = self.ipos();
         if cfg!(feature="gentity_circle") {
             sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, self.whr.2, self.color).unwrap();
