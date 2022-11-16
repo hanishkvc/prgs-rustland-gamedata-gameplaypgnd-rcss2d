@@ -30,6 +30,8 @@ pub struct GEntity<'a> {
     color: Color,
     /// Color adjust
     fcolor: f32,
+    /// Color adjust selector
+    pub colorsel: u8,
     /// Should the entity be moved back into screen, if it goes out
     onscreen: bool,
     /// A cache of the Id string, as a SDL surface
@@ -54,6 +56,7 @@ impl<'a> GEntity<'a> {
             whr: whr,
             color: color,
             fcolor: 1.0,
+            colorsel: 0x01,
             onscreen: true,
             ids: ts,
             mov: (0.0, 0.0),
@@ -124,11 +127,20 @@ impl<'a> GEntity<'a> {
     }
 
     fn color_adjust(&self) -> Color {
-        let (r,g,b) = self.color.rgb();
-        let r = (((r as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
-        let g = (((g as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
-        let b = (((b as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
-        return Color::RGB(r, g, b);
+        let (mut r, mut g, mut b, mut a) = self.color.rgba();
+        if (self.colorsel & 0x08) == 0x08 {
+            r = (((r as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+        }
+        if (self.colorsel & 0x04) == 0x04 {
+            g = (((g as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+        }
+        if (self.colorsel & 0x02) == 0x02 {
+            b = (((b as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+        }
+        if (self.colorsel & 0x01) == 0x01 {
+            a = (((a as f32)*0.75) + (63.0*self.fcolor)).min(255.0) as u8;
+        }
+        return Color::RGBA(r, g, b, a);
     }
 
     /// Draw the gentity on passed canvas
