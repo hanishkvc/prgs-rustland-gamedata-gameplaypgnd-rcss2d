@@ -165,4 +165,8 @@ impl PlayData for Rcg {
         todo!()
     }
 
+    fn send_record_coded(&mut self, _code: isize) {
+        todo!()
+    }
+
 }

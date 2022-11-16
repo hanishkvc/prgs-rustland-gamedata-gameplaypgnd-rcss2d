@@ -27,7 +27,7 @@ fn show_help(sx: &mut SdlX) {
     p:      pause playback\n\
     b:      hide/unhide ball\n\
     h:      hide/unhide help\n\
-    5:      kick-off (RCLive)\n\
+    1:      kick-off (RCLive)\n\
     \n\
     playbackpgnd path/file.rcg\n\
     ...                   Save Nature Save Earth";
@@ -125,8 +125,8 @@ fn main() {
                             }
                             pdata.fps_changed(pgentities.fps());
                         }
-                        Keycode::Num5 => {
-                            pdata.send_record("(dispstart)\x00".as_bytes());
+                        Keycode::Num1 => {
+                            pdata.send_record_coded(1);
                         }
                         Keycode::H => {
                             bhelp = !bhelp;

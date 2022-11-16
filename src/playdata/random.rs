@@ -200,4 +200,8 @@ impl PlayData for RandomData {
         todo!()
     }
 
+    fn send_record_coded(&mut self, _code: isize) {
+        todo!()
+    }
+
 }

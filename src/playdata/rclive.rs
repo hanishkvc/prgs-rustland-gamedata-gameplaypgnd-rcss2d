@@ -270,4 +270,12 @@ impl PlayData for RCLive {
         eprintln!("DBUG:PPGND:RCLive:Sent:{:?}:To:{:?}-{:?}", buf, self.skt, self.srvraddr);
     }
 
+    fn send_record_coded(&mut self, code: isize) {
+        let msg = match code {
+            1 => "(dispstart)\x00".as_bytes(),
+            _ => todo!(),
+        };
+        self.send_record(msg);
+    }
+
 }

@@ -46,6 +46,8 @@ Live
 
 By passing live as the 1st and only argument to the program, one can make the
 program work as a simple and currently very minimal robocup soccer sim monitor.
+It can be used to watch a game live as well as kick-start(kick-off) wrt the
+2 halfs+ if & when needed.
 
 
 Keys
@@ -84,8 +86,8 @@ One can use the following keys to control the behaviour as noted below.
 
 * c -> to change the background color
 
-* 5 -> If working in the RobocupSoccerSim monitor mode, this allows to send
-  the kick-off command to the server.
+* 1 -> If working in the RobocupSoccerSim monitor mode, this allows to send
+  the kick-off (dispstart) command to the server.
 
 * Internal debug cmds
 

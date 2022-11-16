@@ -76,8 +76,11 @@ pub trait PlayData {
     /// no more data available with it.
     fn bdone(&self) -> bool;
 
-    /// A generic send record
+    /// A generic send record, where the caller can pass a byte buffer.
     fn send_record(&mut self, buf: &[u8]);
+
+    /// A generic send record, where the caller specifies a integer code.
+    fn send_record_coded(&mut self, code: isize);
 
 }
 
