@@ -26,10 +26,13 @@ pub struct GEntity<'a> {
     _id: String,
     /// Position of the entity in normal 0.0-1.0 space
     npos: (f32, f32),
-    /// width, height and radius in screen space dimensions
-    whr: (u32, u32, i16),
+    /// width, height in screen space dimensions
+    width_height: (u32, u32),
+    /// Radius in screen space dimensions
+    radius: i16,
+    /// Color of the object
     color: Color,
-    /// Color adjust
+    /// Color adjust fraction for the adjustable part
     fcolor: f32,
     /// Color adjust selector
     pub colorsel: u8,
@@ -44,32 +47,35 @@ pub struct GEntity<'a> {
     hw: i32,
     /// Internal member - half height
     hh: i32,
-    /// Extras - Circle
-    cir_nradius: f32,
-    cir_ndegrees: f32,
-    cir_color: Color,
+    /// Extras - XArc
+    /// XArc radius relative to GEntity size
+    arc_nradius: f32,
+    /// XArc angle in normalised space of 0.0-1.0 (ie wrt 0-360)
+    arc_nangle: f32,
+    arc_color: Color,
 }
 
 impl<'a> GEntity<'a> {
 
     /// Create a new instance of the Graphical Entity
-    pub fn new(id: &str, npos: (f32, f32), whr: (u32, u32, i16), color: Color, font: &'a Font) -> GEntity<'a> {
+    pub fn new(id: &str, npos: (f32, f32), width_height: (u32, u32), color: Color, font: &'a Font) -> GEntity<'a> {
         let ts = sdlx::text_surface(font, id, Color::WHITE);
         GEntity {
             _id: id.to_string(),
-            npos,
-            whr: whr,
+            npos: npos,
+            width_height,
+            radius: ((width_height.0 + width_height.1)/2) as i16,
             color: color,
             fcolor: 1.0,
             colorsel: 0x01,
             onscreen: true,
             ids: ts,
             mov: (0.0, 0.0),
-            hw: (whr.0/2) as i32,
-            hh: (whr.1/2) as i32,
-            cir_nradius: -1.0,
-            cir_ndegrees: -1.0,
-            cir_color: Color::WHITE,
+            hw: (width_height.0/2) as i32,
+            hh: (width_height.1/2) as i32,
+            arc_nradius: -1.0,
+            arc_nangle: -1.0,
+            arc_color: Color::WHITE,
         }
     }
 
@@ -130,10 +136,49 @@ impl<'a> GEntity<'a> {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
 
+    /// Draw the gentity on passed canvas
+    pub fn draw(&self, sx: &mut SdlX) {
+        sx.wc.set_draw_color(self.color_adjust());
+        sx.wc.set_blend_mode(BlendMode::Blend);
+        let ipos = self.ipos();
+        if cfg!(feature="gentity_circle") {
+            sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, self.radius, self.color).unwrap();
+        } else {
+            sx.ns_fill_rect_mid(self.npos.0, self.npos.1, self.width_height.0, self.width_height.1);
+        }
+        let tx = self.ids.as_texture(&sx.wctc).unwrap();
+        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-self.hw, ipos.1-self.hh, self.width_height.0, self.width_height.1))).unwrap();
+        if self.arc_nradius > 0.0 {
+            let rad = (self.radius as f32 * self.arc_nradius).round() as i16;
+            let edeg = (self.arc_nangle * 360.0).round() as i16;
+            sx.ns_arc(self.npos.0, self.npos.1, rad, 0, edeg, self.arc_color);
+        }
+    }
+
+}
+
+impl std::fmt::Debug for GEntity<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GEntity")
+            .field("_id", &self._id)
+            .field("pos", &self.npos)
+            .field("whr", &self.width_height)
+            .field("color", &self.color)
+            .field("onscreen", &self.onscreen)
+            .field("move", &self.mov)
+            .finish()
+    }
+}
+
+/// Helpers to manipulate the base color set
+impl<'a> GEntity<'a> {
+
+    /// color adjust fraction is set to fval1 * fval2
     pub fn set_fcolor(&mut self, fval1: f32, fval2: f32) {
         self.fcolor = fval1 * fval2;
     }
 
+    /// Adjust the gentity's color, rather the adjustable part
     fn color_adjust(&self) -> Color {
         let (mut r, mut g, mut b, mut a) = self.color.rgba();
         if (self.colorsel & 0x08) == 0x08 {
@@ -151,34 +196,18 @@ impl<'a> GEntity<'a> {
         return Color::RGBA(r, g, b, a);
     }
 
-    /// Draw the gentity on passed canvas
-    pub fn draw(&self, sx: &mut SdlX) {
-        sx.wc.set_draw_color(self.color_adjust());
-        sx.wc.set_blend_mode(BlendMode::Blend);
-        let ipos = self.ipos();
-        if cfg!(feature="gentity_circle") {
-            sx.wc.filled_circle(ipos.0 as i16, ipos.1 as i16, self.whr.2, self.color).unwrap();
-        } else {
-            sx.ns_fill_rect_mid(self.npos.0, self.npos.1, self.whr.0, self.whr.1);
-        }
-        let tx = self.ids.as_texture(&sx.wctc).unwrap();
-        sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-self.hw, ipos.1-self.hh, self.whr.0, self.whr.1))).unwrap();
-        if self.cir_nradius > 0.0 {
-            sx.n_arc(self.npos.0, self.npos.1, self.cir_nradius, self.cir_ndegrees, self.cir_color);
-        }
-    }
-
 }
 
-impl std::fmt::Debug for GEntity<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("GEntity")
-            .field("_id", &self._id)
-            .field("pos", &self.npos)
-            .field("whr", &self.whr)
-            .field("color", &self.color)
-            .field("onscreen", &self.onscreen)
-            .field("move", &self.mov)
-            .finish()
+/// Helpers wrt Extra geometry
+impl<'a> GEntity<'a> {
+
+    /// Set the arc
+    /// * nradius is relative to gentity size/radius
+    /// * nangle is in 0.0-1.0 normal space (ie wrt 0-360 degrees).
+    pub fn set_nxarc(&mut self, nradius: f32, nangle: f32, color: Color) {
+        self.arc_nradius = nradius;
+        self.arc_nangle = nangle;
+        self.arc_color = color;
     }
+
 }

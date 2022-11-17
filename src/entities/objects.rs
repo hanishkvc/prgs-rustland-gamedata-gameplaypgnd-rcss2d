@@ -31,7 +31,7 @@ impl<'a> Ball<'a> {
     /// NOTE: The position is set using update call.
     pub fn new(font: &'a Font) -> Ball<'a> {
         Ball {
-            bge: GEntity::new(" ", (0.0,0.0), (BALL_SIZE, BALL_SIZE, (BALL_SIZE/2) as i16), BALL_COLOR, font)
+            bge: GEntity::new(" ", (0.0,0.0), (BALL_SIZE, BALL_SIZE), BALL_COLOR, font)
         }
     }
 
