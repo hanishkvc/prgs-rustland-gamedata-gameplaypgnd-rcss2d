@@ -55,17 +55,17 @@ impl<'a> Team<'a> {
             let fstamina = ppos.3;
             //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
             let istamina = (fstamina * 100.0).round() as i32;
-            let color = match istamina {
+            let stamina_color = match istamina {
                 0..=30 => Color::RED,
                 31..=70 => Color::YELLOW,
                 71..=100 => Color::GREEN,
                 _ => todo!(),
             };
-            self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
-            self.players[pi].set_tl_color(color);
-            self.players[pi].set_bl_color(color);
-            self.players[pi].set_ll_color(color);
-            self.players[pi].set_rl_color(color);
+            //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
+            self.players[pi].set_tl_color(Color::GREEN);
+            self.players[pi].set_bl_color(Color::GREEN);
+            self.players[pi].set_ll_color(stamina_color);
+            self.players[pi].set_rl_color(stamina_color);
             if babsolute {
                 self.players[ppos.0 as usize].pos_set_abs(fx, fy);
             } else {
