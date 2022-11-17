@@ -53,6 +53,14 @@ impl<'a> Team<'a> {
             let fy = ppos.2;
             let fstamina = ppos.3;
             self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
+            let istamina = (fstamina * 100.0).round() as i32;
+            let color = match istamina {
+                0..=30 => Color::RED,
+                31..=70 => Color::YELLOW,
+                71..=100 => Color::GREEN,
+                _ => todo!(),
+            };
+            self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
             if babsolute {
                 self.players[ppos.0 as usize].pos_set_abs(fx, fy);
             } else {

@@ -117,3 +117,6 @@ Augumenting
 The color of the player is set based on the player's stamina info.
 A darker shade indicates more stamina and lighter shade less stamina.
 
+A arc is drawn around the player whose circumference and color is
+based on the stamina of the player, currently.
+
