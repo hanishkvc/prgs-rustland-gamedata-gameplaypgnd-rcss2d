@@ -21,7 +21,7 @@ pub struct SdlX {
     pub wc: WindowCanvas,
     pub ep: EventPump,
     pub wctc: TextureCreator<WindowContext>,
-    n2s: XSpaces,
+    pub n2s: XSpaces,
 }
 
 impl SdlX {

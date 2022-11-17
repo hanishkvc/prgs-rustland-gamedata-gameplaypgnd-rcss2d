@@ -136,7 +136,36 @@ impl<'a> GEntity<'a> {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
 
+    fn draw_outerlines(&self, sx: &mut SdlX) {
+        let nw = sx.n2s.o2dx(self.width_height.0 as f32);
+        let nh = sx.n2s.o2dy(self.width_height.1 as f32);
+        let nhw = nw/2.0;
+        let nhh = nh/2.0;
+        // Top line
+        let tx1 = self.npos.0 - nhw;
+        let ty1 = self.npos.1 - nhh - nh*0.2;
+        sx.nn_line(tx1, ty1, tx1+nw, ty1, self.color);
+        // Bottom line
+        let tx1 = self.npos.0 - nhw;
+        let ty1 = self.npos.1 + nhh + nh*0.2;
+        sx.nn_line(tx1, ty1, tx1+nw, ty1, self.color);
+        // left line
+        let lx1 = self.npos.0 - nhw - nw*0.2;
+        let ly1 = self.npos.1 - nhh;
+        sx.nn_line(lx1, ly1, lx1, ly1+nh, self.color);
+        // Right line
+        let lx1 = self.npos.0 + nhw + nw*0.2;
+        let ly1 = self.npos.1 - nhh;
+        sx.nn_line(lx1, ly1, lx1, ly1+nh, self.color);
+    }
+
     /// Draw the gentity on passed canvas
+    /// At the core it consists of a
+    /// * filled rectangle or a filled circle
+    /// Further one can augument it with additional data using
+    /// * a textual id
+    /// * the fill color (which can be partly modified using fcolor)
+    /// * a arc (wrt/including its radius, angle and color)
     pub fn draw(&self, sx: &mut SdlX) {
         let color;
         if self.fcolor < 0.0 {
@@ -159,6 +188,8 @@ impl<'a> GEntity<'a> {
             let edeg = (self.arc_nangle * 359.0).round() as i16;
             sx.ns_arc(self.npos.0, self.npos.1, rad, 0, edeg, 3, self.arc_color);
         }
+        drop(tx);
+        self.draw_outerlines(sx);
     }
 
 }
