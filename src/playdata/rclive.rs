@@ -104,7 +104,9 @@ impl RCLive {
                 if tok.starts_with("\"name\"") {
                     let (_,d) = tok.split_once(':').unwrap();
                     let mut tstr = self.tstrx.from_str(d, true);
-                    tstr.peel_string('"').unwrap();
+                    if tstr.char_first().unwrap() == '"' {
+                        tstr.peel_string('"').unwrap();
+                    }
                     name = tstr.to_string();
                 }
                 if tok.starts_with("\"score\"") {
