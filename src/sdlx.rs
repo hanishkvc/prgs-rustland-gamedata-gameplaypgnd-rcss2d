@@ -266,3 +266,16 @@ impl SdlX {
     }
 
 }
+
+impl SdlX {
+
+    pub fn n_arc(&self, nx: f32, ny: f32, nrad: f32, nangle: f32, color: Color) {
+        let (sx,sy) = self.n2s.d2o((nx,ny));
+        let radius = self.n2s.d2ox(nrad).round() as i16;
+        let sx = sx.round() as i16;
+        let sy = sy.round() as i16;
+        let edeg = (nangle*360.0).round() as i16;
+        self.wc.arc(sx, sy, radius, 0, edeg, color).unwrap();
+    }
+
+}

@@ -44,6 +44,10 @@ pub struct GEntity<'a> {
     hw: i32,
     /// Internal member - half height
     hh: i32,
+    /// Extras - Circle
+    cir_nradius: f32,
+    cir_ndegrees: f32,
+    cir_color: Color,
 }
 
 impl<'a> GEntity<'a> {
@@ -63,6 +67,9 @@ impl<'a> GEntity<'a> {
             mov: (0.0, 0.0),
             hw: (whr.0/2) as i32,
             hh: (whr.1/2) as i32,
+            cir_nradius: -1.0,
+            cir_ndegrees: -1.0,
+            cir_color: Color::WHITE,
         }
     }
 
@@ -156,6 +163,9 @@ impl<'a> GEntity<'a> {
         }
         let tx = self.ids.as_texture(&sx.wctc).unwrap();
         sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-self.hw, ipos.1-self.hh, self.whr.0, self.whr.1))).unwrap();
+        if self.cir_nradius > 0.0 {
+            sx.n_arc(self.npos.0, self.npos.1, self.cir_nradius, self.cir_ndegrees, self.cir_color);
+        }
     }
 
 }
