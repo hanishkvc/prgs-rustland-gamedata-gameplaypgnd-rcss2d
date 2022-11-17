@@ -49,6 +49,7 @@ impl<'a> Team<'a> {
 
     pub fn update(&mut self, tposs: Vec<(i32, f32, f32, f32)>, babsolute: bool, inframes: f32) {
         for ppos in tposs {
+            let pi = ppos.0 as usize;
             let fx = ppos.1;
             let fy = ppos.2;
             let fstamina = ppos.3;
@@ -61,6 +62,10 @@ impl<'a> Team<'a> {
                 _ => todo!(),
             };
             self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
+            self.players[pi].set_tl_color(color);
+            self.players[pi].set_bl_color(color);
+            self.players[pi].set_ll_color(color);
+            self.players[pi].set_rl_color(color);
             if babsolute {
                 self.players[ppos.0 as usize].pos_set_abs(fx, fy);
             } else {

@@ -114,9 +114,16 @@ player movements.
 Augumenting
 =============
 
-The color of the player is set based on the player's stamina info.
-A darker shade indicates more stamina and lighter shade less stamina.
+The following geometric characteristics wrt the player could be used
+to map to different player performance and or other characteristics
 
-A arc is drawn around the player whose circumference and color is
-based on the stamina of the player, currently.
+* color of the player
+  (Color and its shading can be mapped to some characteristics)
+
+* colors of the 4 outerlines around the player
+  (Currently all are mapped to the player stamina, by default.
+  good stamina is green, in between is yellow and low is red)
+
+* color and arc length of the arc around the player
+  (Currently mapped to player stamina, by default)
 

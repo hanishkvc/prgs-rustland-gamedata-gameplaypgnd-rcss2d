@@ -268,4 +268,20 @@ impl<'a> GEntity<'a> {
         self.arc_color = color;
     }
 
+    pub fn set_tl_color(&mut self, color: Color) {
+        self.tl_color = color;
+    }
+
+    pub fn set_bl_color(&mut self, color: Color) {
+        self.bl_color = color;
+    }
+
+    pub fn set_ll_color(&mut self, color: Color) {
+        self.ll_color = color;
+    }
+
+    pub fn set_rl_color(&mut self, color: Color) {
+        self.rl_color = color;
+    }
+
 }
