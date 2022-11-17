@@ -52,7 +52,7 @@ impl<'a> Team<'a> {
             let fx = ppos.1;
             let fy = ppos.2;
             let fstamina = ppos.3;
-            self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
+            //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
             let istamina = (fstamina * 100.0).round() as i32;
             let color = match istamina {
                 0..=30 => Color::RED,

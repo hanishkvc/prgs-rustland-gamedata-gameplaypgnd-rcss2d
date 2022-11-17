@@ -66,7 +66,7 @@ impl<'a> GEntity<'a> {
             width_height,
             radius: ((width_height.0 + width_height.1)/2) as i16,
             color: color,
-            fcolor: 1.0,
+            fcolor: -1.0,
             colorsel: 0x01,
             onscreen: true,
             ids: ts,
@@ -138,7 +138,13 @@ impl<'a> GEntity<'a> {
 
     /// Draw the gentity on passed canvas
     pub fn draw(&self, sx: &mut SdlX) {
-        sx.wc.set_draw_color(self.color_adjust());
+        let color;
+        if self.fcolor < 0.0 {
+            color = self.color;
+        } else {
+            color = self.color_adjust();
+        }
+        sx.wc.set_draw_color(color);
         sx.wc.set_blend_mode(BlendMode::Blend);
         let ipos = self.ipos();
         if cfg!(feature="gentity_circle") {
