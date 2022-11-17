@@ -151,7 +151,7 @@ impl<'a> GEntity<'a> {
         if self.arc_nradius > 0.0 {
             let rad = (self.radius as f32 * self.arc_nradius).round() as i16;
             let edeg = (self.arc_nangle * 359.0).round() as i16;
-            sx.ns_arc(self.npos.0, self.npos.1, rad, 0, edeg, self.arc_color);
+            sx.ns_arc(self.npos.0, self.npos.1, rad, 0, edeg, 3, self.arc_color);
         }
     }
 

@@ -270,19 +270,25 @@ impl SdlX {
 impl SdlX {
 
     /// NOTE: Remember if start and end angle are same (inc 0 to 360), then no arc
-    pub fn ns_arc(&self, nx: f32, ny: f32, sradius: i16, sstartangle: i16, sendangle: i16, color: Color) {
+    pub fn ns_arc(&self, nx: f32, ny: f32, sradius: i16, sstartangle: i16, sendangle: i16, swidth: isize, color: Color) {
         let (sx,sy) = self.n2s.d2o((nx,ny));
         let sx = sx.round() as i16;
         let sy = sy.round() as i16;
-        self.wc.arc(sx, sy, sradius, sstartangle, sendangle, color).unwrap();
+        let wdiv = swidth/2;
+        let wmod = swidth%2;
+        let sw = sradius as isize - wdiv;
+        let ew = sradius as isize + wdiv + wmod;
+        for ir in sw..ew {
+            self.wc.arc(sx, sy, ir as i16, sstartangle, sendangle, color).unwrap();
+        }
     }
 
     #[allow(dead_code)]
-    pub fn n_arc(&self, nx: f32, ny: f32, nrad: f32, nstartangle: f32, nendangle: f32, color: Color) {
+    pub fn n_arc(&self, nx: f32, ny: f32, nrad: f32, nstartangle: f32, nendangle: f32, width: isize, color: Color) {
         let radius = self.n2s.d2ox(nrad).round() as i16;
         let ssdeg = (nstartangle*360.0).round() as i16;
         let sedeg = (nendangle*360.0).round() as i16;
-        self.ns_arc(nx, ny, radius, ssdeg, sedeg, color);
+        self.ns_arc(nx, ny, radius, ssdeg, sedeg, width, color);
     }
 
 }
