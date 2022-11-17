@@ -297,3 +297,23 @@ impl SdlX {
     }
 
 }
+
+pub fn ncolor_gyr(ncolor: f32) -> Color {
+    let mut r = 0.0;
+    let mut g = 0.0;
+    if ncolor < 0.33 {
+        let fv = (0.33 - ncolor)/0.33;
+        r = 127.0+fv*255.0*0.5;
+    } else if ncolor < 0.66 {
+        //let fv = 1.0-((0.66 - ncolor)/0.33);
+        let fv = (0.66 - ncolor)/0.33;
+        r = 127.0+fv*255.0*0.5;
+        g = 127.0+fv*255.0*0.5;
+    } else {
+        let fv = 1.0-(1.00 - ncolor)/0.33;
+        g = 127.0+fv*255.0*0.5;
+    }
+    let r = r.round().min(255.0) as u8;
+    let g = g.round().min(255.0) as u8;
+    Color::RGB(r, g, 0)
+}
