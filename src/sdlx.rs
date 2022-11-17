@@ -212,12 +212,16 @@ impl SdlX {
         let y1 = self.n2s.d2oy(ny1).round() as i16;
         let x2 = self.n2s.d2ox(nx2).round() as i16;
         let y2 = self.n2s.d2oy(ny2).round() as i16;
-        let sw;
+        let mut sw;
         if (x2-x1).abs() > (y2-y1).abs() {
             sw = self.n2s.d2ox(nw).round() as u8;
         } else {
             sw = self.n2s.d2oy(nw).round() as u8;
         }
+        if sw < 1 {
+            sw = 1;
+        }
+        //eprintln!("DBUG:SdlX:NNThickLine:{},{},{},{},[{},{}]", x1,y1,x2,y2,nw,sw);
         self.wc.thick_line(x1, y1, x2, y2, sw, color).unwrap();
     }
 
