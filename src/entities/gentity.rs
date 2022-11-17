@@ -13,6 +13,9 @@ use crate::sdlx::{self, SdlX};
 
 use super::SCREEN_WIDTH;
 use super::SCREEN_HEIGHT;
+use sdlx::COLOR_INVISIBLE;
+
+
 
 
 /// Represents a Graphical entity, with support
@@ -53,6 +56,10 @@ pub struct GEntity<'a> {
     /// XArc angle in normalised space of 0.0-1.0 (ie wrt 0-360)
     arc_nangle: f32,
     arc_color: Color,
+    tl_color: Color,
+    bl_color: Color,
+    ll_color: Color,
+    rl_color: Color,
 }
 
 impl<'a> GEntity<'a> {
@@ -76,6 +83,10 @@ impl<'a> GEntity<'a> {
             arc_nradius: -1.0,
             arc_nangle: -1.0,
             arc_color: Color::WHITE,
+            tl_color: COLOR_INVISIBLE,
+            bl_color: COLOR_INVISIBLE,
+            ll_color: COLOR_INVISIBLE,
+            rl_color: COLOR_INVISIBLE,
         }
     }
 
@@ -144,21 +155,29 @@ impl<'a> GEntity<'a> {
         let hlw = nh*0.1;
         let vlw = nw*0.2;
         // Top line
-        let tx1 = self.npos.0 - nhw;
-        let ty1 = self.npos.1 - nhh - nh*0.2;
-        sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.color);
+        if self.tl_color != COLOR_INVISIBLE {
+            let tx1 = self.npos.0 - nhw;
+            let ty1 = self.npos.1 - nhh - nh*0.2;
+            sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.tl_color);
+        }
         // Bottom line
-        let tx1 = self.npos.0 - nhw;
-        let ty1 = self.npos.1 + nhh + nh*0.2;
-        sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.color);
+        if self.bl_color != COLOR_INVISIBLE {
+            let tx1 = self.npos.0 - nhw;
+            let ty1 = self.npos.1 + nhh + nh*0.2;
+            sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.bl_color);
+        }
         // left line
-        let lx1 = self.npos.0 - nhw - nw*0.2;
-        let ly1 = self.npos.1 - nhh;
-        sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.color);
+        if self.ll_color != COLOR_INVISIBLE {
+            let lx1 = self.npos.0 - nhw - nw*0.2;
+            let ly1 = self.npos.1 - nhh;
+            sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.ll_color);
+        }
         // Right line
-        let lx1 = self.npos.0 + nhw + nw*0.2;
-        let ly1 = self.npos.1 - nhh;
-        sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.color);
+        if self.rl_color != COLOR_INVISIBLE {
+            let lx1 = self.npos.0 + nhw + nw*0.2;
+            let ly1 = self.npos.1 - nhh;
+            sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.rl_color);
+        }
     }
 
     /// Draw the gentity on passed canvas

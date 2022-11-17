@@ -11,6 +11,7 @@ use sdl2::video::WindowContext;
 pub use sdl2::pixels::Color;
 
 
+pub const COLOR_INVISIBLE: Color = Color::RGBA(0, 0, 0, 0);
 const STRING_CHAR_PIXEL_WIDTH: f32 = 8.0;
 
 
