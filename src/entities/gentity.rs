@@ -141,22 +141,24 @@ impl<'a> GEntity<'a> {
         let nh = sx.n2s.o2dy(self.width_height.1 as f32);
         let nhw = nw/2.0;
         let nhh = nh/2.0;
+        let hlw = nh*0.1;
+        let vlw = nw*0.2;
         // Top line
         let tx1 = self.npos.0 - nhw;
         let ty1 = self.npos.1 - nhh - nh*0.2;
-        sx.nn_line(tx1, ty1, tx1+nw, ty1, self.color);
+        sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.color);
         // Bottom line
         let tx1 = self.npos.0 - nhw;
         let ty1 = self.npos.1 + nhh + nh*0.2;
-        sx.nn_line(tx1, ty1, tx1+nw, ty1, self.color);
+        sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.color);
         // left line
         let lx1 = self.npos.0 - nhw - nw*0.2;
         let ly1 = self.npos.1 - nhh;
-        sx.nn_line(lx1, ly1, lx1, ly1+nh, self.color);
+        sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.color);
         // Right line
         let lx1 = self.npos.0 + nhw + nw*0.2;
         let ly1 = self.npos.1 - nhh;
-        sx.nn_line(lx1, ly1, lx1, ly1+nh, self.color);
+        sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.color);
     }
 
     /// Draw the gentity on passed canvas
