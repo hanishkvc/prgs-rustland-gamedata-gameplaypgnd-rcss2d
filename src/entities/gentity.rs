@@ -150,7 +150,7 @@ impl<'a> GEntity<'a> {
         sx.wc.copy(&tx, None, Some(Rect::new(ipos.0-self.hw, ipos.1-self.hh, self.width_height.0, self.width_height.1))).unwrap();
         if self.arc_nradius > 0.0 {
             let rad = (self.radius as f32 * self.arc_nradius).round() as i16;
-            let edeg = (self.arc_nangle * 360.0).round() as i16;
+            let edeg = (self.arc_nangle * 359.0).round() as i16;
             sx.ns_arc(self.npos.0, self.npos.1, rad, 0, edeg, self.arc_color);
         }
     }

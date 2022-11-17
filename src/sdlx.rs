@@ -269,6 +269,7 @@ impl SdlX {
 
 impl SdlX {
 
+    /// NOTE: Remember if start and end angle are same (inc 0 to 360), then no arc
     pub fn ns_arc(&self, nx: f32, ny: f32, sradius: i16, sstartangle: i16, sendangle: i16, color: Color) {
         let (sx,sy) = self.n2s.d2o((nx,ny));
         let sx = sx.round() as i16;
@@ -276,6 +277,7 @@ impl SdlX {
         self.wc.arc(sx, sy, sradius, sstartangle, sendangle, color).unwrap();
     }
 
+    #[allow(dead_code)]
     pub fn n_arc(&self, nx: f32, ny: f32, nrad: f32, nstartangle: f32, nendangle: f32, color: Color) {
         let radius = self.n2s.d2ox(nrad).round() as i16;
         let ssdeg = (nstartangle*360.0).round() as i16;
