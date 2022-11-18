@@ -120,10 +120,10 @@ to map to different player performance and or other characteristics
 * color and its shading of the player
 
 * colors of the 4 outerlines around the player, Currently
-  * the vertical lines are mapped to player stamina by default
+  * both vertical lines are mapped to player stamina by default
     good stamina is green, in between is yellow and low is red
-  * top and bottom are left green for now, may be later they can
-    be mapped to any cards issued, ...
+  * both (top and bottom) horizontal lines are mapped to any card
+    issued to player, for now.
 
 * color and arc length of the arc around the player
 

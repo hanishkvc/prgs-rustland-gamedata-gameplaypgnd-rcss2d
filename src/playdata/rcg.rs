@@ -7,6 +7,7 @@ use std::{fs::File, io::Read};
 use loggerk::{ldebug, log_d};
 use tokensk::TStr;
 
+use crate::playdata;
 use crate::playdata::PlayUpdate;
 use crate::playdata::PlayData;
 use crate::sdlx::XSpaces;
@@ -15,6 +16,9 @@ use crate::sdlx::XSpaces;
 /// between the records maintained in the rcg file, is hard coded, here.
 const SECONDS_PER_RECORD: f32 = 0.2;
 const STAMINA_BASE: f32 = 8000.0;
+const STATE_REDCARD: u32 = 0x80000;
+const STATE_YELLOWCARD: u32 = 0x40000;
+
 
 pub struct Rcg {
     _fname: String,
@@ -122,6 +126,13 @@ impl PlayData for Rcg {
                     tstr.peel_bracket('(').unwrap();
                     let (steam, splayer) = tstr.split_once(' ').unwrap();
                     let iplayer: i32 = splayer.parse().unwrap();
+                    let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
+                    let mut cards = 0;
+                    if state & STATE_REDCARD == STATE_REDCARD {
+                        cards = playdata::CARD_RED;
+                    } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
+                        cards = playdata::CARD_YELLOW;
+                    }
                     let fxin: f32 = vdata[3].parse().unwrap();
                     let fyin: f32 = vdata[4].parse().unwrap();
                     let sstamina = &vdata[10];
@@ -137,9 +148,9 @@ impl PlayData for Rcg {
                         eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
                     }
                     if steam == "l" {
-                        pu.ateamcoded.push((iplayer-1, fx, fy, fstamina));
+                        pu.ateamcoded.push((iplayer-1, fx, fy, fstamina, cards));
                     } else {
-                        pu.bteamcoded.push((iplayer-1, fx, fy, fstamina));
+                        pu.bteamcoded.push((iplayer-1, fx, fy, fstamina, cards));
                     }
                 }
                 break;

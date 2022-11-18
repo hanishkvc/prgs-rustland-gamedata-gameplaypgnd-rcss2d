@@ -9,13 +9,15 @@ use std::time;
 use tokensk::TStrX;
 use loggerk::{ldebug,log_d};
 
-use crate::sdlx::XSpaces;
+use crate::{sdlx::XSpaces, playdata};
 
 use super::{PlayData, PlayUpdate};
 
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
 const STAMINA_BASE: f32 = 8000.0;
+const STATE_REDCARD: u32 = 0x80000;
+const STATE_YELLOWCARD: u32 = 0x40000;
 
 
 /// Help act as a simple monitor client for RoboCup Sim
@@ -163,6 +165,7 @@ impl RCLive {
             let mut fy = 0.0;
             let mut side = String::new();
             let mut fstamina = 1.0f32;
+            let mut cards = 0u32;
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
                 if k == "\"side\"" {
@@ -180,14 +183,22 @@ impl RCLive {
                 if k == "\"stamina\"" {
                     fstamina = v.parse().unwrap();
                 }
+                if k == "\"state\"" {
+                    let state: u32 = v.parse().unwrap();
+                    if state & STATE_REDCARD == STATE_REDCARD {
+                        cards = playdata::CARD_RED;
+                    } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
+                        cards = playdata::CARD_YELLOW;
+                    }
+                }
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
             fstamina = (fstamina/STAMINA_BASE).min(1.0);
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateamcoded.push((pnum-1, fx, fy, fstamina));
+                pu.ateamcoded.push((pnum-1, fx, fy, fstamina, cards));
             } else {
-                pu.bteamcoded.push((pnum-1, fx, fy, fstamina));
-            }    
+                pu.bteamcoded.push((pnum-1, fx, fy, fstamina, cards));
+            }
         }
 
     }
