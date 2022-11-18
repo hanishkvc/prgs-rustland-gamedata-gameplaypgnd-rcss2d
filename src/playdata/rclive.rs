@@ -184,9 +184,9 @@ impl RCLive {
             let (fx,fy) = self.r2n.d2o((fx,fy));
             fstamina = (fstamina/STAMINA_BASE).min(1.0);
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateamfcoded.push((pnum-1, fx, fy, fstamina));
+                pu.ateamcoded.push((pnum-1, fx, fy, fstamina));
             } else {
-                pu.bteamfcoded.push((pnum-1, fx, fy, fstamina));
+                pu.bteamcoded.push((pnum-1, fx, fy, fstamina));
             }    
         }
 

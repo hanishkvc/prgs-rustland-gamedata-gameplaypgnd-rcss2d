@@ -6,6 +6,17 @@
 use std::collections::HashMap;
 
 
+type TPlayerId = i32;
+type TPosX = f32;
+type TPosY = f32;
+type TStamina = f32;
+type TCards = u32;
+pub type PlayerCodedData = (TPlayerId, TPosX, TPosY, TStamina, TCards);
+
+pub const CARD_RED: TCards = 0x1;
+pub const CARD_YELLOW: TCards = 0x2;
+
+
 pub type Messages = HashMap<String, String>;
 
 #[derive(Debug)]
@@ -18,8 +29,8 @@ pub type Messages = HashMap<String, String>;
 pub struct PlayUpdate {
     pub msgs: Messages,
     pub ball: (f32, f32),
-    pub ateamfcoded: Vec<(i32, f32, f32, f32)>,
-    pub bteamfcoded: Vec<(i32, f32, f32, f32)>,
+    pub ateamcoded: Vec<PlayerCodedData>,
+    pub bteamcoded: Vec<PlayerCodedData>,
 }
 
 impl PlayUpdate {
@@ -28,8 +39,8 @@ impl PlayUpdate {
         PlayUpdate {
             msgs: Messages::new(),
             ball: (0.0,0.0),
-            ateamfcoded: Vec::new(),
-            bteamfcoded: Vec::new(),
+            ateamcoded: Vec::new(),
+            bteamcoded: Vec::new(),
         }
     }
 
