@@ -63,7 +63,6 @@ fn main() {
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
 
     let mut dcolor = 20;
-    let mut ncolor = 1.0;
     let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, &font);
     pgentities.adjust_teams();
 
@@ -100,8 +99,7 @@ fn main() {
             pframe = frame;
         }
         // Clear the background
-        //sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
-        sx.wc.set_draw_color(sdlx::ncolor_gyr(ncolor));
+        sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
         sx.n_string(0.48, 0.01, &format!("{},{}",&pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
 
@@ -115,8 +113,7 @@ fn main() {
                 Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
                     match keycode.unwrap() {
                         Keycode::C => {
-                            //dcolor = dcolor.wrapping_add(20);
-                            ncolor -= 0.01;
+                            dcolor = dcolor.wrapping_add(20);
                         }
                         Keycode::P => {
                             bpause = !bpause;
