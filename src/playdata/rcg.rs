@@ -128,7 +128,7 @@ impl PlayData for Rcg {
                     let mut tstr = TStr::from_str(sstamina, true);
                     tstr.peel_bracket('(').unwrap();
                     let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
-                    ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
+                    //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
                     let mut fstamina: f32 = staminatoks[1].parse().unwrap();
                     fstamina = (fstamina/STAMINA_BASE).min(1.0);
                     let fx = self.r2d.d2ox(fxin);
