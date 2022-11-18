@@ -8,7 +8,7 @@ use sdl2::ttf::Font;
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
-use crate::sdlx::{SdlX, self};
+use crate::sdlx::SdlX;
 
 
 
@@ -61,7 +61,6 @@ impl<'a> Team<'a> {
                 71..=100 => Color::GREEN,
                 _ => todo!(),
             };
-            let stamina_color = sdlx::ncolor_gyr(fstamina);
             //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
             self.players[pi].set_tl_color(Color::GREEN);
             self.players[pi].set_bl_color(Color::GREEN);
