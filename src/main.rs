@@ -6,6 +6,7 @@
 use std::env;
 
 use sdl2::pixels::Color;
+use sdl2::ttf::Font;
 
 use loggerk::log_init;
 
@@ -17,6 +18,8 @@ use playdata::random::RandomData;
 use playdata::PlayData;
 use playdata::rclive::RCLive;
 use sdlx::SdlX;
+
+mod testlib;
 
 fn show_help(sx: &mut SdlX) {
     let shelp = "** Help **\n\
@@ -35,6 +38,12 @@ fn show_help(sx: &mut SdlX) {
     let vhelp: Vec<&str> = shelp.split('\n').collect();
     sx.n_msgbox((0.3, 0.3,0.4,0.4), vhelp, Color::BLUE);
 
+}
+
+#[allow(dead_code)]
+fn test_me(font: &Font) {
+    testlib::test_ncolor();
+    testlib::test_gentity(font);
 }
 
 fn identify() {
