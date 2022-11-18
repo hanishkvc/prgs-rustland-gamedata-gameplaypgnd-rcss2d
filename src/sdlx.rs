@@ -307,11 +307,11 @@ pub fn ncolor_gyr(ncolor: f32) -> Color {
     } else if ncolor < 0.66 {
         //let fv = 1.0-((0.66 - ncolor)/0.33);
         let fv = (0.66 - ncolor)/0.33;
-        r = 127.0+fv*255.0*0.5;
-        g = 127.0+fv*255.0*0.5;
+        r = 191.0+fv*255.0*0.24;
+        g = 191.0+fv*255.0*0.24;
     } else {
         let fv = 1.0-(1.00 - ncolor)/0.33;
-        g = 127.0+fv*255.0*0.5;
+        g = 191.0+fv*255.0*0.24;
     }
     let r = r.round().min(255.0) as u8;
     let g = g.round().min(255.0) as u8;

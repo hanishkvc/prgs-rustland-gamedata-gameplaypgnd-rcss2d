@@ -147,13 +147,15 @@ impl<'a> GEntity<'a> {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
 
+    /// Draw the outer lines provided their colors is not invisible
     fn draw_outerlines(&self, sx: &mut SdlX) {
         let nw = sx.n2s.o2dx(self.width_height.0 as f32);
         let nh = sx.n2s.o2dy(self.width_height.1 as f32);
         let nhw = nw/2.0;
         let nhh = nh/2.0;
         let hlw = nh*0.1;
-        let vlw = nw*0.2;
+        let vlw = hlw*(nh/nw); // nw*0.2;
+        //eprintln!("DBUG:PPGND:GEntity:DrawOuterLines:{}=>{},{}=>{},{}-{}",self.width_height.0, nw, self.width_height.1, nh, vlw, hlw);
         // Top line
         if self.tl_color != COLOR_INVISIBLE {
             let tx1 = self.npos.0 - nhw;
@@ -187,6 +189,7 @@ impl<'a> GEntity<'a> {
     /// * a textual id
     /// * the fill color (which can be partly modified using fcolor)
     /// * a arc (wrt/including its radius, angle and color)
+    /// * a set of outer lines and their colors
     pub fn draw(&self, sx: &mut SdlX) {
         let color;
         if self.fcolor < 0.0 {
