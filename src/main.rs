@@ -164,6 +164,9 @@ fn main() {
                         Keycode::Num1 => {
                             pdata.send_record_coded(1);
                         }
+                        Keycode::Num0 => {
+                            pdata.send_record_coded(0);
+                        }
                         Keycode::H => {
                             bhelp = !bhelp;
                         }

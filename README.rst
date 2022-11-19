@@ -54,6 +54,20 @@ One can pass a 2nd argument to the program, following live, and it will be
 used as the address of the robocup server to connect to. Else it will try
 to connect to the server on port 6000 on the local machine.
 
+NOTE: Ideally one needs to start the rc server first, before starting this
+program, this will ensure tha tthe initial init handshake that is sent when
+this program is started, to the server, will succeed. However if one starts
+the rc server after this program, then one can use key 0 to initiate the
+initial handshake.
+
+NOTE: Also do note that when ever the init handshake is successful, and the
+server sends out a message to this program, it switchs the server address to
+point to the address(including port) from which the message was recieved.
+From then on this program cant connect to a freshly/newly started server, as
+the internally stored server address has changed. So If one wants to connect
+to new rc server again, after a previous successful handshake + msg, one needs
+to quit this program and start it fresh again.
+
 
 Keys
 ======

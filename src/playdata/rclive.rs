@@ -227,6 +227,12 @@ impl PlayData for RCLive {
         return true;
     }
 
+    ///
+    /// A successful reception of a record/message from the server for
+    /// the 1st time, will update the internally maintained server address
+    /// to point to the address (including port) from which the record was
+    /// recieved.
+    ///
     fn next_record(&mut self) -> super::PlayUpdate {
         let mut pu = PlayUpdate::new();
         let mut buf = [0u8; 8196];
@@ -301,6 +307,7 @@ impl PlayData for RCLive {
 
     fn send_record_coded(&mut self, code: isize) {
         let msg = match code {
+            0 => "(dispinit version 5)\r\n".as_bytes(),
             1 => "(dispstart)\x00".as_bytes(),
             _ => todo!(),
         };
