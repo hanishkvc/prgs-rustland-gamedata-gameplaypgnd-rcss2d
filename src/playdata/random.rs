@@ -10,6 +10,9 @@ use crate::sdlx::XSpaces;
 
 use super::PlayData;
 use super::PlayUpdate;
+use super::VPlayerData;
+use super::PlayerData;
+
 
 use crate::entities::SCREEN_WIDTH;
 use crate::entities::SCREEN_HEIGHT;
@@ -137,7 +140,11 @@ impl PlayData for RandomData {
             self.apos[i].0 += dx;
             self.apos[i].1 += dy;
             let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
-            pu.ateampositions.push((i as i32, fx, fy));
+            let pd = VPlayerData::new();
+            pd.push(PlayerData::Pos(fx, fy));
+            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
+            pd.push(PlayerData::Stamina(fstamina));
+            pu.ateamcoded.push((i as i32, pd));
         }
         let mut dx;
         let mut dy;
@@ -152,7 +159,11 @@ impl PlayData for RandomData {
             self.bpos[i].0 += dx as f32;
             self.bpos[i].1 += dy as f32;
             let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
-            pu.bteampositions.push((i as i32, fx, fy));
+            let pd = VPlayerData::new();
+            pd.push(PlayerData::Pos(fx, fy));
+            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
+            pd.push(PlayerData::Stamina(fstamina));
+            pu.bteamcoded.push((i as i32, pd));
         }
         pu
     }
@@ -170,7 +181,11 @@ impl PlayData for RandomData {
             self.apos[i].0 += self.amov[i].0;
             self.apos[i].1 += self.amov[i].1;
             let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
-            pu.ateamcoded.push((i as i32, fx, fy, 0.0, 0));
+            let pd = VPlayerData::new();
+            pd.push(PlayerData::Pos(fx, fy));
+            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
+            pd.push(PlayerData::Stamina(fstamina));
+            pu.ateamcoded.push((i as i32, pd));
         }
         for i in 0..self.bcnt {
             if self.rcnt % self.bchg[i] == 0 {
@@ -181,7 +196,11 @@ impl PlayData for RandomData {
             self.bpos[i].0 += self.bmov[i].0;
             self.bpos[i].1 += self.bmov[i].1;
             let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
-            pu.bteamcoded.push((i as i32, fx, fy, 0.0, 0));
+            let pd = VPlayerData::new();
+            pd.push(PlayerData::Pos(fx, fy));
+            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
+            pd.push(PlayerData::Stamina(fstamina));
+            pu.bteamcoded.push((i as i32, pd));
         }
         self.pos_fix();
         pu
