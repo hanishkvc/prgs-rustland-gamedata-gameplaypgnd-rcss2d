@@ -10,6 +10,7 @@ type TPlayerId = i32;
 
 #[derive(Debug)]
 pub enum Cards {
+    None,
     Red,
     Yellow,
 }

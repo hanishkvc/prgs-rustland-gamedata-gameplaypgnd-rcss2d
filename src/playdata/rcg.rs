@@ -124,14 +124,14 @@ impl PlayData for Rcg {
                         pu.ball = (fx, fy);
                         continue;
                     }
-                    let pd = VPlayerData::new();
+                    let mut pd = VPlayerData::new();
                     let mut tstr = TStr::from_str(&vdata[0], true);
                     tstr.peel_bracket('(').unwrap();
                     let (steam, splayer) = tstr.split_once(' ').unwrap();
                     let iplayer: i32 = splayer.parse().unwrap();
                     // Handle cards
                     let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
-                    let mut card;
+                    let mut card = playdata::Cards::None;
                     if state & STATE_REDCARD == STATE_REDCARD {
                         card = playdata::Cards::Red
                     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {

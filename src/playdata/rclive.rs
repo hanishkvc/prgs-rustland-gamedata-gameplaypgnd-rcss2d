@@ -166,7 +166,7 @@ impl RCLive {
             let mut fy = 0.0;
             let mut side = String::new();
             let mut fstamina = 1.0f32;
-            let mut card;
+            let mut card = playdata::Cards::None;
             // Extract the player specific datas
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
@@ -196,7 +196,7 @@ impl RCLive {
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
             fstamina = (fstamina/STAMINA_BASE).min(1.0);
-            let pd = playdata::VPlayerData::new();
+            let mut pd = playdata::VPlayerData::new();
             pd.push(PlayerData::Pos(fx, fy));
             pd.push(PlayerData::Stamina(fstamina));
             pd.push(PlayerData::Card(card));
