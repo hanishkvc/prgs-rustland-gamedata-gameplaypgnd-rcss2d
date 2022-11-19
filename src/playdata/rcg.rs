@@ -10,6 +10,8 @@ use tokensk::TStr;
 use crate::playdata;
 use crate::playdata::PlayUpdate;
 use crate::playdata::PlayData;
+use crate::playdata::PlayerData;
+use crate::playdata::VPlayerData;
 use crate::sdlx::XSpaces;
 
 /// Currently the time in terms of seconds (could be a fraction),
@@ -122,19 +124,30 @@ impl PlayData for Rcg {
                         pu.ball = (fx, fy);
                         continue;
                     }
+                    let pd = VPlayerData::new();
                     let mut tstr = TStr::from_str(&vdata[0], true);
                     tstr.peel_bracket('(').unwrap();
                     let (steam, splayer) = tstr.split_once(' ').unwrap();
                     let iplayer: i32 = splayer.parse().unwrap();
+                    // Handle cards
                     let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
-                    let mut cards = 0;
+                    let mut card;
                     if state & STATE_REDCARD == STATE_REDCARD {
-                        cards = playdata::CARD_RED;
+                        card = playdata::Cards::Red
                     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
-                        cards = playdata::CARD_YELLOW;
+                        card = playdata::Cards::Yellow;
                     }
+                    pd.push(PlayerData::Card(card));
+                    // Handle position
                     let fxin: f32 = vdata[3].parse().unwrap();
                     let fyin: f32 = vdata[4].parse().unwrap();
+                    let fx = self.r2d.d2ox(fxin);
+                    let fy = self.r2d.d2oy(fyin);
+                    if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
+                        eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+                    }
+                    pd.push(PlayerData::Pos(fx, fy));
+                    // Handle stamina
                     let sstamina = &vdata[10];
                     let mut tstr = TStr::from_str(sstamina, true);
                     tstr.peel_bracket('(').unwrap();
@@ -142,15 +155,12 @@ impl PlayData for Rcg {
                     //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
                     let mut fstamina: f32 = staminatoks[1].parse().unwrap();
                     fstamina = (fstamina/STAMINA_BASE).min(1.0);
-                    let fx = self.r2d.d2ox(fxin);
-                    let fy = self.r2d.d2oy(fyin);
-                    if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
-                        eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
-                    }
+                    pd.push(PlayerData::Stamina(fstamina));
+                    // Fill in the player data
                     if steam == "l" {
-                        pu.ateamcoded.push((iplayer-1, fx, fy, fstamina, cards));
+                        pu.ateamcoded.push((iplayer-1, pd));
                     } else {
-                        pu.bteamcoded.push((iplayer-1, fx, fy, fstamina, cards));
+                        pu.bteamcoded.push((iplayer-1, pd));
                     }
                 }
                 break;
