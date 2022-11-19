@@ -55,6 +55,25 @@ fn identify() {
     }
 }
 
+fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
+    let src;
+    if vargs.len() > 1 {
+        src = vargs[1].as_str();
+    } else {
+        src = "";
+    }
+    if src == "live" {
+        let pdrcl = RCLive::new("0.0.0.0:6000");
+        return Box::new(pdrcl);
+    } else if src.len() > 0 {
+        let pdrcg = Rcg::new(src, fps);
+        return Box::new(pdrcg);
+    } else {
+        let pdrandom = RandomData::new(20.0, 11, 11);
+        return Box::new(pdrandom);
+    }
+}
+
 fn main() {
     log_init();
     identify();
@@ -68,21 +87,8 @@ fn main() {
 
     // Setup the playdata source
     let clargs = env::args().collect::<Vec<String>>();
-    let mut pdrandom = RandomData::new(20.0, 11, 11);
-    let mut pdrcg;
-    let mut pdrcl;
-    let pdata: &mut dyn PlayData;
-    if clargs.len() > 1 {
-        if clargs[1] == "live" {
-            pdrcl = RCLive::new("0.0.0.0:6000");
-            pdata = &mut pdrcl;
-        } else {
-            pdrcg = Rcg::new(&clargs[1], pgentities.fps());
-            pdata = &mut pdrcg;
-        }
-    } else {
-        pdata = &mut pdrandom;
-    }
+    let mut pdatasrc = pdata_source(&clargs, pgentities.fps());
+    let pdata = pdatasrc.as_mut();
 
     let mut bpause = false;
     let mut frame: usize = 0;
