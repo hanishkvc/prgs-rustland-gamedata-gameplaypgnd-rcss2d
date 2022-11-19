@@ -135,7 +135,7 @@ impl FixedPosMessage {
                 self.msg = String::new();
             }
         }
-        sx.n_string(self.npos.0, self.npos.1, &self.msg, self.color);
+        sx.n_msg(self.npos.0, self.npos.1, &self.msg, self.color);
     }
 
 }

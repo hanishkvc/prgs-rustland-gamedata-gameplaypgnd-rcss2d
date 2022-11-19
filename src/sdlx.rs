@@ -16,6 +16,7 @@ pub const COLOR_MSG_BOX_BACKGROUND: Color = Color::RGBA(200, 200, 200, 180);
 pub const COLOR_MSG_HEAD_BACKGROUND: Color = Color::RGBA(80, 80, 80, 180);
 pub const COLOR_MSG_HEAD_TEXT: Color = Color::WHITE;
 const STRING_CHAR_PIXEL_WIDTH: f32 = 8.0;
+const STRING_CHAR_PIXEL_HEIGHT: f32 = 8.0;
 
 
 /// Initialises and maintains the SDL contexts wrt Video and Events.
@@ -245,6 +246,20 @@ impl SdlX {
             let y = ny + (i as f32 * nlh);
             self.n_string(nx, y, ss[i], color);
         }
+    }
+
+    /// Draw a string along with a partially translucent (gray) background box/rect.
+    /// Takes the starting point for drawing in normal space.
+    pub fn n_msg(&mut self, nx: f32, ny: f32, msg: &str, color: Color) {
+        let cw = self.n2s.o2dx(STRING_CHAR_PIXEL_WIDTH);
+        let ch = self.n2s.o2dy(STRING_CHAR_PIXEL_HEIGHT);
+        let nw = (msg.len()+2) as f32 * cw;
+        let rx = nx-cw;
+        let ry = ny-(ch*0.5);
+        self.wc.set_draw_color(COLOR_MSG_BOX_BACKGROUND);
+        self.wc.set_blend_mode(BlendMode::Blend);
+        self.nn_fill_rect(rx, ry, nw, ch*2.0);
+        self.n_string(nx, ny, msg, color);
     }
 
     /// Show a message box.
