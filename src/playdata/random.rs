@@ -172,6 +172,17 @@ impl PlayData for RandomData {
     fn next_record(&mut self) -> PlayUpdate {
         self.rcnt += 1;
         let mut pu = PlayUpdate::new();
+        // Messages
+        pu.msgs.insert("stime".to_string(), self.rcnt.to_string());
+        let gphase = (self.rcnt%3000)/1000;
+        let sgphase = match gphase {
+            0 => "Phase 1",
+            1 => "Phase 2",
+            2 => "Phase 3",
+            _ => todo!(),
+        };
+        pu.msgs.insert("game".to_string(), sgphase.to_string());
+        // Player datas
         for i in 0..self.acnt {
             if self.rcnt % self.achg[i] == 0 {
                 let dx = (rand::random::<i32>() % 4) as f32;
