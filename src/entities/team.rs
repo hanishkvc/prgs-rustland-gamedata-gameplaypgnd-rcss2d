@@ -48,39 +48,45 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn update(&mut self, tposs: Vec<PlayerCodedData>, babsolute: bool, inframes: f32) {
-        for ppos in tposs {
-            let pi = ppos.0 as usize;
-            let fx = ppos.1;
-            let fy = ppos.2;
-            let fstamina = ppos.3;
-            let cards = ppos.4;
-            // Stamina
-            //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
-            let istamina = (fstamina * 100.0).round() as i32;
-            let stamina_color = match istamina {
-                0..=30 => Color::RED,
-                31..=70 => Color::YELLOW,
-                71..=100 => Color::GREEN,
-                _ => todo!(),
-            };
-            //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
-            self.players[pi].set_ll_color(stamina_color);
-            self.players[pi].set_rl_color(stamina_color);
-            // Cards
-            let mut card_color = sdlx::COLOR_INVISIBLE;
-            if cards == playdata::CARD_RED {
-                card_color = Color::RED;
-            } else if cards == playdata::CARD_YELLOW {
-                card_color = Color::YELLOW;
-            }
-            self.players[pi].set_tl_color(card_color);
-            self.players[pi].set_bl_color(card_color);
-            // Position
-            if babsolute {
-                self.players[ppos.0 as usize].pos_set_abs(fx, fy);
-            } else {
-                self.players[ppos.0 as usize].move_to_in_frames((fx, fy), inframes);
+    pub fn update(&mut self, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32) {
+        for player in playersdata {
+            let pi = player.0 as usize;
+            for pd in player.1 {
+                match pd {
+                    playdata::PlayerData::Pos(fx, fy) => {
+                        // Position
+                        if babsolute {
+                            self.players[pi].pos_set_abs(fx, fy);
+                        } else {
+                            self.players[pi].move_to_in_frames((fx, fy), inframes);
+                        }
+                    },
+                    playdata::PlayerData::Stamina(fstamina) => {
+                        // Stamina
+                        //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
+                        let istamina = (fstamina * 100.0).round() as i32;
+                        let stamina_color = match istamina {
+                            0..=30 => Color::RED,
+                            31..=70 => Color::YELLOW,
+                            71..=100 => Color::GREEN,
+                            _ => todo!(),
+                        };
+                        //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
+                        self.players[pi].set_ll_color(stamina_color);
+                        self.players[pi].set_rl_color(stamina_color);
+                    },
+                    playdata::PlayerData::Card(card) => {
+                        // Cards
+                        let mut card_color = sdlx::COLOR_INVISIBLE;
+                        if let playdata::Cards::Red = card {
+                            card_color = Color::RED;
+                        } else if let playdata::Cards::Yellow = card {
+                            card_color = Color::YELLOW;
+                        }
+                        self.players[pi].set_tl_color(card_color);
+                        self.players[pi].set_bl_color(card_color);
+                    },
+                }
             }
         }
     }
