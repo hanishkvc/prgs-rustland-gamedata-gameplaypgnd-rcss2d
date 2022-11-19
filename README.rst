@@ -11,7 +11,8 @@ Overview
 ############
 
 Allow controlled playback and look at captued game data like from robocup
-soccer simulator for example.
+soccer simulator for example. Also allow connecting to a live server to get
+and display the game data.
 
 In the long run additionally allow augumenting of displayed player movements
 playback additionally with info captured manually or automatically (during
@@ -44,10 +45,14 @@ This will playback the contents of the rcg file.
 Live
 ------
 
-By passing live as the 1st and only argument to the program, one can make the
-program work as a simple and currently very minimal robocup soccer sim monitor.
+By passing live as the 1st argument to the program, one can make the program
+work as a simple and currently very minimal robocup soccer sim monitor.
 It can be used to watch a game live as well as kick-start(kick-off) wrt the
 2 halfs+ if & when needed.
+
+One can pass a 2nd argument to the program, following live, and it will be
+used as the address of the robocup server to connect to. Else it will try
+to connect to the server on port 6000 on the local machine.
 
 
 Keys

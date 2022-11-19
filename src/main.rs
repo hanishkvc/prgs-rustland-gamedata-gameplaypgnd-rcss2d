@@ -15,7 +15,7 @@ mod sdlx;
 mod playdata;
 use playdata::rcg::Rcg;
 use playdata::random::RandomData;
-use playdata::PlayData;
+use playdata::{PlayData, rclive};
 use playdata::rclive::RCLive;
 use sdlx::SdlX;
 
@@ -56,6 +56,16 @@ fn identify() {
     }
 }
 
+///
+/// Setup the playdata source based on passed args.
+/// * if no args, then start the random playdata source
+/// * if live passed as 1st arg to program, then try to
+///   connect to a running rcssserver.
+///   * if a 2nd argument is passed, use it has the nw
+///     address of the server to connect to.
+///   * else use the default address specified in rclive.
+/// * else use the 1st argument as the rcg file to playback.
+///
 fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
     let src;
     if vargs.len() > 1 {
@@ -64,7 +74,13 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
         src = "";
     }
     if src == "live" {
-        let pdrcl = RCLive::new("0.0.0.0:6000");
+        let nwaddr;
+        if vargs.len() > 2 {
+            nwaddr = vargs[2].as_str();
+        } else {
+            nwaddr = rclive::NWADDR_DEFAULT;
+        }
+        let pdrcl = RCLive::new(nwaddr);
         return Box::new(pdrcl);
     } else if src.len() > 0 {
         let pdrcg = Rcg::new(src, fps);

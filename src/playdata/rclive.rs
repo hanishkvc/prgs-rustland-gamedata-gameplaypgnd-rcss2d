@@ -13,6 +13,8 @@ use crate::{sdlx::XSpaces, playdata::{self, PlayerData}};
 
 use super::{PlayData, PlayUpdate};
 
+pub const NWADDR_DEFAULT: &str = "0.0.0.0:6000";
+
 const SECONDS_PER_RECORD: f32 = 0.1;
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
