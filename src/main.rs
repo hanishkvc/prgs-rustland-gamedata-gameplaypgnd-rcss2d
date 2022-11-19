@@ -8,7 +8,7 @@ use std::env;
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
-use loggerk::log_init;
+use loggerk::{log_init, ldebug, log_d};
 
 mod entities;
 mod sdlx;
@@ -194,7 +194,7 @@ fn main() {
                 if cfg!(feature = "inbetween_frames") {
                     if pdata.next_frame_is_record_ready() {
                         let pu = pdata.next_record();
-                        eprintln!("DBUG:{:?}", pu);
+                        ldebug!(&format!("DBUG:{:?}", pu));
                         pgentities.update(pu, false, pdata.seconds_per_record() * pgentities.fps());
                         //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
                     }

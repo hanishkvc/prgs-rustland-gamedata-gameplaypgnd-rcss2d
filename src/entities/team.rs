@@ -48,7 +48,7 @@ impl<'a> Team<'a> {
             }
             team.pchgmovs.push(chgmov);
         }
-        print!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team);
+        ldebug!(&format!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team));
         team
     }
 
