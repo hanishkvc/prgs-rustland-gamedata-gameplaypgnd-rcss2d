@@ -6,6 +6,8 @@
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
+use loggerk::{ldebug, log_d};
+
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
 use crate::sdlx::{SdlX, self};
@@ -50,6 +52,7 @@ impl<'a> Team<'a> {
 
     pub fn update(&mut self, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32) {
         for player in playersdata {
+            ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, player));
             let pi = player.0 as usize;
             for pd in player.1 {
                 match pd {
