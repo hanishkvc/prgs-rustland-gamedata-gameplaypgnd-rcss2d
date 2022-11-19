@@ -12,6 +12,9 @@ pub use sdl2::pixels::Color;
 
 
 pub const COLOR_INVISIBLE: Color = Color::RGBA(0, 0, 0, 0);
+pub const COLOR_MSG_BOX_BACKGROUND: Color = Color::RGBA(200, 200, 200, 180);
+pub const COLOR_MSG_HEAD_BACKGROUND: Color = Color::RGBA(80, 80, 80, 180);
+pub const COLOR_MSG_HEAD_TEXT: Color = Color::WHITE;
 const STRING_CHAR_PIXEL_WIDTH: f32 = 8.0;
 
 
@@ -255,16 +258,16 @@ impl SdlX {
     pub fn n_msgbox(&mut self, nr: (f32, f32, f32, f32), mut ss: Vec<&str>, color: Color) {
         let nlh = nr.3/((ss.len()+2) as f32);
         self.wc.set_blend_mode(BlendMode::Blend);
-        self.wc.set_draw_color(Color::RGBA(200, 200, 200, 180));
+        self.wc.set_draw_color(COLOR_MSG_BOX_BACKGROUND);
         self.nn_fill_rect(nr.0, nr.1, nr.2, nr.3);
         // Heading rectangle
-        self.wc.set_draw_color(Color::RGBA(80, 80, 80, 180));
+        self.wc.set_draw_color(COLOR_MSG_HEAD_BACKGROUND);
         self.nn_fill_rect(nr.0, nr.1, nr.2, nlh*(2 as f32));
         // Heading text
         let ncw = self.n2s.o2dx(STRING_CHAR_PIXEL_WIDTH);
         let hlen = ss[0].len() as f32*ncw;
         let hbefore = (nr.3 - hlen)/2.0;
-        self.n_string(nr.0+hbefore, nr.1+nlh, ss[0], Color::WHITE);
+        self.n_string(nr.0+hbefore, nr.1+nlh, ss[0], COLOR_MSG_HEAD_TEXT);
         // The message
         ss.remove(0);
         self.n_strings(nr.0+4.0*ncw, nr.1+3.0*nlh, nlh, ss, color);
