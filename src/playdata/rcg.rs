@@ -16,7 +16,7 @@ use crate::sdlx::XSpaces;
 
 /// Currently the time in terms of seconds (could be a fraction),
 /// between the records maintained in the rcg file, is hard coded, here.
-const SECONDS_PER_RECORD: f32 = 0.2;
+const SECONDS_PER_RECORD: f32 = 0.1;
 const STAMINA_BASE: f32 = 8000.0;
 const STATE_REDCARD: u32 = 0x80000;
 const STATE_YELLOWCARD: u32 = 0x40000;

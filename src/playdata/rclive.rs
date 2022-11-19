@@ -13,6 +13,7 @@ use crate::{sdlx::XSpaces, playdata::{self, PlayerData}};
 
 use super::{PlayData, PlayUpdate};
 
+const SECONDS_PER_RECORD: f32 = 0.1;
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
 const STAMINA_BASE: f32 = 8000.0;
@@ -212,8 +213,9 @@ impl RCLive {
 }
 
 impl PlayData for RCLive {
+
     fn seconds_per_record(&self) -> f32 {
-        return 0.05;
+        return SECONDS_PER_RECORD;
     }
 
     fn fps_changed(&mut self, _fps: f32) {
