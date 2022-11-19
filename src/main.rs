@@ -95,7 +95,13 @@ fn main() {
     log_init();
     identify();
     let ttfx = sdl2::ttf::init().unwrap();
-    let font = ttfx.load_font("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 16).unwrap();
+    let font = ttfx.load_font(sdlx::TTF_FONT, 16);
+    if font.is_err() {
+        let err = font.err().unwrap();
+        eprintln!("ERRR:PPGND:Loading font[{}], install it or update font in sdlx.rs:{}", sdlx::TTF_FONT, err);
+        std::process::exit(10);
+    }
+    let font = font.unwrap();
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
 
     let mut dcolor = 20;
