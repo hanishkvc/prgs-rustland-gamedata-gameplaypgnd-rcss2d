@@ -7,15 +7,26 @@ use std::collections::HashMap;
 
 
 type TPlayerId = i32;
-type TPosX = f32;
-type TPosY = f32;
-type TStamina = f32;
-type TCards = u32;
-pub type PlayerCodedData = (TPlayerId, TPosX, TPosY, TStamina, TCards);
 
-pub const CARD_RED: TCards = 0x1;
-pub const CARD_YELLOW: TCards = 0x2;
+#[derive(Debug)]
+pub enum Cards {
+    Red,
+    Yellow,
+}
 
+#[derive(Debug)]
+/// Player related data
+pub enum PlayerData {
+    Pos(f32,f32),
+    Stamina(f32),
+    Card(Cards),
+}
+
+/// Maintain a vector of player related data
+/// This allows only a subset of data to be available at any given time
+pub type VPlayerData = Vec<PlayerData>;
+
+pub type PlayerCodedData = (TPlayerId, VPlayerData);
 
 pub type Messages = HashMap<String, String>;
 
