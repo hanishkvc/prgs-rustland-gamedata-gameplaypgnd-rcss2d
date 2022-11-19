@@ -183,7 +183,7 @@ impl PlayData for RandomData {
             let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
             let mut pd = VPlayerData::new();
             pd.push(PlayerData::Pos(fx, fy));
-            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
+            let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
             pd.push(PlayerData::Stamina(fstamina));
             pu.ateamcoded.push((i as i32, pd));
         }
@@ -198,7 +198,7 @@ impl PlayData for RandomData {
             let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
             let mut pd = VPlayerData::new();
             pd.push(PlayerData::Pos(fx, fy));
-            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
+            let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
             pd.push(PlayerData::Stamina(fstamina));
             pu.bteamcoded.push((i as i32, pd));
         }
