@@ -10,7 +10,7 @@ use loggerk::{ldebug, log_d};
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
-use crate::sdlx::{SdlX, self};
+use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
 use crate::playdata::{PlayerCodedData, self};
 
 
@@ -22,6 +22,7 @@ pub struct Team<'a> {
     players: Vec<GEntity<'a>>,
     pmoves: Vec<(f32,f32)>,
     pchgmovs: Vec<i32>,
+    bstamina: bool,
 }
 
 impl<'a> Team<'a> {
@@ -33,6 +34,7 @@ impl<'a> Team<'a> {
             players: Vec::new(),
             pmoves: Vec::new(),
             pchgmovs: Vec::new(),
+            bstamina: true,
         };
         let bx = (rand::random::<u32>() % entities::SCREEN_WIDTH) as f32;
         for i in 0..nplayers {
@@ -68,13 +70,16 @@ impl<'a> Team<'a> {
                         // Stamina
                         //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
                         let istamina = (fstamina * 100.0).round() as i32;
-                        let stamina_color = match istamina {
+                        let mut stamina_color = match istamina {
                             0..=30 => Color::RED,
                             31..=70 => Color::YELLOW,
                             71..=100 => Color::GREEN,
                             _ => todo!(),
                         };
-                        //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, color);
+                        if !self.bstamina {
+                            stamina_color = COLOR_INVISIBLE;
+                        }
+                        //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, stamina_color);
                         self.players[pi].set_ll_color(stamina_color);
                         self.players[pi].set_rl_color(stamina_color);
                     },
@@ -114,6 +119,10 @@ impl<'a> Team<'a> {
         for i in 0..self.players.len() {
             self.players[i].colorsel = colorsel;
         }
+    }
+
+    pub fn toggle_bstamina(&mut self) {
+        self.bstamina = !self.bstamina;
     }
 
 }

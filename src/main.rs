@@ -28,6 +28,7 @@ fn show_help(sx: &mut SdlX) {
     rarrow: seek forward\n\
     f/F:    change fps\n\
     p:      pause playback\n\
+    s:      hide/unhide stamina\n\
     b:      hide/unhide ball\n\
     h:      hide/unhide help\n\
     1:      kick-off (RCLive)\n\
@@ -126,6 +127,9 @@ fn main() {
                         }
                         Keycode::B => {
                             pgentities.showball = !pgentities.showball;
+                        }
+                        Keycode::S => {
+                            pgentities.toggle_bstamina();
                         }
                         Keycode::Left => {
                             pdata.seek(-50);

@@ -182,4 +182,9 @@ impl<'a> PGEntities<'a> {
         self.bteam.adjust_players(0x0e); //3
     }
 
+    pub fn toggle_bstamina(&mut self) {
+        self.ateam.toggle_bstamina();
+        self.bteam.toggle_bstamina();
+    }
+
 }
