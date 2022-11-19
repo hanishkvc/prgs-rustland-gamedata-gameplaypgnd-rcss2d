@@ -33,7 +33,7 @@ fn show_help(sx: &mut SdlX) {
     h:      hide/unhide help\n\
     1:      kick-off (RCLive)\n\
     \n\
-    playbackpgnd live|path/file.rcg\n\
+    playbackpgnd <live [addr]> | <path/file.rcg>\n\
     ...                   Save Nature Save Earth";
 
     let vhelp: Vec<&str> = shelp.split('\n').collect();
