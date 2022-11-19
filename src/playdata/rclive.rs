@@ -9,7 +9,7 @@ use std::time;
 use tokensk::TStrX;
 use loggerk::{ldebug,log_d};
 
-use crate::{sdlx::XSpaces, playdata};
+use crate::{sdlx::XSpaces, playdata::{self, PlayerData}};
 
 use super::{PlayData, PlayUpdate};
 
@@ -152,6 +152,7 @@ impl RCLive {
         tstr.peel_bracket('[').unwrap();
         let toks = tstr.tokens_vec(',', true, false).unwrap();
         ldebug!(&format!("DBUG:PPGND:RCLive:Got:Toks:Players:{:#?}", toks));
+        // handle the individual players
         for tok in toks {
             if tok.trim().len() == 0 {
                 continue;
@@ -165,7 +166,8 @@ impl RCLive {
             let mut fy = 0.0;
             let mut side = String::new();
             let mut fstamina = 1.0f32;
-            let mut cards = 0u32;
+            let mut card;
+            // Extract the player specific datas
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
                 if k == "\"side\"" {
@@ -186,18 +188,22 @@ impl RCLive {
                 if k == "\"state\"" {
                     let state: u32 = v.parse().unwrap();
                     if state & STATE_REDCARD == STATE_REDCARD {
-                        cards = playdata::CARD_RED;
+                        card = playdata::Cards::Red;
                     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
-                        cards = playdata::CARD_YELLOW;
+                        card = playdata::Cards::Yellow;
                     }
                 }
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
             fstamina = (fstamina/STAMINA_BASE).min(1.0);
+            let pd = playdata::VPlayerData::new();
+            pd.push(PlayerData::Pos(fx, fy));
+            pd.push(PlayerData::Stamina(fstamina));
+            pd.push(PlayerData::Card(card));
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateamcoded.push((pnum-1, fx, fy, fstamina, cards));
+                pu.ateamcoded.push((pnum-1, pd));
             } else {
-                pu.bteamcoded.push((pnum-1, fx, fy, fstamina, cards));
+                pu.bteamcoded.push((pnum-1, pd));
             }
         }
 
