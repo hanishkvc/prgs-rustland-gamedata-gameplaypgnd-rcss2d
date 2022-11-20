@@ -79,9 +79,13 @@ One can use the following keys to control the behaviour as noted below.
 
 * h -> to hide/unhide the help msg box
 
-* s -> to hide/unhide the display of stamina
+* s -> enter set-show/hide-mode
 
-* b -> to hide/unhide the ball
+  * s -> to show/hide the display of stamina
+
+  * b -> to show/hide the ball
+
+  * any other key -> exit set-show/hide-mode
 
 * Seeking
 

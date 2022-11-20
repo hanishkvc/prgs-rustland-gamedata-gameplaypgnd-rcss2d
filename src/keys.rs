@@ -18,13 +18,35 @@ pub enum ProgramEvent {
     SendRecordCoded(isize),
     DumpPGEntities,
     Quit,
+    NeedMore,
 }
 
-pub fn get_programevents(sx: &mut SdlX) -> ProgramEvent {
+pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
     for ev in sx.ep.poll_iter() {
         use sdl2::event::Event;
         use sdl2::keyboard::Keycode;
         use sdl2::keyboard::Mod;
+        if skey == "s" {
+            match ev {
+                Event::Quit { timestamp: _} => return ProgramEvent::Quit,
+                Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod: _, repeat: _ } => {
+                    match keycode.unwrap() {
+                        Keycode::B => {
+                            return ProgramEvent::ToggleShowBall;
+                        },
+                        Keycode::S => {
+                            return ProgramEvent::ToggleShowStamina;
+                        },
+                        Keycode::Escape | _ => {
+                            skey.clear();
+                            return ProgramEvent::None;
+                        },
+                    }
+                },
+                _ => return ProgramEvent::None,
+            }
+        }
+        skey.clear();
         match ev {
             Event::Quit { timestamp: _ } => return ProgramEvent::Quit,
             Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
@@ -35,11 +57,9 @@ pub fn get_programevents(sx: &mut SdlX) -> ProgramEvent {
                     Keycode::P => {
                         return ProgramEvent::Pause;
                     }
-                    Keycode::B => {
-                        return ProgramEvent::ToggleShowBall;
-                    }
                     Keycode::S => {
-                        return ProgramEvent::ToggleShowStamina;
+                        skey.push('s');
+                        return ProgramEvent::NeedMore;
                     }
                     Keycode::Left => {
                         return ProgramEvent::SeekBackward;

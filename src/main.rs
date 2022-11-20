@@ -29,8 +29,8 @@ fn show_help(sx: &mut SdlX) {
     rarrow: seek forward\n\
     f/F:    change fps\n\
     p:      pause playback\n\
-    s:      hide/unhide stamina\n\
-    b:      hide/unhide ball\n\
+    ss:     show/hide stamina\n\
+    sb:     show/hide ball\n\
     h:      hide/unhide help\n\
     1:      kick-off (RCLive)\n\
     \n\
@@ -120,6 +120,7 @@ fn main() {
     let mut ptime = std::time::Instant::now();
     let mut pframe = 0;
     let mut actualfps = 0;
+    let mut skey = String::new();
     'mainloop: loop {
         frame += 1;
         let dtime = std::time::Instant::now().duration_since(ptime);
@@ -131,10 +132,10 @@ fn main() {
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
-        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("{},{}",&pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
+        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
 
         // handle any pending program events
-        let prgev = keys::get_programevents(&mut sx);
+        let prgev= keys::get_programevents(&mut sx, &mut skey);
         match prgev {
             keys::ProgramEvent::None => (),
             keys::ProgramEvent::Pause => bpause = !bpause,
@@ -151,6 +152,7 @@ fn main() {
             keys::ProgramEvent::SendRecordCoded(code) => pdata.send_record_coded(code),
             keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities),
             keys::ProgramEvent::Quit => break 'mainloop,
+            keys::ProgramEvent::NeedMore => (),
         }
 
         // Update the entities

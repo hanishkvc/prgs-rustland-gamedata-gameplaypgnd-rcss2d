@@ -23,7 +23,7 @@ pub const PITCH_RECT: XRect = ((0.03,0.04), (0.97,0.96));
 
 pub const MSG_SCORE_POS: (f32,f32)      = (0.01,0.01);
 pub const MSG_STIME_POS: (f32,f32)      = (0.50,0.01);
-pub const MSG_FPS_POS: (f32,f32)        = (0.90,0.01);
+pub const MSG_FPS_POS: (f32,f32)        = (0.80,0.01);
 pub const MSG_GAME_POS: (f32,f32)       = (0.01,0.98);
 pub const MSG_UNKNOWN_POS: (f32,f32)    = (0.50,0.98);
 
