@@ -10,7 +10,7 @@ pub const STATE_KICK_FAULT: u32     = 0x00004;
 pub const STATE_CATCH: u32          = 0x00010;
 pub const STATE_CATCH_FAULT: u32    = 0x00020;
 pub const STATE_TACKLE: u32         = 0x01000;
-pub const STATE_TACKLE_FALUT: u32   = 0x02000;
+pub const STATE_TACKLE_FAULT: u32   = 0x02000;
 pub const STATE_REDCARD: u32        = 0x80000;
 pub const STATE_YELLOWCARD: u32     = 0x40000;
 
@@ -30,6 +30,10 @@ pub fn handle_state(state: u32) -> (Action, Cards) {
         action = Action::Catch(true);
     } else if state & STATE_CATCH_FAULT == STATE_CATCH_FAULT {
         action = Action::Catch(false);
+    } else if state & STATE_TACKLE == STATE_TACKLE {
+        action = Action::Tackle(true);
+    } else if state & STATE_TACKLE_FAULT == STATE_TACKLE_FAULT {
+        action = Action::Tackle(false);
     }
     return (action, card);
 }

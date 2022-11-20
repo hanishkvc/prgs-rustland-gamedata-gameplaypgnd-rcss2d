@@ -18,7 +18,8 @@ In the long run additionally allow augumenting of displayed player movements
 playback additionally with info captured manually or automatically (during
 the game or later). This can include
 
-* game actions captured like goal, good or bad pass, penalty, cards, ...
+* game actions captured like goal, kick/tackle/... and good/bad pass/...,
+  penalty, cards, ...
 
 * color coding of
 
@@ -147,4 +148,5 @@ to map to different player performance and or other characteristics
     issued to player, for now.
 
 * color and arc length of the arc around the player
+  Currently it is mapped to actions like kick, tackle, catch
 

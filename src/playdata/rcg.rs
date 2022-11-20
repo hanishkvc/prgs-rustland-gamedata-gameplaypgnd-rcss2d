@@ -130,9 +130,7 @@ impl PlayData for Rcg {
                     let iplayer: i32 = splayer.parse().unwrap();
                     // Handle cards
                     let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
-                    let mut card = playdata::Cards::None;
-                    let mut action = playdata::Action::None;
-                    (action, card) = rcss::handle_state(state);
+                    let (action, card) = rcss::handle_state(state);
                     if (action == playdata::Action::None) && (card == playdata::Cards::None) {
                         ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
                     }
