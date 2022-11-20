@@ -166,7 +166,7 @@ impl RCLive {
             let mut fy = 0.0;
             let mut side = String::new();
             let mut fstamina = 1.0f32;
-            let mut card = playdata::Cards::None;
+            let mut card = playdata::Card::None;
             let mut action = playdata::Action::None;
             // Extract the player specific datas
             for tokl2 in toksl2 {
@@ -189,7 +189,7 @@ impl RCLive {
                 if k == "\"state\"" {
                     let state: u32 = v.parse().unwrap();
                     (action, card) = rcss::handle_state(state);
-                    if (action == playdata::Action::None) && (card == playdata::Cards::None) {
+                    if (action == playdata::Action::None) && (card == playdata::Card::None) {
                         ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",side, pnum, state));
                     }
                 }

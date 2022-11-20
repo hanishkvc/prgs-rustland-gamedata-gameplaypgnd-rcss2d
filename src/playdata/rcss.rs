@@ -3,7 +3,7 @@
 //! HanishKVC, 2022
 //!
 
-use super::{Cards, Action};
+use super::{Card, Action};
 
 /// This time is infered from live record reception,
 /// Later need to check docs/src of rcss to check, if it can change
@@ -21,13 +21,13 @@ pub const STATE_REDCARD: u32        = 0x80000;
 pub const STATE_YELLOWCARD: u32     = 0x40000;
 
 
-pub fn handle_state(state: u32) -> (Action, Cards) {
+pub fn handle_state(state: u32) -> (Action, Card) {
     let mut action = Action::None;
-    let mut card = Cards::None;
+    let mut card = Card::None;
     if state & STATE_REDCARD == STATE_REDCARD {
-        card = Cards::Red;
+        card = Card::Red;
     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
-        card = Cards::Yellow;
+        card = Card::Yellow;
     } else if state & STATE_KICK == STATE_KICK {
         action = Action::Kick(true);
     } else if state & STATE_KICK_FAULT == STATE_KICK_FAULT {

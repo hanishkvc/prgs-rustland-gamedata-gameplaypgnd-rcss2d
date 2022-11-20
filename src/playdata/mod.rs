@@ -9,7 +9,7 @@ use std::collections::HashMap;
 type TPlayerId = i32;
 
 #[derive(Debug, PartialEq)]
-pub enum Cards {
+pub enum Card {
     None,
     Red,
     Yellow,
@@ -28,7 +28,7 @@ pub enum Action {
 pub enum PlayerData {
     Pos(f32,f32),
     Stamina(f32),
-    Card(Cards),
+    Card(Card),
     Action(Action),
 }
 

@@ -79,7 +79,7 @@ impl Rcg {
         // Handle actions and cards
         let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
         let (action, card) = rcss::handle_state(state);
-        if (action == playdata::Action::None) && (card == playdata::Cards::None) {
+        if (action == playdata::Action::None) && (card == playdata::Card::None) {
             ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
         }
         pd.push(PlayerData::Card(card));

@@ -86,9 +86,9 @@ impl<'a> Team<'a> {
                     playdata::PlayerData::Card(card) => {
                         // Cards
                         let mut card_color = sdlx::COLOR_INVISIBLE;
-                        if let playdata::Cards::Red = card {
+                        if let playdata::Card::Red = card {
                             card_color = Color::RED;
-                        } else if let playdata::Cards::Yellow = card {
+                        } else if let playdata::Card::Yellow = card {
                             card_color = Color::YELLOW;
                         }
                         self.players[pi].set_tl_color(card_color);
