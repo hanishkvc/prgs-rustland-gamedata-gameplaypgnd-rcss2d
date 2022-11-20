@@ -9,7 +9,7 @@ use std::time;
 use tokensk::TStrX;
 use loggerk::{ldebug,log_d};
 
-use crate::{sdlx::XSpaces, playdata::{self, PlayerData}};
+use crate::{sdlx::XSpaces, playdata::{self, PlayerData, rcss}};
 
 use super::{PlayData, PlayUpdate};
 
@@ -19,14 +19,6 @@ const SECONDS_PER_RECORD: f32 = 0.1;
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
 const STAMINA_BASE: f32 = 8000.0;
-pub const STATE_KICK: u32           = 0x00002;
-pub const STATE_KICK_FAULT: u32     = 0x00004;
-pub const STATE_CATCH: u32          = 0x00010;
-pub const STATE_CATCH_FAULT: u32    = 0x00020;
-pub const STATE_TACKLE: u32         = 0x01000;
-pub const STATE_TACKLE_FALUT: u32   = 0x02000;
-pub const STATE_REDCARD: u32        = 0x80000;
-pub const STATE_YELLOWCARD: u32     = 0x40000;
 
 
 /// Help act as a simple monitor client for RoboCup Sim
@@ -197,15 +189,8 @@ impl RCLive {
                 }
                 if k == "\"state\"" {
                     let state: u32 = v.parse().unwrap();
-                    if state & STATE_REDCARD == STATE_REDCARD {
-                        card = playdata::Cards::Red;
-                    } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
-                        card = playdata::Cards::Yellow;
-                    } else if state & STATE_KICK == STATE_KICK {
-                        action = playdata::Action::Kick(true);
-                    } else if state & STATE_KICK_FAULT == STATE_KICK_FAULT {
-                        action = playdata::Action::Kick(false);
-                    } else {
+                    (action, card) = rcss::handle_state(state);
+                    if (action == playdata::Action::None) && (card == playdata::Cards::None) {
                         ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",side, pnum, state));
                     }
                 }

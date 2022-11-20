@@ -8,14 +8,14 @@ use std::collections::HashMap;
 
 type TPlayerId = i32;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Cards {
     None,
     Red,
     Yellow,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Action {
     None,
     Kick(bool),
@@ -118,5 +118,6 @@ pub trait PlayData {
 }
 
 pub mod random;
+pub mod rcss;
 pub mod rcg;
 pub mod rclive;
