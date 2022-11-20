@@ -32,14 +32,15 @@ fn show_help(sx: &mut SdlX) {
     ss:     show/hide stamina\n\
     sa:     show/hide actions\n\
     sb:     show/hide ball\n\
+    c1:     RCLive kick-off\n\
+    c0:     RCLive init hs\n\
     h:      hide/unhide help\n\
-    1:      kick-off (RCLive)\n\
     \n\
     playbackpgnd <live [addr]> | <path/file.rcg>\n\
     ...                   Save Nature Save Earth";
 
     let vhelp: Vec<&str> = shelp.split('\n').collect();
-    sx.n_msgbox((0.3, 0.3,0.4,0.4), vhelp, Color::BLUE);
+    sx.n_msgbox((0.3,0.2, 0.4,0.6), vhelp, Color::BLUE);
 
 }
 

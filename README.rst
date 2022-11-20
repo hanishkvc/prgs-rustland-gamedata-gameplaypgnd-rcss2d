@@ -112,10 +112,17 @@ One can use the following keys to control the behaviour as noted below.
   frame mode. However in the interpolated movement mode, changing fps, doesnt
   allow one to change the rate of playback.
 
-* c -> to change the background color
+* b -> to change the background color
 
-* 1 -> If working in the RobocupSoccerSim monitor mode, this allows to send
-  the kick-off (dispstart) command to the server.
+* c -> enter send-record-coded-mode
+
+  If working in RobocupSoccerSim monitor live mode, then
+
+  * 0 -> send the initial handshake (dispinit) command to the server
+
+  * 1 -> send the kick-off (dispstart) command to the server.
+
+  * any other key -> exit send-record-coded-mode
 
 * Internal debug cmds
 

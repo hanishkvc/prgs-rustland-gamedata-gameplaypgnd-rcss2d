@@ -3,6 +3,8 @@
 //! HanishKVC, 2022
 //!
 
+use sdl2::keyboard::Keycode;
+
 use crate::sdlx::SdlX;
 
 pub enum ProgramEvent {
@@ -22,33 +24,57 @@ pub enum ProgramEvent {
     NeedMore,
 }
 
+fn handle_s_cmds(keycode: Keycode) -> ProgramEvent {
+    match keycode {
+        Keycode::A => {
+            return ProgramEvent::ToggleShowActions;
+        },
+        Keycode::B => {
+            return ProgramEvent::ToggleShowBall;
+        },
+        Keycode::S => {
+            return ProgramEvent::ToggleShowStamina;
+        },
+        Keycode::H => {
+            return ProgramEvent::ToggleShowHelp;
+        },
+        _ => (),
+    }
+    return ProgramEvent::None;
+}
+
+fn handle_c_cmds(keycode: Keycode) -> ProgramEvent {
+    match keycode {
+        Keycode::Num0 => {
+            return ProgramEvent::SendRecordCoded(0);
+        },
+        Keycode::Num1 => {
+            return ProgramEvent::SendRecordCoded(1);
+        },
+        _ => (),
+    }
+    return ProgramEvent::None;
+}
+
 pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
     for ev in sx.ep.poll_iter() {
         use sdl2::event::Event;
-        use sdl2::keyboard::Keycode;
         use sdl2::keyboard::Mod;
-        if skey == "s" {
+        if skey.len() > 0 {
             match ev {
                 Event::Quit { timestamp: _} => return ProgramEvent::Quit,
                 Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod: _, repeat: _ } => {
-                    match keycode.unwrap() {
-                        Keycode::A => {
-                            return ProgramEvent::ToggleShowActions;
-                        },
-                        Keycode::B => {
-                            return ProgramEvent::ToggleShowBall;
-                        },
-                        Keycode::S => {
-                            return ProgramEvent::ToggleShowStamina;
-                        },
-                        Keycode::H => {
-                            return ProgramEvent::ToggleShowHelp;
-                        },
-                        Keycode::Escape | _ => {
-                            skey.clear();
-                            return ProgramEvent::None;
-                        },
+                    let mut pev = ProgramEvent::None;
+                    if skey == "s" {
+                        pev = handle_s_cmds(keycode.unwrap());
                     }
+                    if skey == "c" {
+                        pev = handle_c_cmds(keycode.unwrap());
+                    }
+                    if let ProgramEvent::None = pev {
+                        skey.clear();
+                    }
+                    return pev;
                 },
                 _ => return ProgramEvent::None,
             }
@@ -58,8 +84,12 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
             Event::Quit { timestamp: _ } => return ProgramEvent::Quit,
             Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
                 match keycode.unwrap() {
-                    Keycode::C => {
+                    Keycode::B => {
                         return ProgramEvent::BackgroundColorChange;
+                    }
+                    Keycode::C => {
+                        skey.push('c');
+                        return ProgramEvent::NeedMore;
                     }
                     Keycode::P => {
                         return ProgramEvent::Pause;
@@ -80,12 +110,6 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
                         } else {
                             return ProgramEvent::AdjustFPS(0.80);
                         }
-                    }
-                    Keycode::Num1 => {
-                        return ProgramEvent::SendRecordCoded(1);
-                    }
-                    Keycode::Num0 => {
-                        return ProgramEvent::SendRecordCoded(0);
                     }
                     Keycode::H => {
                         return ProgramEvent::ToggleShowHelp;
