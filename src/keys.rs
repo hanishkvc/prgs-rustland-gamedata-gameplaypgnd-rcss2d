@@ -37,6 +37,9 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
                         Keycode::S => {
                             return ProgramEvent::ToggleShowStamina;
                         },
+                        Keycode::H => {
+                            return ProgramEvent::ToggleShowHelp;
+                        },
                         Keycode::Escape | _ => {
                             skey.clear();
                             return ProgramEvent::None;
