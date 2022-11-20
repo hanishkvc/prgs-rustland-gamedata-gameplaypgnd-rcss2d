@@ -96,6 +96,13 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
 }
 
 /// Sync up fps to the seconds per record of the playdata source
+#[cfg(feature="inbetween_frames")]
+fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
+    pdata.fps_changed(pgentities.fps());
+    eprintln!("INFO:PPGND:Main:Fps:{}", pgentities.fps());
+}
+
+#[cfg(not(feature="inbetween_frames"))]
 fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
     let spr = pdata.seconds_per_record();
     let fpsadj = (1.0/spr)/pgentities.fps();

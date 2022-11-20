@@ -17,7 +17,8 @@ use super::PlayerData;
 use crate::entities::SCREEN_WIDTH;
 use crate::entities::SCREEN_HEIGHT;
 
-const FRAMES_NORMAL_SPR_MULT: f32 = 4.0;
+const FRAMES_NORMAL_SPR_MULT: f32 = 2.0;
+#[cfg(feature="inbetween_frames")]
 const FRAMES_INBTW_SPR_MULT: f32 = FRAMES_NORMAL_SPR_MULT*50.0;
 
 struct Team {
@@ -25,6 +26,7 @@ struct Team {
     pos: Vec<(f32,f32)>,
     mov: Vec<(f32, f32)>,
     chg: Vec<usize>,
+    rcnt: usize,
 }
 
 impl Team {
@@ -45,6 +47,7 @@ impl Team {
             pos: pos,
             mov: mov,
             chg: chg,
+            rcnt: 0,
         }
     }
 
@@ -70,6 +73,36 @@ impl Team {
         }
     }
 
+    fn next_internal_record(&mut self) {
+        self.rcnt += 1;
+        for i in 0..self.cnt {
+            if self.rcnt % self.chg[i] == 0 {
+                let dx = (rand::random::<i32>() % 4) as f32;
+                let dy = (rand::random::<i32>() % 4) as f32;
+                self.mov[i] = (dx, dy);
+            }
+            self.pos[i].0 += self.mov[i].0;
+            self.pos[i].1 += self.mov[i].1;
+        }
+    }
+
+    fn next_external_record(&mut self, pu: &mut PlayUpdate, s2n: &XSpaces, team: char, internalcnt: usize) {
+        for _i in 0..internalcnt {
+            self.next_internal_record();
+        }
+        for i in 0..self.cnt {
+            let (fx, fy) = s2n.d2o((self.pos[i].0, self.pos[i].1));
+            let mut pd = VPlayerData::new();
+            pd.push(PlayerData::Pos(fx, fy));
+            let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
+            pd.push(PlayerData::Stamina(fstamina));
+            if team == 'a' {
+                pu.ateamcoded.push((i as i32, pd));
+            } else {
+                pu.bteamcoded.push((i as i32, pd));
+            }
+        }
+    }
 
 }
 
@@ -114,6 +147,18 @@ impl RandomData {
         self.bteam.pos_fix();
     }
 
+    #[cfg(feature="inbetween_frames")]
+    fn next_external_record(&mut self, pu: &mut PlayUpdate) {
+        self.ateam.next_external_record(pu, &self.s2n, 'a', FRAMES_INBTW_SPR_MULT as usize);
+        self.bteam.next_external_record(pu, &self.s2n, 'b', FRAMES_INBTW_SPR_MULT as usize);
+    }
+
+    #[cfg(not(feature="inbetween_frames"))]
+    fn next_external_record(&mut self, pu: &mut PlayUpdate) {
+        self.ateam.next_external_record(pu, &self.s2n, 'a', FRAMES_NORMAL_SPR_MULT as usize);
+        self.bteam.next_external_record(pu, &self.s2n, 'b', FRAMES_NORMAL_SPR_MULT as usize);
+    }
+
 }
 
 impl PlayData for RandomData {
@@ -142,44 +187,6 @@ impl PlayData for RandomData {
         return false;
     }
 
-    #[cfg(feature="inbetween_frames")]
-    fn next_record(&mut self) -> PlayUpdate {
-        let mut pu = PlayUpdate::new();
-        for i in 0..self.acnt {
-            let dx = (rand::random::<i32>() % 8) as f32;
-            let dy = (rand::random::<i32>() % 8) as f32;
-            self.apos[i].0 += dx;
-            self.apos[i].1 += dy;
-            let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
-            let pd = VPlayerData::new();
-            pd.push(PlayerData::Pos(fx, fy));
-            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
-            pd.push(PlayerData::Stamina(fstamina));
-            pu.ateamcoded.push((i as i32, pd));
-        }
-        let mut dx;
-        let mut dy;
-        for i in 0..self.bcnt {
-            if cfg!(feature="inbetween_frames") {
-                dx = 1 + rand::random::<i32>() % 16;
-                dy = 1 + rand::random::<i32>() % 16;
-            } else {
-                dx = 1 + rand::random::<i32>() % 2;
-                dy = 1 + rand::random::<i32>() % 2;
-            }
-            self.bpos[i].0 += dx as f32;
-            self.bpos[i].1 += dy as f32;
-            let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
-            let pd = VPlayerData::new();
-            pd.push(PlayerData::Pos(fx, fy));
-            let fstamina = ((self.rcnt%3000) as f32)/3000.0;
-            pd.push(PlayerData::Stamina(fstamina));
-            pu.bteamcoded.push((i as i32, pd));
-        }
-        pu
-    }
-
-    #[cfg(not(feature="inbetween_frames"))]
     fn next_record(&mut self) -> PlayUpdate {
         self.rcnt += 1;
         let mut pu = PlayUpdate::new();
@@ -194,36 +201,7 @@ impl PlayData for RandomData {
         };
         pu.msgs.insert("game".to_string(), sgphase.to_string());
         // Player datas
-        for i in 0..self.acnt {
-            if self.rcnt % self.achg[i] == 0 {
-                let dx = (rand::random::<i32>() % 4) as f32;
-                let dy = (rand::random::<i32>() % 4) as f32;
-                self.amov[i] = (dx, dy);
-            }
-            self.apos[i].0 += self.amov[i].0;
-            self.apos[i].1 += self.amov[i].1;
-            let (fx, fy) = self.s2n.d2o((self.apos[i].0, self.apos[i].1));
-            let mut pd = VPlayerData::new();
-            pd.push(PlayerData::Pos(fx, fy));
-            let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
-            pd.push(PlayerData::Stamina(fstamina));
-            pu.ateamcoded.push((i as i32, pd));
-        }
-        for i in 0..self.bcnt {
-            if self.rcnt % self.bchg[i] == 0 {
-                let dx = (rand::random::<i32>() % 4) as f32;
-                let dy = (rand::random::<i32>() % 4) as f32;
-                self.bmov[i] = (dx, dy);
-            }
-            self.bpos[i].0 += self.bmov[i].0;
-            self.bpos[i].1 += self.bmov[i].1;
-            let (fx, fy) = self.s2n.d2o((self.bpos[i].0, self.bpos[i].1));
-            let mut pd = VPlayerData::new();
-            pd.push(PlayerData::Pos(fx, fy));
-            let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
-            pd.push(PlayerData::Stamina(fstamina));
-            pu.bteamcoded.push((i as i32, pd));
-        }
+        self.next_external_record(&mut pu);
         self.pos_fix();
         pu
     }
