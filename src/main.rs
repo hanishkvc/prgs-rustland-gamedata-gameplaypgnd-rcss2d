@@ -20,6 +20,7 @@ use playdata::rclive::RCLive;
 use sdlx::SdlX;
 
 mod testlib;
+mod keys;
 
 fn show_help(sx: &mut SdlX) {
     let shelp = "** Help **\n\
@@ -132,60 +133,24 @@ fn main() {
         sx.wc.clear();
         sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("{},{}",&pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
 
-        // handle any pending events
-        for ev in sx.ep.poll_iter() {
-            use sdl2::event::Event;
-            use sdl2::keyboard::Keycode;
-            use sdl2::keyboard::Mod;
-            match ev {
-                Event::Quit { timestamp: _ } => break 'mainloop,
-                Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
-                    match keycode.unwrap() {
-                        Keycode::C => {
-                            dcolor = dcolor.wrapping_add(20);
-                        }
-                        Keycode::P => {
-                            bpause = !bpause;
-                        }
-                        Keycode::B => {
-                            pgentities.showball = !pgentities.showball;
-                        }
-                        Keycode::S => {
-                            pgentities.toggle_bstamina();
-                        }
-                        Keycode::Left => {
-                            pdata.seek(-50);
-                        }
-                        Keycode::Right => {
-                            pdata.seek(50);
-                        }
-                        Keycode::F => {
-                            if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
-                                pgentities.fps_adjust(1.20);
-                            } else {
-                                pgentities.fps_adjust(0.80);
-                            }
-                            pdata.fps_changed(pgentities.fps());
-                        }
-                        Keycode::Num1 => {
-                            pdata.send_record_coded(1);
-                        }
-                        Keycode::Num0 => {
-                            pdata.send_record_coded(0);
-                        }
-                        Keycode::H => {
-                            bhelp = !bhelp;
-                        }
-                        Keycode::D => {
-                            eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities);
-                        }
-                        _ => {
-
-                        }
-                    }
-                },
-                _ => (),
-            }
+        // handle any pending program events
+        let prgev = keys::get_programevents(&mut sx);
+        match prgev {
+            keys::ProgramEvent::None => (),
+            keys::ProgramEvent::Pause => bpause = !bpause,
+            keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
+            keys::ProgramEvent::ToggleShowHelp => bhelp = !bhelp,
+            keys::ProgramEvent::ToggleShowBall => pgentities.showball = !pgentities.showball,
+            keys::ProgramEvent::ToggleShowStamina => pgentities.toggle_bstamina(),
+            keys::ProgramEvent::SeekBackward => pdata.seek(-50),
+            keys::ProgramEvent::SeekForward => pdata.seek(50),
+            keys::ProgramEvent::AdjustFPS(ratio) => {
+                pgentities.fps_adjust(ratio);
+                pdata.fps_changed(pgentities.fps());
+            },
+            keys::ProgramEvent::SendRecordCoded(code) => pdata.send_record_coded(code),
+            keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities),
+            keys::ProgramEvent::Quit => break 'mainloop,
         }
 
         // Update the entities
