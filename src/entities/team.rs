@@ -94,6 +94,32 @@ impl<'a> Team<'a> {
                         self.players[pi].set_tl_color(card_color);
                         self.players[pi].set_bl_color(card_color);
                     },
+                    playdata::PlayerData::Action(action) => {
+                        match action {
+                            playdata::Action::Kick(good) => {
+                                if good {
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::BLUE);
+                                } else {
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
+                                }
+                            },
+                            playdata::Action::Catch(good) => {
+                                if good {
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::YELLOW);
+                                } else {
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
+                                }
+                            },
+                            playdata::Action::Tackle(good) => {
+                                if good {
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::MAGENTA);
+                                } else {
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
+                                }
+                            },
+                            playdata::Action::None => self.players[pi].set_nxarc(1.0, 0.98, COLOR_INVISIBLE),
+                        }
+                    }
                 }
             }
         }

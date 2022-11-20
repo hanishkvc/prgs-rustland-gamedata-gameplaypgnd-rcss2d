@@ -18,8 +18,14 @@ use crate::sdlx::XSpaces;
 /// between the records maintained in the rcg file, is hard coded, here.
 const SECONDS_PER_RECORD: f32 = 0.1;
 const STAMINA_BASE: f32 = 8000.0;
-const STATE_REDCARD: u32 = 0x80000;
-const STATE_YELLOWCARD: u32 = 0x40000;
+use crate::playdata::rclive::STATE_CATCH;
+use crate::playdata::rclive::STATE_CATCH_FAULT;
+use crate::playdata::rclive::STATE_KICK;
+use crate::playdata::rclive::STATE_KICK_FAULT;
+use crate::playdata::rclive::STATE_TACKLE;
+use crate::playdata::rclive::STATE_TACKLE_FALUT;
+use crate::playdata::rclive::STATE_REDCARD;
+use crate::playdata::rclive::STATE_YELLOWCARD;
 
 
 pub struct Rcg {
@@ -132,12 +138,20 @@ impl PlayData for Rcg {
                     // Handle cards
                     let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
                     let mut card = playdata::Cards::None;
+                    let mut action = playdata::Action::None;
                     if state & STATE_REDCARD == STATE_REDCARD {
-                        card = playdata::Cards::Red
+                        card = playdata::Cards::Red;
                     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
                         card = playdata::Cards::Yellow;
+                    } else if state & STATE_KICK == STATE_KICK {
+                        action = playdata::Action::Kick(true);
+                    } else if state & STATE_KICK_FAULT == STATE_KICK_FAULT {
+                        action = playdata::Action::Kick(false);
+                    } else {
+                        ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
                     }
                     pd.push(PlayerData::Card(card));
+                    pd.push(PlayerData::Action(action));
                     // Handle position
                     let fxin: f32 = vdata[3].parse().unwrap();
                     let fyin: f32 = vdata[4].parse().unwrap();

@@ -16,11 +16,20 @@ pub enum Cards {
 }
 
 #[derive(Debug)]
+pub enum Action {
+    None,
+    Kick(bool),
+    Catch(bool),
+    Tackle(bool),
+}
+
+#[derive(Debug)]
 /// Player related data
 pub enum PlayerData {
     Pos(f32,f32),
     Stamina(f32),
     Card(Cards),
+    Action(Action),
 }
 
 /// Maintain a vector of player related data

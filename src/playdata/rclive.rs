@@ -19,8 +19,14 @@ const SECONDS_PER_RECORD: f32 = 0.1;
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
 const STAMINA_BASE: f32 = 8000.0;
-const STATE_REDCARD: u32 = 0x80000;
-const STATE_YELLOWCARD: u32 = 0x40000;
+pub const STATE_KICK: u32           = 0x00002;
+pub const STATE_KICK_FAULT: u32     = 0x00004;
+pub const STATE_CATCH: u32          = 0x00010;
+pub const STATE_CATCH_FAULT: u32    = 0x00020;
+pub const STATE_TACKLE: u32         = 0x01000;
+pub const STATE_TACKLE_FALUT: u32   = 0x02000;
+pub const STATE_REDCARD: u32        = 0x80000;
+pub const STATE_YELLOWCARD: u32     = 0x40000;
 
 
 /// Help act as a simple monitor client for RoboCup Sim
@@ -170,6 +176,7 @@ impl RCLive {
             let mut side = String::new();
             let mut fstamina = 1.0f32;
             let mut card = playdata::Cards::None;
+            let mut action = playdata::Action::None;
             // Extract the player specific datas
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
@@ -194,6 +201,12 @@ impl RCLive {
                         card = playdata::Cards::Red;
                     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
                         card = playdata::Cards::Yellow;
+                    } else if state & STATE_KICK == STATE_KICK {
+                        action = playdata::Action::Kick(true);
+                    } else if state & STATE_KICK_FAULT == STATE_KICK_FAULT {
+                        action = playdata::Action::Kick(false);
+                    } else {
+                        ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",side, pnum, state));
                     }
                 }
             }
@@ -203,6 +216,7 @@ impl RCLive {
             pd.push(PlayerData::Pos(fx, fy));
             pd.push(PlayerData::Stamina(fstamina));
             pd.push(PlayerData::Card(card));
+            pd.push(PlayerData::Action(action));
             if side.chars().nth(1).unwrap() == 'l' {
                 pu.ateamcoded.push((pnum-1, pd));
             } else {
