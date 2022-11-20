@@ -230,8 +230,8 @@ impl PlayData for RandomData {
         todo!()
     }
 
-    fn send_record_coded(&mut self, _code: isize) {
-        todo!()
+    fn send_record_coded(&mut self, code: isize) {
+        eprintln!("WARN:PPGND:PlayDataRandom:ignoring request for send record coded [{}]", code);
     }
 
 }
