@@ -18,6 +18,7 @@ use playdata::random::RandomData;
 use playdata::{PlayData, rclive};
 use playdata::rclive::RCLive;
 use sdlx::SdlX;
+use entities::PGEntities;
 
 mod testlib;
 mod keys;
@@ -94,6 +95,15 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
     }
 }
 
+/// Sync up fps to the seconds per record of the playdata source
+fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
+    let spr = pdata.seconds_per_record();
+    let fpsadj = (1.0/spr)/pgentities.fps();
+    pgentities.fps_adjust(fpsadj);
+    pdata.fps_changed(1.0/spr);
+    eprintln!("INFO:PPGND:Main:Fps:{}", pgentities.fps());
+}
+
 fn main() {
     log_init();
     identify();
@@ -116,6 +126,10 @@ fn main() {
     let mut pdatasrc = pdata_source(&clargs, pgentities.fps());
     let pdata = pdatasrc.as_mut();
 
+    // sync up fps to spr
+    sync_up_fps_to_spr(&mut pgentities, pdata);
+
+    // The main loop of the program starts now
     let mut bpause = false;
     let mut frame: usize = 0;
     let mut bhelp = false;
