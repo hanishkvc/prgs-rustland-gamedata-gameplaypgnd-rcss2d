@@ -90,7 +90,7 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
         let pdrcg = Rcg::new(src, fps);
         return Box::new(pdrcg);
     } else {
-        let pdrandom = RandomData::new(20.0, 11, 11);
+        let pdrandom = RandomData::new(1.0/24.0, 11, 11);
         return Box::new(pdrandom);
     }
 }

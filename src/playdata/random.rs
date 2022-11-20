@@ -17,6 +17,9 @@ use super::PlayerData;
 use crate::entities::SCREEN_WIDTH;
 use crate::entities::SCREEN_HEIGHT;
 
+const FRAMES_NORMAL_SPR_MULT: f32 = 4.0;
+const FRAMES_INBTW_SPR_MULT: f32 = FRAMES_NORMAL_SPR_MULT*50.0;
+
 struct Team {
     cnt: usize,
     pos: Vec<(f32,f32)>,
@@ -35,7 +38,7 @@ impl Team {
             let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
             pos.push((fx, fy));
             mov.push((0.0, 0.0));
-            chg.push(1 + (rand::random::<usize>() % 128));
+            chg.push(1 + (rand::random::<usize>() % 128)*(FRAMES_NORMAL_SPR_MULT as usize));
         }
         Team {
             cnt: cnt,
@@ -72,7 +75,7 @@ impl Team {
 
 pub struct RandomData {
     /// seconds per record
-    spr: f32,
+    base_spr: f32,
     /// frames per record
     fpr: f32,
     next: f32,
@@ -84,13 +87,15 @@ pub struct RandomData {
 
 impl RandomData {
 
-    pub fn new(spr: f32, acnt: usize, bcnt: usize) -> RandomData {
+    ///
+    /// base_spr: the smallest fraction of a second, at which the logic works internally wrt movemens
+    pub fn new(base_spr: f32, acnt: usize, bcnt: usize) -> RandomData {
         let srect = ((-20.0, -20.0), (SCREEN_WIDTH as f32 + 20.0, SCREEN_HEIGHT as f32 + 20.0));
         let nrect = ((0.0,0.0), (1.0,1.0));
         let ateam = Team::new(acnt);
         let bteam = Team::new(bcnt);
         RandomData {
-            spr: spr,
+            base_spr,
             fpr: 0.0,
             next: 0.0,
             rcnt: 0,
@@ -114,12 +119,18 @@ impl RandomData {
 impl PlayData for RandomData {
 
     fn fps_changed(&mut self, fps: f32) {
-        self.fpr = fps*self.spr;
+        self.fpr = fps*self.seconds_per_record();
         self.next = 0.0;
     }
 
+    #[cfg(feature="inbetween_frames")]
     fn seconds_per_record(&self) -> f32 {
-        self.spr
+        self.base_spr*FRAMES_INBTW_SPR_MULT
+    }
+
+    #[cfg(not(feature="inbetween_frames"))]
+    fn seconds_per_record(&self) -> f32 {
+        self.base_spr*FRAMES_NORMAL_SPR_MULT
     }
 
     fn next_frame_is_record_ready(&mut self) -> bool {
