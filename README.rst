@@ -3,7 +3,7 @@ Playback Playground
 ####################
 
 Author: HanishKVC
-Version: 20221118IST2325
+Version: 20221120IST2244
 License: GPL-3.0+
 
 
@@ -144,7 +144,8 @@ player movements.
 
 * any unknown/unhandled messages in the play data, at the bottom mid
 
-* the set and actual fps, at the top right
+* curently active starting key in multikey cmds and set+actual fps,
+  at the top right
 
 Augumenting
 =============

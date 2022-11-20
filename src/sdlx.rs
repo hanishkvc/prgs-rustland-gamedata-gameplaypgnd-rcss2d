@@ -298,7 +298,8 @@ impl SdlX {
         // Heading text
         let ncw = self.n2s.o2dx(STRING_CHAR_PIXEL_WIDTH);
         let hlen = ss[0].len() as f32*ncw;
-        let hbefore = (nr.3 - hlen)/2.0;
+        let hbefore = (nr.2 - hlen)/2.0;
+        //eprintln!("DBUG:SdlX:NMsgBox:[{:?}]:hlen[{}]:hb4[{}]:", nr, hlen, hbefore);
         self.n_string(nr.0+hbefore, nr.1+nlh, ss[0], COLOR_MSG_HEAD_TEXT);
         // The message
         ss.remove(0);
