@@ -17,72 +17,33 @@ use super::PlayerData;
 use crate::entities::SCREEN_WIDTH;
 use crate::entities::SCREEN_HEIGHT;
 
-
-pub struct RandomData {
-    /// seconds per record
-    spr: f32,
-    /// frames per record
-    fpr: f32,
-    next: f32,
-    acnt: usize,
-    bcnt: usize,
-    apos: Vec<(f32,f32)>,
-    bpos: Vec<(f32,f32)>,
-    amov: Vec<(f32, f32)>,
-    bmov: Vec<(f32, f32)>,
-    achg: Vec<usize>,
-    bchg: Vec<usize>,
-    rcnt: usize,
-    s2n: XSpaces,
+struct Team {
+    cnt: usize,
+    pos: Vec<(f32,f32)>,
+    mov: Vec<(f32, f32)>,
+    chg: Vec<usize>,
 }
 
-impl RandomData {
+impl Team {
 
-    pub fn new(spr: f32, acnt: usize, bcnt: usize) -> RandomData {
-        let mut apos = Vec::new();
-        let mut amov = Vec::new();
-        let mut achg = Vec::new();
-        for _i in 0..acnt {
+    fn new(cnt: usize) -> Team {
+        let mut pos = Vec::new();
+        let mut mov = Vec::new();
+        let mut chg = Vec::new();
+        for _i in 0..cnt {
             let fx = (rand::random::<u32>() % entities::SCREEN_WIDTH) as f32;
             let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
-            apos.push((fx, fy));
-            amov.push((0.0, 0.0));
-            achg.push(1 + (rand::random::<usize>() % 128));
+            pos.push((fx, fy));
+            mov.push((0.0, 0.0));
+            chg.push(1 + (rand::random::<usize>() % 128));
         }
-        let mut bpos = Vec::new();
-        let mut bmov = Vec::new();
-        let mut bchg = Vec::new();
-        for _i in 0..bcnt {
-            let fx = (rand::random::<u32>() % 400) as f32;
-            let fy = (rand::random::<u32>() % 400) as f32;
-            bpos.push((fx, fy));
-            bmov.push((0.0, 0.0));
-            bchg.push((rand::random::<usize>() % 128) + 1);
-        }
-
-        let srect = ((-20.0, -20.0), (SCREEN_WIDTH as f32 + 20.0, SCREEN_HEIGHT as f32 + 20.0));
-        let nrect = ((0.0,0.0), (1.0,1.0));
-
-        RandomData {
-            spr: spr,
-            fpr: 0.0,
-            next: 0.0,
-            acnt: acnt,
-            bcnt: bcnt,
-            apos: apos,
-            bpos: bpos,
-            amov: amov,
-            bmov: bmov,
-            rcnt: 0,
-            achg: achg,
-            bchg: bchg,
-            s2n: XSpaces::new(srect, nrect)
+        Team {
+            cnt: cnt,
+            pos: pos,
+            mov: mov,
+            chg: chg,
         }
     }
-
-}
-
-impl RandomData {
 
     fn fpos_fix(mut pos: (f32, f32)) -> (f32, f32) {
         if pos.0 < 0.0 {
@@ -101,12 +62,51 @@ impl RandomData {
     }
 
     fn pos_fix(&mut self) {
-        for i in 0..self.acnt {
-            self.apos[i] = Self::fpos_fix(self.apos[i]);
+        for i in 0..self.cnt {
+            self.pos[i] = Self::fpos_fix(self.pos[i]);
         }
-        for i in 0..self.bcnt {
-            self.bpos[i] = Self::fpos_fix(self.bpos[i]);
+    }
+
+
+}
+
+pub struct RandomData {
+    /// seconds per record
+    spr: f32,
+    /// frames per record
+    fpr: f32,
+    next: f32,
+    ateam: Team,
+    bteam: Team,
+    rcnt: usize,
+    s2n: XSpaces,
+}
+
+impl RandomData {
+
+    pub fn new(spr: f32, acnt: usize, bcnt: usize) -> RandomData {
+        let srect = ((-20.0, -20.0), (SCREEN_WIDTH as f32 + 20.0, SCREEN_HEIGHT as f32 + 20.0));
+        let nrect = ((0.0,0.0), (1.0,1.0));
+        let ateam = Team::new(acnt);
+        let bteam = Team::new(bcnt);
+        RandomData {
+            spr: spr,
+            fpr: 0.0,
+            next: 0.0,
+            rcnt: 0,
+            s2n: XSpaces::new(srect, nrect),
+            ateam: ateam,
+            bteam: bteam,
         }
+    }
+
+}
+
+impl RandomData {
+
+    fn pos_fix(&mut self) {
+        self.ateam.pos_fix();
+        self.bteam.pos_fix();
     }
 
 }
