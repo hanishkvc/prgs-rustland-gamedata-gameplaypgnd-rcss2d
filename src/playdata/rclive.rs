@@ -9,16 +9,16 @@ use std::time;
 use tokensk::TStrX;
 use loggerk::{ldebug,log_d};
 
-use crate::{sdlx::XSpaces, playdata::{self, PlayerData, rcss}};
+use crate::sdlx::XSpaces;
 
-use super::{PlayData, PlayUpdate};
+use crate::playdata;
+use super::rcss;
+use super::{PlayData, PlayUpdate, PlayerData};
 
 pub const NWADDR_DEFAULT: &str = "0.0.0.0:6000";
 
-const SECONDS_PER_RECORD: f32 = 0.1;
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
-const STAMINA_BASE: f32 = 8000.0;
 
 
 /// Help act as a simple monitor client for RoboCup Sim
@@ -196,7 +196,7 @@ impl RCLive {
                 }
             }
             let (fx,fy) = self.r2n.d2o((fx,fy));
-            fstamina = (fstamina/STAMINA_BASE).min(1.0);
+            fstamina = (fstamina/rcss::STAMINA_BASE).min(1.0);
             let mut pd = playdata::VPlayerData::new();
             pd.push(PlayerData::Pos(fx, fy));
             pd.push(PlayerData::Stamina(fstamina));
@@ -216,7 +216,7 @@ impl RCLive {
 impl PlayData for RCLive {
 
     fn seconds_per_record(&self) -> f32 {
-        return SECONDS_PER_RECORD;
+        return rcss::SECONDS_PER_RECORD;
     }
 
     fn fps_changed(&mut self, _fps: f32) {

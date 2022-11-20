@@ -5,6 +5,12 @@
 
 use super::{Cards, Action};
 
+/// This time is infered from live record reception,
+/// Later need to check docs/src of rcss to check, if it can change
+pub const SECONDS_PER_RECORD: f32 = 0.1;
+pub const STAMINA_BASE: f32 = 8000.0;
+
+/// Player states
 pub const STATE_KICK: u32           = 0x00002;
 pub const STATE_KICK_FAULT: u32     = 0x00004;
 pub const STATE_CATCH: u32          = 0x00010;

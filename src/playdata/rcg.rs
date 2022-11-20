@@ -8,17 +8,12 @@ use loggerk::{ldebug, log_d};
 use tokensk::TStr;
 
 use crate::playdata;
+use crate::playdata::rcss;
 use crate::playdata::PlayUpdate;
 use crate::playdata::PlayData;
 use crate::playdata::PlayerData;
 use crate::playdata::VPlayerData;
 use crate::sdlx::XSpaces;
-use crate::playdata::rcss;
-
-/// Currently the time in terms of seconds (could be a fraction),
-/// between the records maintained in the rcg file, is hard coded, here.
-const SECONDS_PER_RECORD: f32 = 0.1;
-const STAMINA_BASE: f32 = 8000.0;
 
 
 pub struct Rcg {
@@ -52,7 +47,7 @@ impl Rcg {
             lines: vline,
             iline: -1,
             bdone: false,
-            secondsper_record: SECONDS_PER_RECORD,
+            secondsper_record: rcss::SECONDS_PER_RECORD,
             secondsafter_lastrecord: 0.0,
             secondsperframe: 1.0/fps,
             r2d: XSpaces::new(rrect, drect)
@@ -152,7 +147,7 @@ impl PlayData for Rcg {
                     let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
                     //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
                     let mut fstamina: f32 = staminatoks[1].parse().unwrap();
-                    fstamina = (fstamina/STAMINA_BASE).min(1.0);
+                    fstamina = (fstamina/rcss::STAMINA_BASE).min(1.0);
                     pd.push(PlayerData::Stamina(fstamina));
                     // Fill in the player data
                     if steam == "l" {
