@@ -56,6 +56,62 @@ impl Rcg {
 
 }
 
+impl Rcg {
+
+    fn handle_ball(&mut self, vdata: &Vec<String>, pu: &mut PlayUpdate) {
+        let fxin: f32 = vdata[1].parse().unwrap();
+        let fyin: f32 = vdata[2].parse().unwrap();
+        let fx = self.r2d.d2ox(fxin);
+        let fy = self.r2d.d2oy(fyin);
+        if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
+            eprintln!("DBUG:Rcg:Ball:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+        }
+        pu.ball = (fx, fy);
+    }
+
+    fn handle_player(&mut self, vdata: &Vec<String>, pu: &mut PlayUpdate) {
+        let mut pd = VPlayerData::new();
+        // Handle team and player id
+        let mut tstr = TStr::from_str(&vdata[0], true);
+        tstr.peel_bracket('(').unwrap();
+        let (steam, splayer) = tstr.split_once(' ').unwrap();
+        let iplayer: i32 = splayer.parse().unwrap();
+        // Handle actions and cards
+        let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
+        let (action, card) = rcss::handle_state(state);
+        if (action == playdata::Action::None) && (card == playdata::Cards::None) {
+            ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
+        }
+        pd.push(PlayerData::Card(card));
+        pd.push(PlayerData::Action(action));
+        // Handle position
+        let fxin: f32 = vdata[3].parse().unwrap();
+        let fyin: f32 = vdata[4].parse().unwrap();
+        let fx = self.r2d.d2ox(fxin);
+        let fy = self.r2d.d2oy(fyin);
+        if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
+            eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+        }
+        pd.push(PlayerData::Pos(fx, fy));
+        // Handle stamina
+        let sstamina = &vdata[10];
+        let mut tstr = TStr::from_str(sstamina, true);
+        tstr.peel_bracket('(').unwrap();
+        let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
+        //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
+        let mut fstamina: f32 = staminatoks[1].parse().unwrap();
+        fstamina = (fstamina/rcss::STAMINA_BASE).min(1.0);
+        pd.push(PlayerData::Stamina(fstamina));
+        // Fill in the player data
+        if steam == "l" {
+            pu.ateamcoded.push((iplayer-1, pd));
+        } else {
+            pu.bteamcoded.push((iplayer-1, pd));
+        }
+    }
+
+}
+
 impl PlayData for Rcg {
 
     fn fps_changed(&mut self, fps: f32) {
@@ -108,52 +164,9 @@ impl PlayData for Rcg {
                     let vdata = tstr.tokens_vec(' ', true, true).unwrap();
                     ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Full:{:?}", vdata));
                     if vdata[0].starts_with("(b") {
-                        let fxin: f32 = vdata[1].parse().unwrap();
-                        let fyin: f32 = vdata[2].parse().unwrap();
-                        let fx = self.r2d.d2ox(fxin);
-                        let fy = self.r2d.d2oy(fyin);
-                        if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
-                            eprintln!("DBUG:Rcg:Ball:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
-                        }
-                        pu.ball = (fx, fy);
-                        continue;
-                    }
-                    let mut pd = VPlayerData::new();
-                    let mut tstr = TStr::from_str(&vdata[0], true);
-                    tstr.peel_bracket('(').unwrap();
-                    let (steam, splayer) = tstr.split_once(' ').unwrap();
-                    let iplayer: i32 = splayer.parse().unwrap();
-                    // Handle cards
-                    let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
-                    let (action, card) = rcss::handle_state(state);
-                    if (action == playdata::Action::None) && (card == playdata::Cards::None) {
-                        ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
-                    }
-                    pd.push(PlayerData::Card(card));
-                    pd.push(PlayerData::Action(action));
-                    // Handle position
-                    let fxin: f32 = vdata[3].parse().unwrap();
-                    let fyin: f32 = vdata[4].parse().unwrap();
-                    let fx = self.r2d.d2ox(fxin);
-                    let fy = self.r2d.d2oy(fyin);
-                    if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
-                        eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
-                    }
-                    pd.push(PlayerData::Pos(fx, fy));
-                    // Handle stamina
-                    let sstamina = &vdata[10];
-                    let mut tstr = TStr::from_str(sstamina, true);
-                    tstr.peel_bracket('(').unwrap();
-                    let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
-                    //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
-                    let mut fstamina: f32 = staminatoks[1].parse().unwrap();
-                    fstamina = (fstamina/rcss::STAMINA_BASE).min(1.0);
-                    pd.push(PlayerData::Stamina(fstamina));
-                    // Fill in the player data
-                    if steam == "l" {
-                        pu.ateamcoded.push((iplayer-1, pd));
+                        self.handle_ball(&vdata, &mut pu);
                     } else {
-                        pu.bteamcoded.push((iplayer-1, pd));
+                        self.handle_player(&vdata, &mut pu);
                     }
                 }
                 break;

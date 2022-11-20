@@ -16,7 +16,6 @@ use super::rcss;
 use super::{PlayData, PlayUpdate, PlayerData};
 
 pub const NWADDR_DEFAULT: &str = "0.0.0.0:6000";
-
 const OWN_ADDRESS: &str = "0.0.0.0:6600";
 const READ_TIMEOUT_MS: u64 = 500;
 
