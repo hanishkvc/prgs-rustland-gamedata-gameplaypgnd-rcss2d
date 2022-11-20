@@ -30,6 +30,7 @@ fn show_help(sx: &mut SdlX) {
     f/F:    change fps\n\
     p:      pause playback\n\
     ss:     show/hide stamina\n\
+    sa:     show/hide actions\n\
     sb:     show/hide ball\n\
     h:      hide/unhide help\n\
     1:      kick-off (RCLive)\n\
@@ -142,6 +143,7 @@ fn main() {
             keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
             keys::ProgramEvent::ToggleShowHelp => bhelp = !bhelp,
             keys::ProgramEvent::ToggleShowBall => pgentities.showball = !pgentities.showball,
+            keys::ProgramEvent::ToggleShowActions => pgentities.toggle_bshowactions(),
             keys::ProgramEvent::ToggleShowStamina => pgentities.toggle_bstamina(),
             keys::ProgramEvent::SeekBackward => pdata.seek(-50),
             keys::ProgramEvent::SeekForward => pdata.seek(50),

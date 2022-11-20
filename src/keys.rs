@@ -10,6 +10,7 @@ pub enum ProgramEvent {
     Pause,
     BackgroundColorChange,
     ToggleShowHelp,
+    ToggleShowActions,
     ToggleShowBall,
     ToggleShowStamina,
     SeekBackward,
@@ -31,6 +32,9 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
                 Event::Quit { timestamp: _} => return ProgramEvent::Quit,
                 Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod: _, repeat: _ } => {
                     match keycode.unwrap() {
+                        Keycode::A => {
+                            return ProgramEvent::ToggleShowActions;
+                        },
                         Keycode::B => {
                             return ProgramEvent::ToggleShowBall;
                         },

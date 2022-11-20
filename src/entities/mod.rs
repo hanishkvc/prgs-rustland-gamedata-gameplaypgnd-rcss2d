@@ -189,4 +189,9 @@ impl<'a> PGEntities<'a> {
         self.bteam.toggle_bstamina();
     }
 
+    pub fn toggle_bshowactions(&mut self) {
+        self.ateam.toggle_bshowactions();
+        self.bteam.toggle_bshowactions();
+    }
+
 }

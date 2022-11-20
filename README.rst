@@ -83,6 +83,8 @@ One can use the following keys to control the behaviour as noted below.
 
   * s -> to show/hide the display of stamina
 
+  * a -> to show/hide the display of actions
+
   * b -> to show/hide the ball
 
   * any other key -> exit set-show/hide-mode
