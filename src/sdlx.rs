@@ -232,7 +232,7 @@ impl SdlX {
     }
 
     /// Draw a string.
-    /// Takes the starting point for drawing in normal space.
+    /// Takes the starting point (horiz_left-vert_mid) for drawing in normal space.
     pub fn n_string(&self, nx: f32, ny: f32, s: &str, color: Color) {
         let sx = self.n2s.d2ox(nx).round() as i16;
         let sy = self.n2s.d2oy(ny).round() as i16;
@@ -257,6 +257,22 @@ impl SdlX {
         let nw = (msg.len()+2) as f32 * cw;
         let rx = nx-cw;
         let ry = ny-(ch*0.5);
+        self.wc.set_draw_color(COLOR_MSG_BOX_BACKGROUND);
+        self.wc.set_blend_mode(BlendMode::Blend);
+        self.nn_fill_rect(rx, ry, nw, ch*2.0);
+        self.n_string(nx, ny, msg, color);
+    }
+
+    /// Draw a string along with a partially translucent (gray) background box/rect.
+    /// Takes the horiz_mid-vert_mid point for drawing in normal space.
+    pub fn n_msg_mid(&mut self, nx: f32, ny: f32, msg: &str, color: Color) {
+        let cw = self.n2s.o2dx(STRING_CHAR_PIXEL_WIDTH);
+        let ch = self.n2s.o2dy(STRING_CHAR_PIXEL_HEIGHT);
+        let nw = (msg.len()+2) as f32 * cw;
+        let rx = nx - nw/2.0;
+        let nx = rx+cw;
+        let ry = ny-(ch*0.5);
+        let ny = ny-(ch*0.0);
         self.wc.set_draw_color(COLOR_MSG_BOX_BACKGROUND);
         self.wc.set_blend_mode(BlendMode::Blend);
         self.nn_fill_rect(rx, ry, nw, ch*2.0);

@@ -125,13 +125,13 @@ player movements.
 
 * the score, at the top left
 
-* the game time as represented by the playdata source, at the top right
+* the game time as represented by the playdata source, at the top mid
 
 * game related messages in the play data, at the bottom left.
 
 * any unknown/unhandled messages in the play data, at the bottom mid
 
-* the set and actual fps, at the top mid
+* the set and actual fps, at the top right
 
 Augumenting
 =============

@@ -76,6 +76,8 @@ pub struct FixedPosMessage {
     key: String,
     /// The position is specified in the normalised space of 0.0-1.0
     npos: (f32, f32),
+    /// Is the specified position mid or top-left, default false
+    pub posmid: bool,
     /// The message that is shown
     msg: String,
     /// Color to use wrt the message.
@@ -101,6 +103,7 @@ impl FixedPosMessage {
             allowemptyupdate: ballowemptyupdate,
             autoclearchk: autoclearchk,
             autoclearcnt: autoclearchk,
+            posmid: false,
         }
     }
 
@@ -135,7 +138,11 @@ impl FixedPosMessage {
                 self.msg = String::new();
             }
         }
-        sx.n_msg(self.npos.0, self.npos.1, &self.msg, self.color);
+        if self.posmid {
+            sx.n_msg_mid(self.npos.0, self.npos.1, &self.msg, self.color);
+        } else {
+            sx.n_msg(self.npos.0, self.npos.1, &self.msg, self.color);
+        }
     }
 
 }

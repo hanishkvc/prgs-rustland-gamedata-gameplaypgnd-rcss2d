@@ -22,8 +22,8 @@ pub const FRAMES_PER_SEC: usize = 24;
 pub const PITCH_RECT: XRect = ((0.03,0.04), (0.97,0.96));
 
 pub const MSG_SCORE_POS: (f32,f32)      = (0.01,0.01);
-pub const MSG_FPS_POS: (f32,f32)        = (0.48,0.01);
-pub const MSG_STIME_POS: (f32,f32)      = (0.90,0.01);
+pub const MSG_STIME_POS: (f32,f32)      = (0.50,0.01);
+pub const MSG_FPS_POS: (f32,f32)        = (0.90,0.01);
 pub const MSG_GAME_POS: (f32,f32)       = (0.01,0.98);
 pub const MSG_UNKNOWN_POS: (f32,f32)    = (0.50,0.98);
 
@@ -82,7 +82,8 @@ impl<'a> PGEntities<'a> {
         let mut vfpmsgs = Vec::new();
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
-        let stimemsg = FixedPosMessage::new("stime", MSG_STIME_POS, false, -1);
+        let mut stimemsg = FixedPosMessage::new("stime", MSG_STIME_POS, false, -1);
+        stimemsg.posmid = true;
         vfpmsgs.push(stimemsg);
         let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false, -1);
         vfpmsgs.push(gamemsg);
