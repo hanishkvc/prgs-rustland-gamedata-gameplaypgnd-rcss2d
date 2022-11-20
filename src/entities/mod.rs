@@ -21,10 +21,11 @@ pub const FRAMES_PER_SEC: usize = 24;
 
 pub const PITCH_RECT: XRect = ((0.03,0.04), (0.97,0.96));
 
-pub const MSG_SCORE_POS: (f32,f32) = (0.01,0.01);
-pub const MSG_STIME_POS: (f32,f32) = (0.90,0.01);
-pub const MSG_GAME_POS: (f32,f32) = (0.01,0.98);
-pub const MSG_UNKNOWN_POS: (f32,f32) = (0.50,0.98);
+pub const MSG_SCORE_POS: (f32,f32)      = (0.01,0.01);
+pub const MSG_FPS_POS: (f32,f32)        = (0.48,0.01);
+pub const MSG_STIME_POS: (f32,f32)      = (0.90,0.01);
+pub const MSG_GAME_POS: (f32,f32)       = (0.01,0.98);
+pub const MSG_UNKNOWN_POS: (f32,f32)    = (0.50,0.98);
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {

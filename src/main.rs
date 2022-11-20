@@ -130,7 +130,7 @@ fn main() {
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
-        sx.n_msg(0.48, 0.01, &format!("{},{}",&pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
+        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("{},{}",&pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
 
         // handle any pending events
         for ev in sx.ep.poll_iter() {
