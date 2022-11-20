@@ -105,14 +105,14 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Catch(good) => {
                                 if good {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::YELLOW);
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::WHITE);
                                 } else {
                                     self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
                                 }
                             },
                             playdata::Action::Tackle(good) => {
                                 if good {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::MAGENTA);
+                                    self.players[pi].set_nxarc(1.0, 0.98, Color::CYAN);
                                 } else {
                                     self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
                                 }
