@@ -23,6 +23,7 @@ pub struct Team<'a> {
     pmoves: Vec<(f32,f32)>,
     pchgmovs: Vec<i32>,
     bstamina: bool,
+    bshowactions: bool,
 }
 
 impl<'a> Team<'a> {
@@ -35,6 +36,7 @@ impl<'a> Team<'a> {
             pmoves: Vec::new(),
             pchgmovs: Vec::new(),
             bstamina: true,
+            bshowactions: true,
         };
         let bx = (rand::random::<u32>() % entities::SCREEN_WIDTH) as f32;
         for i in 0..nplayers {
@@ -95,30 +97,34 @@ impl<'a> Team<'a> {
                         self.players[pi].set_bl_color(card_color);
                     },
                     playdata::PlayerData::Action(action) => {
-                        match action {
+                        let mut action_color = match action {
                             playdata::Action::Kick(good) => {
                                 if good {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::BLUE);
+                                    Color::BLUE
                                 } else {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
+                                    Color::GRAY
                                 }
                             },
                             playdata::Action::Catch(good) => {
                                 if good {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::WHITE);
+                                    Color::WHITE
                                 } else {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
+                                    Color::GRAY
                                 }
                             },
                             playdata::Action::Tackle(good) => {
                                 if good {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::CYAN);
+                                    Color::CYAN
                                 } else {
-                                    self.players[pi].set_nxarc(1.0, 0.98, Color::GRAY);
+                                    Color::GRAY
                                 }
                             },
-                            playdata::Action::None => self.players[pi].set_nxarc(1.0, 0.98, COLOR_INVISIBLE),
+                            playdata::Action::None => COLOR_INVISIBLE,
+                        };
+                        if !self.bshowactions {
+                            action_color = COLOR_INVISIBLE;
                         }
+                        self.players[pi].set_nxarc(1.0, 0.98, action_color);
                     }
                 }
             }
@@ -149,6 +155,10 @@ impl<'a> Team<'a> {
 
     pub fn toggle_bstamina(&mut self) {
         self.bstamina = !self.bstamina;
+    }
+
+    pub fn toggle_bshowactions(&mut self) {
+        self.bshowactions = !self.bshowactions;
     }
 
 }
