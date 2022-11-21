@@ -23,6 +23,20 @@ use entities::PGEntities;
 mod testlib;
 mod keys;
 
+struct Gui {
+    showhelp: bool,
+}
+
+impl Gui {
+
+    fn new() -> Gui {
+        Gui {
+            showhelp: false,
+        }
+    }
+
+}
+
 fn show_help(sx: &mut SdlX) {
     let shelp = "** Help **\n\
     \n\
@@ -114,6 +128,7 @@ fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
 fn main() {
     log_init();
     identify();
+    let mut gui = Gui::new();
     let ttfx = sdl2::ttf::init().unwrap();
     let font = ttfx.load_font(sdlx::TTF_FONT, 16);
     if font.is_err() {
@@ -139,7 +154,6 @@ fn main() {
     // The main loop of the program starts now
     let mut bpause = false;
     let mut frame: usize = 0;
-    let mut bhelp = false;
     let mut ptime = std::time::Instant::now();
     let mut pframe = 0;
     let mut actualfps = 0;
@@ -163,7 +177,7 @@ fn main() {
             keys::ProgramEvent::None => (),
             keys::ProgramEvent::Pause => bpause = !bpause,
             keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
-            keys::ProgramEvent::ToggleShowHelp => bhelp = !bhelp,
+            keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
             keys::ProgramEvent::ToggleShowBall => pgentities.showball = !pgentities.showball,
             keys::ProgramEvent::ToggleShowActions => pgentities.toggle_bshowactions(),
             keys::ProgramEvent::ToggleShowStamina => pgentities.toggle_bstamina(),
@@ -202,7 +216,7 @@ fn main() {
 
         // Draw entities
         pgentities.draw(&mut sx);
-        if bhelp {
+        if gui.showhelp {
             show_help(&mut sx);
         }
 

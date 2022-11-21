@@ -7,6 +7,8 @@ license = "GPL-3.0-or-later"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
+# The program generated interpolated inbetween frames. [off by default]
+# Helps with visual playback of the game data, if the play data source has less frequent game data.
 inbetween_frames = []
 
 [dependencies]
