@@ -30,28 +30,36 @@ struct Gui {
     fpsframe: usize,
     fpstime: time::Instant,
     actualfps: usize,
+    curframetime: time::Instant,
 }
 
 impl Gui {
 
     fn new() -> Gui {
+        let ctime = time::Instant::now();
         Gui {
             showhelp: false,
             frame: 0,
             fpsframe: 0,
-            fpstime: time::Instant::now(),
+            fpstime: ctime,
             actualfps: 0,
+            curframetime: ctime,
         }
     }
 
     fn next_frame(&mut self) {
         self.frame += 1;
-        let dtime = time::Instant::now().duration_since(self.fpstime);
+        self.curframetime = time::Instant::now();
+        let dtime = self.curframetime.duration_since(self.fpstime);
         if dtime > time::Duration::from_millis(1000) {
-            self.fpstime = time::Instant::now();
+            self.fpstime = self.curframetime;
             self.actualfps = self.frame - self.fpsframe;
             self.fpsframe = self.frame;
         }
+    }
+
+    fn consume_time(&mut self) {
+
     }
 
 }
