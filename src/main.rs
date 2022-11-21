@@ -101,6 +101,14 @@ impl<'a> Gui<'a> {
         self.frametime = time::Duration::from_millis((1000.0/fps).round() as u64);
     }
 
+    /// Adjust the fps to be used wrt the program.
+    /// It inturn takes care of keeping gui internal logic, pgentities and pdata in sync wrt fps changes
+    fn fps_adjust(&mut self, ratio: f32) {
+        self.pgentities.fps_adjust(ratio);
+        self.pdata.fps_changed(self.pgentities.fps());
+        self.internal_fps_changed(self.pgentities.fps());
+    }
+
     /// Update internal state, wrt/related-to begining of a new frame
     fn next_frame(&mut self) {
         self.frame += 1;
@@ -236,9 +244,7 @@ fn main() {
             keys::ProgramEvent::SeekBackward => gui.pdata.seek(-50),
             keys::ProgramEvent::SeekForward => gui.pdata.seek(50),
             keys::ProgramEvent::AdjustFPS(ratio) => {
-                gui.pgentities.fps_adjust(ratio);
-                gui.pdata.fps_changed(gui.pgentities.fps());
-                gui.internal_fps_changed(gui.pgentities.fps());
+                gui.fps_adjust(ratio);
             },
             keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
             keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
