@@ -25,12 +25,19 @@ mod testlib;
 mod keys;
 
 struct Gui {
+    /// Whether help msgbox should be shown or not in the current frame
     showhelp: bool,
+    /// Current frame number
     frame: usize,
+    /// Time alloted per frame
     frametime: time::Duration,
+    /// fps tracking: frame number wrt prev second
     fpsframe: usize,
+    /// fps tracking: time wrt prev second
     fpstime: time::Instant,
+    /// fps tracking: actually achieved fps
     actualfps: usize,
+    /// the time at begining of processing wrt current frame
     curframetime: time::Instant,
 }
 
@@ -51,10 +58,12 @@ impl Gui {
         return gui;
     }
 
+    /// Update gui internal state, as needed, when fps requested by user/playdata source/... changes
     fn fps_changed(&mut self, fps: f32) {
         self.frametime = time::Duration::from_millis((1000.0/fps).round() as u64);
     }
 
+    /// Update internal state, wrt/related-to begining of a new frame
     fn next_frame(&mut self) {
         self.frame += 1;
         self.curframetime = time::Instant::now();
@@ -66,6 +75,7 @@ impl Gui {
         }
     }
 
+    /// Consume any frame time remaining wrt current frame, by sleeping
     fn consume_frametime(&mut self) {
         let ctime = time::Instant::now();
         let consumedtime = ctime.duration_since(self.curframetime);
