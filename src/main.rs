@@ -210,8 +210,10 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
 fn main() {
     log_init();
     identify();
+
+    // SDL related setup
     let ttfx = sdl2::ttf::init().unwrap();
-    let font = ttfx.load_font(sdlx::TTF_FONT, 16);
+    let font = ttfx.load_font(sdlx::TTF_FONT, sdlx::TTF_FONT_SIZE);
     if font.is_err() {
         let err = font.err().unwrap();
         eprintln!("ERRR:PPGND:Loading font[{}], install it or update font in sdlx.rs:{}", sdlx::TTF_FONT, err);
@@ -219,11 +221,12 @@ fn main() {
     }
     let font = font.unwrap();
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
+
+    // Get the gui program related entity
     let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32, &font);
 
-    let mut dcolor = 20;
-
     // The main loop of the program starts now
+    let mut dcolor = 20;
     let mut skey = String::new();
     'mainloop: loop {
         gui.next_frame();
@@ -232,7 +235,7 @@ fn main() {
         sx.wc.clear();
         sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &gui.pgentities.fps().round(), gui.actualfps), sdlx::Color::BLUE);
 
-        // handle any pending program events
+        // handle any pending/queued program events
         let prgev= keys::get_programevents(&mut sx, &mut skey);
         match prgev {
             keys::ProgramEvent::None => (),
@@ -280,7 +283,10 @@ fn main() {
             show_help(&mut sx);
         }
 
+        // Present screen update to user
         sx.wc.present();
+
+        // consume any remaining frame time
         gui.consume_frametime();
     }
 

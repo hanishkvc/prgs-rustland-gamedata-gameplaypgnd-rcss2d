@@ -18,6 +18,7 @@ pub const COLOR_MSG_HEAD_TEXT: Color = Color::WHITE;
 const STRING_CHAR_PIXEL_WIDTH: f32 = 8.0;
 const STRING_CHAR_PIXEL_HEIGHT: f32 = 8.0;
 pub const TTF_FONT: &str = "/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf";
+pub const TTF_FONT_SIZE: u16 = 16;
 
 
 /// Initialises and maintains the SDL contexts wrt Video and Events.
