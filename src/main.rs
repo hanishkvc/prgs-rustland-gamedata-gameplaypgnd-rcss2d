@@ -43,13 +43,40 @@ struct Gui<'a> {
     curframetime: time::Instant,
     /// Playground entities
     pgentities: PGEntities<'a>,
+    /// Playdata source
+    pdata: Box<dyn PlayData>,
+}
+
+impl<'a> Gui<'a> {
+
+    /// Sync up fps to the seconds per record of the playdata source
+    #[cfg(feature="inbetween_frames")]
+    fn sync_up_fps_to_spr(&mut self) {
+        self.pdata.fps_changed(pgentities.fps());
+        eprintln!("INFO:PPGND:Main:Fps:{}", self.pgentities.fps());
+    }
+
+    #[cfg(not(feature="inbetween_frames"))]
+    fn sync_up_fps_to_spr(&mut self) {
+        let spr = self.pdata.seconds_per_record();
+        let fpsadj = (1.0/spr)/self.pgentities.fps();
+        self.pgentities.fps_adjust(fpsadj);
+        self.pdata.fps_changed(1.0/spr);
+        eprintln!("INFO:PPGND:Main:Fps:{}", self.pgentities.fps());
+    }
+
 }
 
 impl<'a> Gui<'a> {
 
     fn new(fps: f32, font: &'a Font) -> Gui<'a> {
+        // PGEntities
         let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, font);
         pgentities.adjust_teams();
+        // Playdata source
+        let clargs = env::args().collect::<Vec<String>>();
+        let pdata = pdata_source(&clargs, pgentities.fps());
+
         let ctime = time::Instant::now();
         let mut gui = Gui {
             showhelp: false,
@@ -61,13 +88,16 @@ impl<'a> Gui<'a> {
             actualfps: 0,
             curframetime: ctime,
             pgentities: pgentities,
+            pdata: pdata,
         };
-        gui.fps_changed(fps);
+        // sync up fps to spr
+        gui.sync_up_fps_to_spr();
+        gui.internal_fps_changed(fps);
         return gui;
     }
 
     /// Update gui internal state, as needed, when fps requested by user/playdata source/... changes
-    fn fps_changed(&mut self, fps: f32) {
+    fn internal_fps_changed(&mut self, fps: f32) {
         self.frametime = time::Duration::from_millis((1000.0/fps).round() as u64);
     }
 
@@ -167,21 +197,6 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
     }
 }
 
-/// Sync up fps to the seconds per record of the playdata source
-#[cfg(feature="inbetween_frames")]
-fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
-    pdata.fps_changed(pgentities.fps());
-    eprintln!("INFO:PPGND:Main:Fps:{}", pgentities.fps());
-}
-
-#[cfg(not(feature="inbetween_frames"))]
-fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
-    let spr = pdata.seconds_per_record();
-    let fpsadj = (1.0/spr)/pgentities.fps();
-    pgentities.fps_adjust(fpsadj);
-    pdata.fps_changed(1.0/spr);
-    eprintln!("INFO:PPGND:Main:Fps:{}", pgentities.fps());
-}
 
 fn main() {
     log_init();
@@ -198,15 +213,6 @@ fn main() {
     let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32, &font);
 
     let mut dcolor = 20;
-
-    // Setup the playdata source
-    let clargs = env::args().collect::<Vec<String>>();
-    let mut pdatasrc = pdata_source(&clargs, gui.pgentities.fps());
-    let pdata = pdatasrc.as_mut();
-
-    // sync up fps to spr
-    sync_up_fps_to_spr(&mut gui.pgentities, pdata);
-    gui.fps_changed(gui.pgentities.fps());
 
     // The main loop of the program starts now
     let mut skey = String::new();
@@ -227,14 +233,14 @@ fn main() {
             keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
             keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
             keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
-            keys::ProgramEvent::SeekBackward => pdata.seek(-50),
-            keys::ProgramEvent::SeekForward => pdata.seek(50),
+            keys::ProgramEvent::SeekBackward => gui.pdata.seek(-50),
+            keys::ProgramEvent::SeekForward => gui.pdata.seek(50),
             keys::ProgramEvent::AdjustFPS(ratio) => {
                 gui.pgentities.fps_adjust(ratio);
-                pdata.fps_changed(gui.pgentities.fps());
-                gui.fps_changed(gui.pgentities.fps());
+                gui.pdata.fps_changed(gui.pgentities.fps());
+                gui.internal_fps_changed(gui.pgentities.fps());
             },
-            keys::ProgramEvent::SendRecordCoded(code) => pdata.send_record_coded(code),
+            keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
             keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
             keys::ProgramEvent::Quit => break 'mainloop,
             keys::ProgramEvent::NeedMore => (),
@@ -242,12 +248,12 @@ fn main() {
 
         // Update the entities
         if !gui.pause {
-            if !pdata.bdone() {
+            if !gui.pdata.bdone() {
                 if cfg!(feature = "inbetween_frames") {
-                    if pdata.next_frame_is_record_ready() {
-                        let pu = pdata.next_record();
+                    if gui.pdata.next_frame_is_record_ready() {
+                        let pu = gui.pdata.next_record();
                         ldebug!(&format!("DBUG:{:?}", pu));
-                        gui.pgentities.update(pu, false, pdata.seconds_per_record() * gui.pgentities.fps());
+                        gui.pgentities.update(pu, false, gui.pdata.seconds_per_record() * gui.pgentities.fps());
                         //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
@@ -255,7 +261,7 @@ fn main() {
                     gui.pgentities.next_frame();
                     //eprintln!("DBUG:PPGND:Main:{}:NextFrame called", _frame);
                 } else {
-                    let pu = pdata.next_record();
+                    let pu = gui.pdata.next_record();
                     gui.pgentities.update(pu, true, 0.0);
                 }
             }
