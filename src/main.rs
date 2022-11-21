@@ -27,6 +27,7 @@ mod keys;
 struct Gui {
     showhelp: bool,
     frame: usize,
+    frametime: time::Duration,
     fpsframe: usize,
     fpstime: time::Instant,
     actualfps: usize,
@@ -35,16 +36,23 @@ struct Gui {
 
 impl Gui {
 
-    fn new() -> Gui {
+    fn new(fps: f32) -> Gui {
         let ctime = time::Instant::now();
-        Gui {
+        let mut gui = Gui {
             showhelp: false,
             frame: 0,
+            frametime: time::Duration::from_millis(100),
             fpsframe: 0,
             fpstime: ctime,
             actualfps: 0,
             curframetime: ctime,
-        }
+        };
+        gui.fps_changed(fps);
+        return gui;
+    }
+
+    fn fps_changed(&mut self, fps: f32) {
+        self.frametime = time::Duration::from_millis((1000.0/fps).round() as u64);
     }
 
     fn next_frame(&mut self) {
@@ -58,8 +66,13 @@ impl Gui {
         }
     }
 
-    fn consume_time(&mut self) {
-
+    fn consume_frametime(&mut self) {
+        let ctime = time::Instant::now();
+        let consumedtime = ctime.duration_since(self.curframetime);
+        if self.frametime > consumedtime {
+            let dtime = self.frametime - consumedtime;
+            std::thread::sleep(dtime);
+        }
     }
 
 }
@@ -155,7 +168,7 @@ fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
 fn main() {
     log_init();
     identify();
-    let mut gui = Gui::new();
+    let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32);
     let ttfx = sdl2::ttf::init().unwrap();
     let font = ttfx.load_font(sdlx::TTF_FONT, 16);
     if font.is_err() {
@@ -177,6 +190,7 @@ fn main() {
 
     // sync up fps to spr
     sync_up_fps_to_spr(&mut pgentities, pdata);
+    gui.fps_changed(pgentities.fps());
 
     // The main loop of the program starts now
     let mut bpause = false;
@@ -203,6 +217,7 @@ fn main() {
             keys::ProgramEvent::AdjustFPS(ratio) => {
                 pgentities.fps_adjust(ratio);
                 pdata.fps_changed(pgentities.fps());
+                gui.fps_changed(pgentities.fps());
             },
             keys::ProgramEvent::SendRecordCoded(code) => pdata.send_record_coded(code),
             keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities),
@@ -238,7 +253,7 @@ fn main() {
         }
 
         sx.wc.present();
-        std::thread::sleep(std::time::Duration::from_millis((1000.0/pgentities.fps()).round() as u64));
+        gui.consume_frametime();
     }
 
 }
