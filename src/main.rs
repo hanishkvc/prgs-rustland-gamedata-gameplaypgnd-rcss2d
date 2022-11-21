@@ -27,6 +27,8 @@ mod keys;
 struct Gui {
     /// Whether help msgbox should be shown or not in the current frame
     showhelp: bool,
+    /// Pause the playback
+    pause: bool,
     /// Current frame number
     frame: usize,
     /// Time alloted per frame
@@ -47,6 +49,7 @@ impl Gui {
         let ctime = time::Instant::now();
         let mut gui = Gui {
             showhelp: false,
+            pause: false,
             frame: 0,
             frametime: time::Duration::from_millis(100),
             fpsframe: 0,
@@ -203,7 +206,6 @@ fn main() {
     gui.fps_changed(pgentities.fps());
 
     // The main loop of the program starts now
-    let mut bpause = false;
     let mut skey = String::new();
     'mainloop: loop {
         gui.next_frame();
@@ -216,7 +218,7 @@ fn main() {
         let prgev= keys::get_programevents(&mut sx, &mut skey);
         match prgev {
             keys::ProgramEvent::None => (),
-            keys::ProgramEvent::Pause => bpause = !bpause,
+            keys::ProgramEvent::Pause => gui.pause = !gui.pause,
             keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
             keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
             keys::ProgramEvent::ToggleShowBall => pgentities.showball = !pgentities.showball,
@@ -236,7 +238,7 @@ fn main() {
         }
 
         // Update the entities
-        if !bpause {
+        if !gui.pause {
             if !pdata.bdone() {
                 if cfg!(feature = "inbetween_frames") {
                     if pdata.next_frame_is_record_ready() {
