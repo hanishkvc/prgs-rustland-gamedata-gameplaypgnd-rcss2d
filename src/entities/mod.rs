@@ -78,7 +78,7 @@ impl<'a> PGEntities<'a> {
     /// * score: Give the current score, if any.
     /// * stime: Provide any time related info wrt the game.
     /// * game: show any game related messages.
-    pub fn new(pitch: XRect, anplayers: i32, bnplayers: i32, font: &'a Font) -> PGEntities<'a> {
+    pub fn new(pitch: XRect, anplayers: i32, bnplayers: i32, fps: f32, font: &'a Font) -> PGEntities<'a> {
         let mut vfpmsgs = Vec::new();
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
@@ -90,7 +90,7 @@ impl<'a> PGEntities<'a> {
         let unknownmsg = FixedPosMessage::new("unknown", MSG_UNKNOWN_POS, false, -1);
         vfpmsgs.push(unknownmsg);
         PGEntities {
-            fps: FRAMES_PER_SEC as f32,
+            fps: fps,
             vfpmsgs: vfpmsgs,
             ball: Ball::new(font),
             showball: true,

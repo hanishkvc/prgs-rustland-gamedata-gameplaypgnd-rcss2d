@@ -49,20 +49,21 @@ struct Gui<'a> {
 
 impl<'a> Gui<'a> {
 
+    fn calc_frametime(fps: f32) -> time::Duration {
+        time::Duration::from_millis((1000.0/fps).round() as u64)
+    }
+
     /// Sync up fps to the seconds per record of the playdata source
     #[cfg(feature="inbetween_frames")]
     fn sync_up_fps_to_spr(&mut self) {
-        self.pdata.fps_changed(pgentities.fps());
-        eprintln!("INFO:PPGND:Main:Fps:{}", self.pgentities.fps());
+        self.fps_adjust(1.0);
     }
 
     #[cfg(not(feature="inbetween_frames"))]
     fn sync_up_fps_to_spr(&mut self) {
         let spr = self.pdata.seconds_per_record();
         let fpsadj = (1.0/spr)/self.pgentities.fps();
-        self.pgentities.fps_adjust(fpsadj);
-        self.pdata.fps_changed(1.0/spr);
-        eprintln!("INFO:PPGND:Main:Fps:{}", self.pgentities.fps());
+        self.fps_adjust(fpsadj);
     }
 
 }
@@ -71,7 +72,7 @@ impl<'a> Gui<'a> {
 
     fn new(fps: f32, font: &'a Font) -> Gui<'a> {
         // PGEntities
-        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, font);
+        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, fps, font);
         pgentities.adjust_teams();
         // Playdata source
         let clargs = env::args().collect::<Vec<String>>();
@@ -82,7 +83,7 @@ impl<'a> Gui<'a> {
             showhelp: false,
             pause: false,
             frame: 0,
-            frametime: time::Duration::from_millis(100),
+            frametime: Self::calc_frametime(fps),
             fpsframe: 0,
             fpstime: ctime,
             actualfps: 0,
@@ -92,13 +93,12 @@ impl<'a> Gui<'a> {
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
-        gui.internal_fps_changed(fps);
         return gui;
     }
 
     /// Update gui internal state, as needed, when fps requested by user/playdata source/... changes
     fn internal_fps_changed(&mut self, fps: f32) {
-        self.frametime = time::Duration::from_millis((1000.0/fps).round() as u64);
+        self.frametime = Self::calc_frametime(fps);
     }
 
     /// Adjust the fps to be used wrt the program.
@@ -107,6 +107,7 @@ impl<'a> Gui<'a> {
         self.pgentities.fps_adjust(ratio);
         self.pdata.fps_changed(self.pgentities.fps());
         self.internal_fps_changed(self.pgentities.fps());
+        eprintln!("INFO:PPGND:Main:Fps:{}", self.pgentities.fps());
     }
 
     /// Update internal state, wrt/related-to begining of a new frame
