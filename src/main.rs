@@ -24,7 +24,7 @@ use entities::PGEntities;
 mod testlib;
 mod keys;
 
-struct Gui {
+struct Gui<'a> {
     /// Whether help msgbox should be shown or not in the current frame
     showhelp: bool,
     /// Pause the playback
@@ -41,11 +41,15 @@ struct Gui {
     actualfps: usize,
     /// the time at begining of processing wrt current frame
     curframetime: time::Instant,
+    /// Playground entities
+    pgentities: PGEntities<'a>,
 }
 
-impl Gui {
+impl<'a> Gui<'a> {
 
-    fn new(fps: f32) -> Gui {
+    fn new(fps: f32, font: &'a Font) -> Gui<'a> {
+        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, font);
+        pgentities.adjust_teams();
         let ctime = time::Instant::now();
         let mut gui = Gui {
             showhelp: false,
@@ -56,6 +60,7 @@ impl Gui {
             fpstime: ctime,
             actualfps: 0,
             curframetime: ctime,
+            pgentities: pgentities,
         };
         gui.fps_changed(fps);
         return gui;
@@ -181,7 +186,6 @@ fn sync_up_fps_to_spr(pgentities: &mut PGEntities, pdata: &mut dyn PlayData) {
 fn main() {
     log_init();
     identify();
-    let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32);
     let ttfx = sdl2::ttf::init().unwrap();
     let font = ttfx.load_font(sdlx::TTF_FONT, 16);
     if font.is_err() {
@@ -191,19 +195,18 @@ fn main() {
     }
     let font = font.unwrap();
     let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
+    let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32, &font);
 
     let mut dcolor = 20;
-    let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, &font);
-    pgentities.adjust_teams();
 
     // Setup the playdata source
     let clargs = env::args().collect::<Vec<String>>();
-    let mut pdatasrc = pdata_source(&clargs, pgentities.fps());
+    let mut pdatasrc = pdata_source(&clargs, gui.pgentities.fps());
     let pdata = pdatasrc.as_mut();
 
     // sync up fps to spr
-    sync_up_fps_to_spr(&mut pgentities, pdata);
-    gui.fps_changed(pgentities.fps());
+    sync_up_fps_to_spr(&mut gui.pgentities, pdata);
+    gui.fps_changed(gui.pgentities.fps());
 
     // The main loop of the program starts now
     let mut skey = String::new();
@@ -212,7 +215,7 @@ fn main() {
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
-        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &pgentities.fps().round(), gui.actualfps), sdlx::Color::BLUE);
+        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &gui.pgentities.fps().round(), gui.actualfps), sdlx::Color::BLUE);
 
         // handle any pending program events
         let prgev= keys::get_programevents(&mut sx, &mut skey);
@@ -221,18 +224,18 @@ fn main() {
             keys::ProgramEvent::Pause => gui.pause = !gui.pause,
             keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
             keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
-            keys::ProgramEvent::ToggleShowBall => pgentities.showball = !pgentities.showball,
-            keys::ProgramEvent::ToggleShowActions => pgentities.toggle_bshowactions(),
-            keys::ProgramEvent::ToggleShowStamina => pgentities.toggle_bstamina(),
+            keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
+            keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
+            keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
             keys::ProgramEvent::SeekBackward => pdata.seek(-50),
             keys::ProgramEvent::SeekForward => pdata.seek(50),
             keys::ProgramEvent::AdjustFPS(ratio) => {
-                pgentities.fps_adjust(ratio);
-                pdata.fps_changed(pgentities.fps());
-                gui.fps_changed(pgentities.fps());
+                gui.pgentities.fps_adjust(ratio);
+                pdata.fps_changed(gui.pgentities.fps());
+                gui.fps_changed(gui.pgentities.fps());
             },
             keys::ProgramEvent::SendRecordCoded(code) => pdata.send_record_coded(code),
-            keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", pgentities),
+            keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
             keys::ProgramEvent::Quit => break 'mainloop,
             keys::ProgramEvent::NeedMore => (),
         }
@@ -244,22 +247,22 @@ fn main() {
                     if pdata.next_frame_is_record_ready() {
                         let pu = pdata.next_record();
                         ldebug!(&format!("DBUG:{:?}", pu));
-                        pgentities.update(pu, false, pdata.seconds_per_record() * pgentities.fps());
+                        gui.pgentities.update(pu, false, pdata.seconds_per_record() * gui.pgentities.fps());
                         //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
                     // Or Rcg needs to be udpated to set bdone after a second of ending or so ...
-                    pgentities.next_frame();
+                    gui.pgentities.next_frame();
                     //eprintln!("DBUG:PPGND:Main:{}:NextFrame called", _frame);
                 } else {
                     let pu = pdata.next_record();
-                    pgentities.update(pu, true, 0.0);
+                    gui.pgentities.update(pu, true, 0.0);
                 }
             }
         }
 
         // Draw entities
-        pgentities.draw(&mut sx);
+        gui.pgentities.draw(&mut sx);
         if gui.showhelp {
             show_help(&mut sx);
         }
