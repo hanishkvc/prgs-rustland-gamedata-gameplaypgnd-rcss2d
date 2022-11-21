@@ -4,6 +4,7 @@
 //!
 
 use std::env;
+use std::time;
 
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
@@ -25,6 +26,10 @@ mod keys;
 
 struct Gui {
     showhelp: bool,
+    frame: usize,
+    pframe: usize,
+    ptime: time::Instant,
+    actualfps: usize,
 }
 
 impl Gui {
@@ -32,6 +37,20 @@ impl Gui {
     fn new() -> Gui {
         Gui {
             showhelp: false,
+            frame: 0,
+            pframe: 0,
+            ptime: time::Instant::now(),
+            actualfps: 0,
+        }
+    }
+
+    fn next_frame(&mut self) {
+        self.frame += 1;
+        let dtime = time::Instant::now().duration_since(self.ptime);
+        if dtime > time::Duration::from_millis(1000) {
+            self.ptime = time::Instant::now();
+            self.actualfps = self.frame - self.pframe;
+            self.pframe = self.frame;
         }
     }
 
@@ -153,23 +172,13 @@ fn main() {
 
     // The main loop of the program starts now
     let mut bpause = false;
-    let mut frame: usize = 0;
-    let mut ptime = std::time::Instant::now();
-    let mut pframe = 0;
-    let mut actualfps = 0;
     let mut skey = String::new();
     'mainloop: loop {
-        frame += 1;
-        let dtime = std::time::Instant::now().duration_since(ptime);
-        if dtime > std::time::Duration::from_millis(1000) {
-            ptime = std::time::Instant::now();
-            actualfps = frame - pframe;
-            pframe = frame;
-        }
+        gui.next_frame();
         // Clear the background
         sx.wc.set_draw_color(entities::screen_color_bg_rel(dcolor, 0, 0));
         sx.wc.clear();
-        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &pgentities.fps().round(), actualfps), sdlx::Color::BLUE);
+        sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &pgentities.fps().round(), gui.actualfps), sdlx::Color::BLUE);
 
         // handle any pending program events
         let prgev= keys::get_programevents(&mut sx, &mut skey);
