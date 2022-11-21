@@ -27,8 +27,8 @@ mod keys;
 struct Gui {
     showhelp: bool,
     frame: usize,
-    pframe: usize,
-    ptime: time::Instant,
+    fpsframe: usize,
+    fpstime: time::Instant,
     actualfps: usize,
 }
 
@@ -38,19 +38,19 @@ impl Gui {
         Gui {
             showhelp: false,
             frame: 0,
-            pframe: 0,
-            ptime: time::Instant::now(),
+            fpsframe: 0,
+            fpstime: time::Instant::now(),
             actualfps: 0,
         }
     }
 
     fn next_frame(&mut self) {
         self.frame += 1;
-        let dtime = time::Instant::now().duration_since(self.ptime);
+        let dtime = time::Instant::now().duration_since(self.fpstime);
         if dtime > time::Duration::from_millis(1000) {
-            self.ptime = time::Instant::now();
-            self.actualfps = self.frame - self.pframe;
-            self.pframe = self.frame;
+            self.fpstime = time::Instant::now();
+            self.actualfps = self.frame - self.fpsframe;
+            self.fpsframe = self.frame;
         }
     }
 
