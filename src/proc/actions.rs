@@ -11,6 +11,7 @@
 use sdl2::{pixels::Color, render::BlendMode};
 
 use crate::sdlx::SdlX;
+use crate::playdata::Action;
 
 
 const SELF_PASS_MINTIME: isize = 10;
@@ -76,6 +77,22 @@ impl Players {
             self.aplayers[playerid].1.score += score;
         } else {
             self.bplayers[playerid].1.score += score;
+        }
+    }
+
+    /// Help update the score of a specific player
+    fn count_increment(&mut self, side: char, playerid: usize, atype: Action) {
+        let player;
+        if side == 'a' {
+            player = &mut self.aplayers[playerid];
+        } else {
+            player = &mut self.bplayers[playerid];
+        }
+        match atype {
+            Action::None => todo!(),
+            Action::Kick(_) => player.1.kicks += 1,
+            Action::Catch(_) => player.1.catchs += 1,
+            Action::Tackle(_) => player.1.tackles += 1,
         }
     }
 
@@ -166,15 +183,18 @@ impl ActionsInfo {
                 }
             }
         }
+        self.players.count_increment(kick.side, kick.playerid, Action::Kick(true));
         self.kicks.push(kick);
     }
 
     pub fn handle_tackle(&mut self, tackle: ActionData) {
         self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
+        self.players.count_increment(tackle.side, tackle.playerid, Action::Tackle(true));
     }
 
     pub fn handle_catch(&mut self, catch: ActionData) {
         self.players.score(catch.side, catch.playerid, SCORE_CATCH);
+        self.players.count_increment(catch.side, catch.playerid, Action::Catch(true));
     }
 
     #[allow(dead_code)]
