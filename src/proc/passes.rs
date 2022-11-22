@@ -34,12 +34,32 @@ impl Players {
         return players;
     }
 
+    /// Help update the score of a specific player
     fn score(&mut self, side: char, playerid: usize, score: f32) {
         if side == 'a' {
             self.aplayers[playerid].1 += score;
         } else {
             self.bplayers[playerid].1 += score;
         }
+    }
+
+    /// Return the max player score for each of the teams
+    fn score_max(&self) -> (f32, f32) {
+        let mut amax = f32::MIN;
+        for i in 0..self.aplayers.len() {
+            let player = self.aplayers[i];
+            if amax < player.1 {
+                amax = player.1;
+            }
+        }
+        let mut bmax = f32::MIN;
+        for i in 0..self.bplayers.len() {
+            let player = self.bplayers[i];
+            if bmax < player.1 {
+                bmax = player.1;
+            }
+        }
+        (amax, bmax)
     }
 
 }
@@ -80,6 +100,7 @@ impl Passes {
         }
     }
 
+    /// Add a kick data and inturn adjust the scores
     pub fn add_kick(&mut self, kick: KickData) {
         let ik = self.kicks.len();
         if ik > 0 {
@@ -127,18 +148,23 @@ impl Passes {
         }
     }
 
+    /// Graphics Summary (a relative graph)
+    /// Take the max score across players wrt each team and
+    /// plot score bar relative to that max score.
     pub fn summary_sdl(&self, sx: &mut SdlX) {
+        // let (amax, bmax) = (20.0, 20.0);
+        let (amax, bmax) = self.players.score_max();
         for i in 0..self.players.aplayers.len() {
             let player = self.players.aplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), player.1/20.0, 0.04)
+            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1/amax), 0.04)
         }
         for i in 0..self.players.bplayers.len() {
             let player = self.players.bplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), player.1/20.0, 0.04)
+            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1/bmax), 0.04)
         }
     }
 
