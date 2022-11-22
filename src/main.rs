@@ -222,7 +222,7 @@ fn main() {
         std::process::exit(10);
     }
     let font = font.unwrap();
-    let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT);
+    let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, false);
 
     // Get the gui program related entity
     let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32, &font);

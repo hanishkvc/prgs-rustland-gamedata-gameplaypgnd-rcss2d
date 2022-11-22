@@ -21,9 +21,11 @@ the game or later). This can include
 * game actions captured like goal, kick/tackle/... and good/bad pass/...,
   penalty, cards, ...
 
-* color coding of
+* color coding ++ of
 
   * performance from captured game actions.
+
+    * some internal explorations for now
 
   * coarse grained view of captured/tracked health params like stamina, ...
 
