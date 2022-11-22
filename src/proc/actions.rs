@@ -17,12 +17,17 @@ use crate::playdata::Action;
 const REPEAT_TACKLE_MINTIME: isize = 10;
 const SELF_PASS_MINTIME: isize = 10;
 
-const SCORE_BAD_PASS: f32 = -0.5;
+//
+// The scores are set such that a tackle followed by a
+// kick by the other side, will still lead to a +ve score
+// for the person who mounted the tackle (TACKLE-BADPASS)
+//
+const SCORE_BAD_PASS: f32 = -0.4;
 const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
-const SCORE_GOOD_PASS_SENT: f32 = 1.0;
+const SCORE_GOOD_PASS_SENT: f32 = 0.8;
 const SCORE_GOOD_PASS_GOT: f32 = 0.4;
-const SCORE_SELF_PASS: f32 = 0.05;
-const SCORE_TACKLE: f32 = 0.5;
+const SCORE_SELF_PASS: f32 = 0.06;
+const SCORE_TACKLE: f32 = 0.6;
 const SCORE_CATCH: f32 = 1.0;
 
 
@@ -138,16 +143,18 @@ pub struct ActionData {
     playerid: usize,
     #[allow(dead_code)]
     pos: (f32, f32),
+    action: Action,
 }
 
 impl ActionData {
 
-    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32)) -> ActionData {
+    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32), action: Action) -> ActionData {
         ActionData {
             time: time,
             side: side,
             playerid: playerid,
             pos: pos,
+            action: action,
         }
     }
 
@@ -156,8 +163,7 @@ impl ActionData {
 #[derive(Debug)]
 pub struct ActionsInfo {
     players: Players,
-    kicks: Vec<ActionData>,
-    tackles: Vec<ActionData>,
+    actions: Vec<ActionData>,
 }
 
 impl ActionsInfo {
@@ -165,8 +171,7 @@ impl ActionsInfo {
     pub fn new(acnt: usize, bcnt: usize) -> ActionsInfo {
         ActionsInfo {
             players: Players::new(acnt, bcnt),
-            kicks: Vec::new(),
-            tackles: Vec::new(),
+            actions: Vec::new(),
         }
     }
 
@@ -176,20 +181,27 @@ impl ActionsInfo {
     /// * TODO: This needs to account for goal/half-time/...
     /// Else
     /// * if same player, reward to some extent
-    ///   * provided ball maintained for a minimum sufficient time
-    /// * if new player, reward prev player for a good pass.
+    ///   provided ball was maintained for a sufficiently minimum time
+    /// * if diff players, reward both players for a good pass.
+    ///
+    /// ALERT: prev and current actions dont matter wrt current list of actions,
+    /// except for the self pass case. However in future, if new actions are
+    /// added, the logical flow will have to be evaluated and updated if reqd.
     pub fn handle_kick(&mut self, kick: ActionData) {
-        let ik = self.kicks.len();
+        let ik = self.actions.len();
         if ik > 0 {
-            let prev = &self.kicks[ik-1];
+            let prev = &self.actions[ik-1];
             if prev.side != kick.side {
                 self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
                 self.players.score(kick.side, kick.playerid, SCORE_HIJACK_PASS);
             } else {
                 if prev.playerid == kick.playerid {
-                    let dtime = kick.time as isize - prev.time as isize;
-                    if dtime < SELF_PASS_MINTIME {
-                        return;
+                    if prev.action == kick.action {
+                        let dtime = kick.time as isize - prev.time as isize;
+                        if dtime < SELF_PASS_MINTIME {
+                            eprintln!("DBUG:PPGND:ProcAction:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", kick.side, kick.playerid, prev.time, kick.time, dtime);
+                            return;
+                        }
                     }
                     self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
                 } else {
@@ -199,30 +211,31 @@ impl ActionsInfo {
             }
         }
         self.players.count_increment(kick.side, kick.playerid, Action::Kick(true));
-        self.kicks.push(kick);
+        self.actions.push(kick);
     }
 
-    /// TOTHINK: Maybe merge kicks/tackles/... into a single vector
-    /// So that any different action inbetween two tackles wrt same player,
-    /// will treat the repeat tackle as new. However for now, time is used
-    /// as a proxy indirectly.
+    /// Assumes a merged (be it kicks/tackles) actions vector.
+    /// If the same player has repeat adjacent tackles, within a predefined short time,
+    /// then the repeated tackle will be ignored.
     pub fn handle_tackle(&mut self, tackle: ActionData) {
-        let it = self.tackles.len();
+        let it = self.actions.len();
         if it > 0 {
-            let prev = &self.tackles[it-1];
+            let prev = &self.actions[it-1];
             if prev.side == tackle.side {
                 if prev.playerid == tackle.playerid {
-                    let dtime = tackle.time as isize - prev.time as isize;
-                    if dtime < REPEAT_TACKLE_MINTIME {
-                        eprintln!("DBUG:PPGND:ProcAction:{}:{}:Skipping too soon repeat tackle????:{}:{}:{}", tackle.side, tackle.playerid, prev.time, tackle.time, dtime);
-                        return;
+                    if prev.action == tackle.action {
+                        let dtime = tackle.time as isize - prev.time as isize;
+                        if dtime < REPEAT_TACKLE_MINTIME {
+                            eprintln!("DBUG:PPGND:ProcAction:{}:{}:Skipping TOO SOON repeat tackle????:{}:{}:{}", tackle.side, tackle.playerid, prev.time, tackle.time, dtime);
+                            return;
+                        }
                     }
                 }
             }
         }
         self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
         self.players.count_increment(tackle.side, tackle.playerid, Action::Tackle(true));
-        self.tackles.push(tackle);
+        self.actions.push(tackle);
     }
 
     pub fn handle_catch(&mut self, catch: ActionData) {
