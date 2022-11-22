@@ -214,6 +214,7 @@ impl ActionsInfo {
                 if prev.playerid == tackle.playerid {
                     let dtime = tackle.time as isize - prev.time as isize;
                     if dtime < REPEAT_TACKLE_MINTIME {
+                        eprintln!("DBUG:PPGND:ProcAction:{}:{}:Skipping too soon repeat tackle????:{}:{}:{}", tackle.side, tackle.playerid, prev.time, tackle.time, dtime);
                         return;
                     }
                 }
@@ -221,6 +222,7 @@ impl ActionsInfo {
         }
         self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
         self.players.count_increment(tackle.side, tackle.playerid, Action::Tackle(true));
+        self.tackles.push(tackle);
     }
 
     pub fn handle_catch(&mut self, catch: ActionData) {
