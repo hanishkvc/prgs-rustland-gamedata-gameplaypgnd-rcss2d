@@ -14,7 +14,9 @@ use crate::sdlx::SdlX;
 use crate::playdata::Action;
 
 
+const REPEAT_TACKLE_MINTIME: isize = 10;
 const SELF_PASS_MINTIME: isize = 10;
+
 const SCORE_BAD_PASS: f32 = -0.5;
 const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
 const SCORE_GOOD_PASS_SENT: f32 = 1.0;
@@ -155,6 +157,7 @@ impl ActionData {
 pub struct ActionsInfo {
     players: Players,
     kicks: Vec<ActionData>,
+    tackles: Vec<ActionData>,
 }
 
 impl ActionsInfo {
@@ -163,6 +166,7 @@ impl ActionsInfo {
         ActionsInfo {
             players: Players::new(acnt, bcnt),
             kicks: Vec::new(),
+            tackles: Vec::new(),
         }
     }
 
@@ -198,7 +202,23 @@ impl ActionsInfo {
         self.kicks.push(kick);
     }
 
+    /// TOTHINK: Maybe merge kicks/tackles/... into a single vector
+    /// So that any different action inbetween two tackles wrt same player,
+    /// will treat the repeat tackle as new. However for now, time is used
+    /// as a proxy indirectly.
     pub fn handle_tackle(&mut self, tackle: ActionData) {
+        let it = self.tackles.len();
+        if it > 0 {
+            let prev = &self.tackles[it-1];
+            if prev.side == tackle.side {
+                if prev.playerid == tackle.playerid {
+                    let dtime = tackle.time as isize - prev.time as isize;
+                    if dtime < REPEAT_TACKLE_MINTIME {
+                        return;
+                    }
+                }
+            }
+        }
         self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
         self.players.count_increment(tackle.side, tackle.playerid, Action::Tackle(true));
     }
