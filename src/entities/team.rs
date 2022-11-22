@@ -10,7 +10,7 @@ use loggerk::{ldebug, log_d};
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
-use crate::proc::passes::{Passes, ActionData};
+use crate::proc::actions::{Passes, ActionData};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
 use crate::playdata::{PlayerCodedData, self};
 

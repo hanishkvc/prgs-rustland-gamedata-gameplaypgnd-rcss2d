@@ -8,7 +8,7 @@ use sdl2::ttf::Font;
 
 use crate::sdlx::{SdlX, XRect};
 use crate::playdata::PlayUpdate;
-use crate::proc::passes::Passes;
+use crate::proc::actions::Passes;
 
 
 const ENTITY_WIDTH: u32 = 16;

@@ -3,4 +3,4 @@
 //! HanishKVC, 2022
 //!
 
-pub mod passes;
+pub mod actions;
