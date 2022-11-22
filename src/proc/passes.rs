@@ -3,12 +3,14 @@
 //! HanishKVC, 2022
 //!
 
+use sdl2::{pixels::Color, render::BlendMode};
+
 use crate::sdlx::SdlX;
 
 
 const SCORE_BAD_PASS: f32 = -0.5;
 const SCORE_GOOD_PASS: f32 = 1.0;
-const SCORE_SELF_PASS: f32 = 0.1;
+const SCORE_SELF_PASS: f32 = 0.05;
 
 #[derive(Debug)]
 struct Players {
@@ -128,10 +130,14 @@ impl Passes {
     pub fn summary_sdl(&self, sx: &mut SdlX) {
         for i in 0..self.players.aplayers.len() {
             let player = self.players.aplayers[i];
+            sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
+            sx.wc.set_blend_mode(BlendMode::Blend);
             sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), player.1/20.0, 0.04)
         }
         for i in 0..self.players.bplayers.len() {
             let player = self.players.bplayers[i];
+            sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
+            sx.wc.set_blend_mode(BlendMode::Blend);
             sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), player.1/20.0, 0.04)
         }
     }
