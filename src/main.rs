@@ -23,6 +23,7 @@ use entities::PGEntities;
 
 mod testlib;
 mod keys;
+mod proc;
 
 struct Gui<'a> {
     /// Whether help msgbox should be shown or not in the current frame
