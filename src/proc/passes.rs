@@ -2,6 +2,11 @@
 //! Identify pass quality
 //! HanishKVC, 2022
 //!
+//! TODO:
+//! * Track for goals/halftime/etal and avoid providing -ve scoring
+//!   due to any of these shifting side that will kick
+//! * Add support for providing scores for tackle/catch/etal
+//!
 
 use sdl2::{pixels::Color, render::BlendMode};
 
@@ -9,6 +14,7 @@ use crate::sdlx::SdlX;
 
 
 const SCORE_BAD_PASS: f32 = -0.5;
+const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
 const SCORE_GOOD_PASS: f32 = 1.0;
 const SCORE_SELF_PASS: f32 = 0.05;
 
@@ -21,7 +27,7 @@ struct Players {
 impl Players {
 
     fn new(acnt: usize, bcnt: usize) -> Players {
-        let mut     players = Players {
+        let mut players = Players {
             aplayers: Vec::new(),
             bplayers: Vec::new(),
         };
@@ -101,12 +107,20 @@ impl Passes {
     }
 
     /// Add a kick data and inturn adjust the scores
+    /// If a kick has changed sides, then
+    /// * penalise prev side player and reward current side player
+    /// * TODO: This needs to account for goal/half-time/...
+    /// Else
+    /// * if same player, reward to some extent
+    ///   * provided ball maintained for a minimum sufficient time
+    /// * if new player, reward prev player for a good pass.
     pub fn add_kick(&mut self, kick: KickData) {
         let ik = self.kicks.len();
         if ik > 0 {
             let prev = &self.kicks[ik-1];
             if prev.side != kick.side {
                 self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
+                self.players.score(kick.side, kick.playerid, SCORE_HIJACK_PASS);
             } else {
                 if prev.playerid == kick.playerid {
                     self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
