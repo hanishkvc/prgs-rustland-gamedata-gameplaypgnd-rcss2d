@@ -76,11 +76,11 @@ impl<'a> Gui<'a> {
         pgentities.adjust_teams();
         // Playdata source
         let clargs = env::args().collect::<Vec<String>>();
-        let pdata = pdata_source(&clargs, pgentities.fps());
+        let (pdata, showhelp) = pdata_source(&clargs, pgentities.fps());
 
         let ctime = time::Instant::now();
         let mut gui = Gui {
-            showhelp: false,
+            showhelp: showhelp,
             pause: false,
             frame: 0,
             frametime: Self::calc_frametime(fps),
@@ -181,7 +181,9 @@ fn identify() {
 ///   * else use the default address specified in rclive.
 /// * else use the 1st argument as the rcg file to playback.
 ///
-fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
+/// Return the playdata source and whether help msgbox should be shown
+///
+fn pdata_source(vargs: &Vec<String>, fps: f32) -> (Box<dyn PlayData>, bool) {
     let src;
     if vargs.len() > 1 {
         src = vargs[1].as_str();
@@ -196,13 +198,13 @@ fn pdata_source(vargs: &Vec<String>, fps: f32) -> Box<dyn PlayData> {
             nwaddr = rclive::NWADDR_DEFAULT;
         }
         let pdrcl = RCLive::new(nwaddr);
-        return Box::new(pdrcl);
+        return (Box::new(pdrcl), false);
     } else if src.len() > 0 {
         let pdrcg = Rcg::new(src, fps);
-        return Box::new(pdrcg);
+        return (Box::new(pdrcg), false);
     } else {
         let pdrandom = RandomData::new(1.0/24.0, 11, 11);
-        return Box::new(pdrandom);
+        return (Box::new(pdrandom), true);
     }
 }
 
