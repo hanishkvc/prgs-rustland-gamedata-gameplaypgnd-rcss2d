@@ -100,14 +100,19 @@ impl Rcg {
         }
         pd.push(PlayerData::Pos(fx, fy));
         // Handle stamina
-        let sstamina = &vdata[10];
-        let mut tstr = TStr::from_str(sstamina, true);
-        tstr.peel_bracket('(').unwrap();
-        let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
-        //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
-        let mut fstamina: f32 = staminatoks[1].parse().unwrap();
-        fstamina = (fstamina/rcss::STAMINA_BASE).min(1.0);
-        pd.push(PlayerData::Stamina(fstamina));
+        for i in 5..vdata.len() {
+            if !vdata[i].starts_with("(s ") {
+                continue;
+            }
+            let sstamina = &vdata[i];
+            let mut tstr = TStr::from_str(sstamina, true);
+            tstr.peel_bracket('(').unwrap();
+            let staminatoks = tstr.tokens_vec(' ', true, false).unwrap();
+            //ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Stamina:{:?}", staminatoks));
+            let mut fstamina: f32 = staminatoks[1].parse().unwrap();
+            fstamina = (fstamina/rcss::STAMINA_BASE).min(1.0);
+            pd.push(PlayerData::Stamina(fstamina));
+        }
         // Fill in the player data
         if steam == "l" {
             pu.ateamcoded.push((iplayer-1, pd));
