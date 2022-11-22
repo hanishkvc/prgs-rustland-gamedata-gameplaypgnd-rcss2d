@@ -164,9 +164,10 @@ impl PlayData for Rcg {
             }
             tstr.peel_bracket('(').unwrap();
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
+            ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Top:Full:{:?}", toks));
             pu.msgs.insert("stime".to_string(), toks[1].to_string());
-            pu.timecounter = toks[1].parse().unwrap();
             if toks[0].starts_with("show") {
+                pu.timecounter = toks[1].parse().unwrap();
                 for tok in toks {
                     if !tok.starts_with("((l") && !tok.starts_with("((r") && !tok.starts_with("((b") {
                         continue;

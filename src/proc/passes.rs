@@ -13,7 +13,7 @@ use sdl2::{pixels::Color, render::BlendMode};
 use crate::sdlx::SdlX;
 
 
-const SELF_PASS_MINTIME: usize = 10;
+const SELF_PASS_MINTIME: isize = 10;
 const SCORE_BAD_PASS: f32 = -0.5;
 const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
 const SCORE_GOOD_PASS: f32 = 1.0;
@@ -124,7 +124,8 @@ impl Passes {
                 self.players.score(kick.side, kick.playerid, SCORE_HIJACK_PASS);
             } else {
                 if prev.playerid == kick.playerid {
-                    if (kick.time-prev.time) < SELF_PASS_MINTIME {
+                    let dtime = kick.time as isize - prev.time as isize;
+                    if dtime < SELF_PASS_MINTIME {
                         return;
                     }
                     self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
