@@ -79,7 +79,7 @@ impl Passes {
     pub fn add_kick(&mut self, kick: KickData) {
         let ik = self.kicks.len();
         if ik > 0 {
-            let prev = &self.kicks[ik];
+            let prev = &self.kicks[ik-1];
             if prev.side != kick.side {
                 self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
             } else {
