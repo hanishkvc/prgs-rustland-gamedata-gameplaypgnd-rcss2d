@@ -18,11 +18,39 @@ const SCORE_BAD_PASS: f32 = -0.5;
 const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
 const SCORE_GOOD_PASS: f32 = 1.0;
 const SCORE_SELF_PASS: f32 = 0.05;
+const SCORE_TACKLE: f32 = 0.5;
+const SCORE_CATCH: f32 = 1.0;
+
+
+#[derive(Debug)]
+struct Score {
+    score: f32,
+    kicks: usize,
+    tackles: usize,
+    catchs: usize,
+}
+
+impl Score {
+
+    fn new(score: f32, kicks: usize, tackles: usize, catchs: usize) -> Score {
+        Score {
+            score: score,
+            kicks: kicks,
+            tackles: tackles,
+            catchs: catchs,
+        }
+    }
+
+    fn default() -> Score {
+        return Score::new(0.0, 0, 0, 0);
+    }
+
+}
 
 #[derive(Debug)]
 struct Players {
-    aplayers: Vec<(usize, f32)>,
-    bplayers: Vec<(usize, f32)>,
+    aplayers: Vec<(usize, Score)>,
+    bplayers: Vec<(usize, Score)>,
 }
 
 impl Players {
@@ -33,10 +61,10 @@ impl Players {
             bplayers: Vec::new(),
         };
         for i in 0..acnt {
-            players.aplayers.push((i, 0.0));
+            players.aplayers.push((i, Score::default()));
         }
         for i in 0..bcnt {
-            players.bplayers.push((i, 0.0));
+            players.bplayers.push((i, Score::default()));
         }
         return players;
     }
@@ -44,9 +72,9 @@ impl Players {
     /// Help update the score of a specific player
     fn score(&mut self, side: char, playerid: usize, score: f32) {
         if side == 'a' {
-            self.aplayers[playerid].1 += score;
+            self.aplayers[playerid].1.score += score;
         } else {
-            self.bplayers[playerid].1 += score;
+            self.bplayers[playerid].1.score += score;
         }
     }
 
@@ -54,22 +82,23 @@ impl Players {
     fn score_max(&self) -> (f32, f32) {
         let mut amax = f32::MIN;
         for i in 0..self.aplayers.len() {
-            let player = self.aplayers[i];
-            if amax < player.1 {
-                amax = player.1;
+            let player = &self.aplayers[i];
+            if amax < player.1.score {
+                amax = player.1.score;
             }
         }
         let mut bmax = f32::MIN;
         for i in 0..self.bplayers.len() {
-            let player = self.bplayers[i];
-            if bmax < player.1 {
-                bmax = player.1;
+            let player = &self.bplayers[i];
+            if bmax < player.1.score {
+                bmax = player.1.score;
             }
         }
         (amax, bmax)
     }
 
 }
+
 
 #[derive(Debug)]
 pub struct KickData {
@@ -141,28 +170,28 @@ impl Passes {
     #[allow(dead_code)]
     fn summary_simple(&self) {
         for i in 0..self.players.aplayers.len() {
-            let player = self.players.aplayers[i];
-            eprintln!("DBUG:PPGND:Proc:Passes:A:{:02}:{}", player.0, player.1);
+            let player = &self.players.aplayers[i];
+            eprintln!("DBUG:PPGND:Proc:Passes:A:{:02}:{}", player.0, player.1.score);
         }
         for i in 0..self.players.bplayers.len() {
-            let player = self.players.bplayers[i];
-            eprintln!("DBUG:PPGND:Proc:Passes:B:{:02}:{}", player.0, player.1);
+            let player = &self.players.bplayers[i];
+            eprintln!("DBUG:PPGND:Proc:Passes:B:{:02}:{}", player.0, player.1.score);
         }
     }
 
     fn summary_asciiart(&self) {
         for i in 0..self.players.aplayers.len() {
-            let player = self.players.aplayers[i];
+            let player = &self.players.aplayers[i];
             eprint!("DBUG:PPGND:Proc:Passes:A:{:02}:", player.0);
-            for _j in 0..player.1.round() as usize {
+            for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
             eprintln!();
         }
         for i in 0..self.players.bplayers.len() {
-            let player = self.players.bplayers[i];
+            let player = &self.players.bplayers[i];
             eprint!("DBUG:PPGND:Proc:Passes:B:{:02}:", player.0);
-            for _j in 0..player.1.round() as usize {
+            for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
             eprintln!();
@@ -176,16 +205,16 @@ impl Passes {
         // let (amax, bmax) = (20.0, 20.0);
         let (amax, bmax) = self.players.score_max();
         for i in 0..self.players.aplayers.len() {
-            let player = self.players.aplayers[i];
+            let player = &self.players.aplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1/amax), 0.04)
+            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/amax), 0.04)
         }
         for i in 0..self.players.bplayers.len() {
-            let player = self.players.bplayers[i];
+            let player = &self.players.bplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1/bmax), 0.04)
+            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/bmax), 0.04)
         }
     }
 
