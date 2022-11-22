@@ -256,6 +256,7 @@ fn main() {
                 },
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
                 keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
+                keys::ProgramEvent::DumpPasses => gui.pgentities.passes.summary(),
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),
             }

@@ -93,4 +93,15 @@ impl Passes {
         self.kicks.push(kick);
     }
 
+    pub fn summary(&self) {
+        for i in 0..self.players.aplayers.len() {
+            let player = self.players.aplayers[i];
+            eprintln!("DBUG:PPGND:Proc:Passes:A:{}:{}", player.0, player.1);
+        }
+        for i in 0..self.players.bplayers.len() {
+            let player = self.players.bplayers[i];
+            eprintln!("DBUG:PPGND:Proc:Passes:B:{}:{}", player.0, player.1);
+        }
+    }
+
 }

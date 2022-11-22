@@ -20,6 +20,7 @@ pub enum ProgramEvent {
     AdjustFPS(f32),
     SendRecordCoded(isize),
     DumpPGEntities,
+    DumpPasses,
     Quit,
     NeedMore,
 }
@@ -56,6 +57,19 @@ fn handle_c_cmds(keycode: Keycode) -> ProgramEvent {
     return ProgramEvent::None;
 }
 
+fn handle_d_cmds(keycode: Keycode) -> ProgramEvent {
+    match keycode {
+        Keycode::E => {
+            return ProgramEvent::DumpPGEntities;
+        },
+        Keycode::P => {
+            return ProgramEvent::DumpPasses;
+        },
+        _ => (),
+    }
+    return ProgramEvent::None;
+}
+
 pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
     for ev in sx.ep.poll_iter() {
         use sdl2::event::Event;
@@ -70,6 +84,9 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
                     }
                     if skey == "c" {
                         pev = handle_c_cmds(keycode.unwrap());
+                    }
+                    if skey == "d" {
+                        pev = handle_d_cmds(keycode.unwrap());
                     }
                     if let ProgramEvent::None = pev {
                         skey.clear();
@@ -115,7 +132,8 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
                         return ProgramEvent::ToggleShowHelp;
                     }
                     Keycode::D => {
-                        return ProgramEvent::DumpPGEntities;
+                        skey.push('d');
+                        return ProgramEvent::NeedMore;
                     }
                     _ => {
 

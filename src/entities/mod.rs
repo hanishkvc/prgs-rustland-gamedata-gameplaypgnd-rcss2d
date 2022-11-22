@@ -66,7 +66,7 @@ pub(crate) struct PGEntities<'a> {
     /// If extra pitch markers should be shown or not.
     pub showxtrapitchmarkers: bool,
     /// Info from Data
-    passes: Passes,
+    pub passes: Passes,
 }
 
 impl<'a> PGEntities<'a> {
