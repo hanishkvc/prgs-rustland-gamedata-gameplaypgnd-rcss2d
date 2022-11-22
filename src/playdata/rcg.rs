@@ -77,7 +77,13 @@ impl Rcg {
         let (steam, splayer) = tstr.split_once(' ').unwrap();
         let iplayer: i32 = splayer.parse().unwrap();
         // Handle actions and cards
-        let state: u32 = u32::from_str_radix(&vdata[2][2..], 16).unwrap();
+        let sstate;
+        if vdata[2].contains("x") {
+            sstate = &vdata[2][2..];
+        } else {
+            sstate = &vdata[2];
+        }
+        let state: u32 = u32::from_str_radix(sstate, 16).unwrap();
         let (action, card) = rcss::handle_state(state);
         if (action == playdata::Action::None) && (card == playdata::Card::None) {
             ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
