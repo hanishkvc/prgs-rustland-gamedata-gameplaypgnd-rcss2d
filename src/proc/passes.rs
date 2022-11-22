@@ -29,6 +29,14 @@ impl Players {
         return players;
     }
 
+    fn score(&mut self, side: char, playerid: usize, score: f32) {
+        if side == 'a' {
+            self.aplayers[playerid].1 += score;
+        } else {
+            self.bplayers[playerid].1 += score;
+        }
+    }
+
 }
 
 struct KickData {
@@ -70,12 +78,12 @@ impl Passes {
         if ik > 0 {
             let prev = &self.kicks[ik];
             if prev.side != kick.side {
-                self.players.aplayers[prev.playerid].1 += SCORE_BAD_PASS;
+                self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
             } else {
                 if prev.playerid == kick.playerid {
-                    self.players.aplayers[prev.playerid].1 += SCORE_SELF_PASS;
+                    self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
                 } else {
-                    self.players.aplayers[prev.playerid].1 += SCORE_GOOD_PASS;
+                    self.players.score(prev.side, prev.playerid, SCORE_GOOD_PASS);
                 }
             }
         }
