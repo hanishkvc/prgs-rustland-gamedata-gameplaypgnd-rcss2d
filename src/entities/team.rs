@@ -10,6 +10,7 @@ use loggerk::{ldebug, log_d};
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
+use crate::proc::passes::{Passes, KickData};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
 use crate::playdata::{PlayerCodedData, self};
 
@@ -54,7 +55,7 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn update(&mut self, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32) {
+    pub fn update(&mut self, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, passes: &mut Passes) {
         for player in playersdata {
             ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, player));
             let pi = player.0 as usize;
@@ -100,6 +101,8 @@ impl<'a> Team<'a> {
                         let mut action_color = match action {
                             playdata::Action::Kick(good) => {
                                 if good {
+                                    // TODO: Need to handle time and position
+                                    passes.add_kick(KickData::new(0, self.name.chars().nth(0).unwrap(), pi, (0.0,0.0)));
                                     Color::BLUE
                                 } else {
                                     Color::GRAY

@@ -50,7 +50,7 @@ pub struct KickData {
 
 impl KickData {
 
-    fn new(time: usize, side: char, playerid: usize, pos: (f32,f32)) -> KickData {
+    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32)) -> KickData {
         KickData {
             time: time,
             side: side,
