@@ -55,7 +55,7 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn update(&mut self, timecounter: usize, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, passes: &mut ActionsInfo) {
+    pub fn update(&mut self, timecounter: usize, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, actionsinfo: &mut ActionsInfo) {
         for player in playersdata {
             ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, player));
             let pi = player.0 as usize;
@@ -101,8 +101,8 @@ impl<'a> Team<'a> {
                         let mut action_color = match action {
                             playdata::Action::Kick(good) => {
                                 if good {
-                                    // TODO: Need to handle time and position
-                                    passes.add_kick(ActionData::new(timecounter, self.name.chars().nth(0).unwrap(), pi, (0.0,0.0)));
+                                    // TODO: Need to handle/update position
+                                    actionsinfo.add_kick(ActionData::new(timecounter, self.name.chars().nth(0).unwrap(), pi, (0.0,0.0)));
                                     Color::BLUE
                                 } else {
                                     Color::GRAY

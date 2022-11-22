@@ -66,7 +66,7 @@ pub(crate) struct PGEntities<'a> {
     /// If extra pitch markers should be shown or not.
     pub showxtrapitchmarkers: bool,
     /// Info from Data
-    pub passes: ActionsInfo,
+    pub actionsinfo: ActionsInfo,
 }
 
 impl<'a> PGEntities<'a> {
@@ -101,7 +101,7 @@ impl<'a> PGEntities<'a> {
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
             pitch: pitch,
             showxtrapitchmarkers: true,
-            passes: ActionsInfo::new(anplayers as usize, bnplayers as usize),
+            actionsinfo: ActionsInfo::new(anplayers as usize, bnplayers as usize),
         }
     }
 
@@ -130,8 +130,8 @@ impl<'a> PGEntities<'a> {
             fpmsg.update(&pu.msgs);
         }
         self.ball.update(pu.ball, babsolute, inframes);
-        self.ateam.update(pu.timecounter, pu.ateamcoded, babsolute, inframes, &mut self.passes);
-        self.bteam.update(pu.timecounter, pu.bteamcoded, babsolute, inframes, &mut self.passes);
+        self.ateam.update(pu.timecounter, pu.ateamcoded, babsolute, inframes, &mut self.actionsinfo);
+        self.bteam.update(pu.timecounter, pu.bteamcoded, babsolute, inframes, &mut self.actionsinfo);
     }
 
     /// If using interpolated updating of object positions,
