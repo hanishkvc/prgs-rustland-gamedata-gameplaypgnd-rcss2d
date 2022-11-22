@@ -93,15 +93,38 @@ impl Passes {
         self.kicks.push(kick);
     }
 
-    pub fn summary(&self) {
+    fn summary_simple(&self) {
         for i in 0..self.players.aplayers.len() {
             let player = self.players.aplayers[i];
-            eprintln!("DBUG:PPGND:Proc:Passes:A:{}:{}", player.0, player.1);
+            eprintln!("DBUG:PPGND:Proc:Passes:A:{:02}:{}", player.0, player.1);
         }
         for i in 0..self.players.bplayers.len() {
             let player = self.players.bplayers[i];
-            eprintln!("DBUG:PPGND:Proc:Passes:B:{}:{}", player.0, player.1);
+            eprintln!("DBUG:PPGND:Proc:Passes:B:{:02}:{}", player.0, player.1);
         }
+    }
+
+    fn summary_asciiart(&self) {
+        for i in 0..self.players.aplayers.len() {
+            let player = self.players.aplayers[i];
+            eprint!("DBUG:PPGND:Proc:Passes:A:{:02}:", player.0);
+            for _j in 0..player.1.round() as usize {
+                eprint!("#");
+            }
+            eprintln!();
+        }
+        for i in 0..self.players.bplayers.len() {
+            let player = self.players.bplayers[i];
+            eprint!("DBUG:PPGND:Proc:Passes:B:{:02}:", player.0);
+            for _j in 0..player.1.round() as usize {
+                eprint!("#");
+            }
+            eprintln!();
+        }
+    }
+
+    pub fn summary(&self) {
+        self.summary_asciiart();
     }
 
 }
