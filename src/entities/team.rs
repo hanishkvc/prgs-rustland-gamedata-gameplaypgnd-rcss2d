@@ -103,7 +103,7 @@ impl<'a> Team<'a> {
                             playdata::Action::Kick(good) => {
                                 if good {
                                     // TODO: Need to handle/update position
-                                    actionsinfo.add_kick(ActionData::new(timecounter, side, pi, (0.0,0.0)));
+                                    actionsinfo.handle_kick(ActionData::new(timecounter, side, pi, (0.0,0.0)));
                                     Color::BLUE
                                 } else {
                                     Color::GRAY

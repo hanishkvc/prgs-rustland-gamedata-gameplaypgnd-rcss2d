@@ -163,7 +163,7 @@ impl ActionsInfo {
     /// * if same player, reward to some extent
     ///   * provided ball maintained for a minimum sufficient time
     /// * if new player, reward prev player for a good pass.
-    pub fn add_kick(&mut self, kick: ActionData) {
+    pub fn handle_kick(&mut self, kick: ActionData) {
         let ik = self.kicks.len();
         if ik > 0 {
             let prev = &self.kicks[ik-1];
