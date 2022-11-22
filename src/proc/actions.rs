@@ -167,6 +167,14 @@ impl ActionsInfo {
         self.kicks.push(kick);
     }
 
+    pub fn handle_tackle(&mut self, tackle: ActionData) {
+        self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
+    }
+
+    pub fn handle_catch(&mut self, catch: ActionData) {
+        self.players.score(catch.side, catch.playerid, SCORE_CATCH);
+    }
+
     #[allow(dead_code)]
     fn summary_simple(&self) {
         for i in 0..self.players.aplayers.len() {

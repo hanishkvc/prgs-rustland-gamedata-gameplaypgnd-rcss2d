@@ -98,11 +98,12 @@ impl<'a> Team<'a> {
                         self.players[pi].set_bl_color(card_color);
                     },
                     playdata::PlayerData::Action(action) => {
+                        let side = self.name.chars().nth(0).unwrap();
                         let mut action_color = match action {
                             playdata::Action::Kick(good) => {
                                 if good {
                                     // TODO: Need to handle/update position
-                                    actionsinfo.add_kick(ActionData::new(timecounter, self.name.chars().nth(0).unwrap(), pi, (0.0,0.0)));
+                                    actionsinfo.add_kick(ActionData::new(timecounter, side, pi, (0.0,0.0)));
                                     Color::BLUE
                                 } else {
                                     Color::GRAY
@@ -110,6 +111,7 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Catch(good) => {
                                 if good {
+                                    actionsinfo.handle_catch(ActionData::new(timecounter, side, pi, (0.0,0.0)));
                                     Color::WHITE
                                 } else {
                                     Color::GRAY
@@ -117,6 +119,7 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Tackle(good) => {
                                 if good {
+                                    actionsinfo.handle_tackle(ActionData::new(timecounter, side, pi, (0.0,0.0)));
                                     Color::CYAN
                                 } else {
                                     Color::GRAY
