@@ -3,6 +3,8 @@
 //! HanishKVC, 2022
 //!
 
+use crate::sdlx::SdlX;
+
 
 const SCORE_BAD_PASS: f32 = -0.5;
 const SCORE_GOOD_PASS: f32 = 1.0;
@@ -120,6 +122,17 @@ impl Passes {
                 eprint!("#");
             }
             eprintln!();
+        }
+    }
+
+    pub fn summary_sdl(&self, sx: &mut SdlX) {
+        for i in 0..self.players.aplayers.len() {
+            let player = self.players.aplayers[i];
+            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), player.1/20.0, 0.04)
+        }
+        for i in 0..self.players.bplayers.len() {
+            let player = self.players.bplayers[i];
+            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), player.1/20.0, 0.04)
         }
     }
 

@@ -46,6 +46,8 @@ struct Gui<'a> {
     pgentities: PGEntities<'a>,
     /// Playdata source
     pdata: Box<dyn PlayData>,
+    /// Show Passes summary
+    showpasses: bool,
 }
 
 impl<'a> Gui<'a> {
@@ -91,6 +93,7 @@ impl<'a> Gui<'a> {
             curframetime: ctime,
             pgentities: pgentities,
             pdata: pdata,
+            showpasses: false,
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -256,7 +259,10 @@ fn main() {
                 },
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
                 keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
-                keys::ProgramEvent::DumpPasses => gui.pgentities.passes.summary(),
+                keys::ProgramEvent::DumpPasses => {
+                    gui.pgentities.passes.summary();
+                    gui.showpasses = !gui.showpasses;
+                }
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),
             }
@@ -287,6 +293,11 @@ fn main() {
         gui.pgentities.draw(&mut sx);
         if gui.showhelp {
             show_help(&mut sx);
+        }
+
+        // Draw info
+        if gui.showpasses {
+            gui.pgentities.passes.summary_sdl(&mut sx);
         }
 
         // Present screen update to user
