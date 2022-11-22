@@ -192,6 +192,7 @@ impl PlayData for RandomData {
         let mut pu = PlayUpdate::new();
         // Messages
         pu.msgs.insert("stime".to_string(), self.rcnt.to_string());
+        pu.timecounter = self.rcnt;
         let gphase = (self.rcnt%3000)/1000;
         let sgphase = match gphase {
             0 => "Phase 1",

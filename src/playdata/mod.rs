@@ -43,11 +43,13 @@ pub type Messages = HashMap<String, String>;
 #[derive(Debug)]
 /// Maintain possible updates wrt a playdata update.
 /// It can contain
+/// * states like timecounter, game play state, ...
 /// * messages if any, like score, time info, game actions, ...
 /// * position of the ball
 /// * positiono f the players.
 /// * stamina of the players
 pub struct PlayUpdate {
+    pub timecounter: usize,
     pub msgs: Messages,
     pub ball: (f32, f32),
     pub ateamcoded: Vec<PlayerCodedData>,
@@ -58,6 +60,7 @@ impl PlayUpdate {
 
     pub fn new() -> PlayUpdate {
         PlayUpdate {
+            timecounter: 0,
             msgs: Messages::new(),
             ball: (0.0,0.0),
             ateamcoded: Vec::new(),

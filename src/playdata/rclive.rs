@@ -74,6 +74,7 @@ impl RCLive {
 
     fn handle_time(&mut self, tok: &str, pu: &mut PlayUpdate) {
         let (_,d) = tok.split_once(':').unwrap();
+        pu.timecounter = d.parse().unwrap();
         pu.msgs.insert("stime".to_string(), d.to_string());
         self.stime = d.to_string();
     }
