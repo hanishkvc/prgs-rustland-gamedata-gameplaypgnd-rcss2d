@@ -88,12 +88,23 @@ impl Players {
         } else {
             player = &mut self.bplayers[playerid];
         }
+        let stype;
         match atype {
             Action::None => todo!(),
-            Action::Kick(_) => player.1.kicks += 1,
-            Action::Catch(_) => player.1.catchs += 1,
-            Action::Tackle(_) => player.1.tackles += 1,
+            Action::Kick(_) => {
+                stype = "Kick";
+                player.1.kicks += 1;
+            },
+            Action::Catch(_) => {
+                stype = "Catch";
+                player.1.catchs += 1;
+            },
+            Action::Tackle(_) => {
+                stype = "Tackle";
+                player.1.tackles += 1;
+            },
         }
+        eprintln!("DBUG:PPGND:ProcActions:{}:{}:{}", side, playerid, stype);
     }
 
     /// Return the max player score for each of the teams
