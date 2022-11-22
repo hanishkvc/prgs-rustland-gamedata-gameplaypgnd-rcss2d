@@ -14,6 +14,8 @@ use crate::sdlx::SdlX;
 use crate::playdata::Action;
 
 
+const MTAG: &str = "PPGND:ProcActions";
+
 const REPEAT_TACKLE_MINTIME: isize = 10;
 const SELF_PASS_MINTIME: isize = 10;
 
@@ -111,7 +113,7 @@ impl Players {
                 player.1.tackles += 1;
             },
         }
-        eprintln!("DBUG:PPGND:ProcActions:{}:{}:{}", side, playerid, stype);
+        eprintln!("DBUG:{}:{}:{}:{}", MTAG, side, playerid, stype);
     }
 
     /// Return the max player score for each of the teams
@@ -199,7 +201,7 @@ impl ActionsInfo {
                     if prev.action == kick.action {
                         let dtime = kick.time as isize - prev.time as isize;
                         if dtime < SELF_PASS_MINTIME {
-                            eprintln!("DBUG:PPGND:ProcAction:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", kick.side, kick.playerid, prev.time, kick.time, dtime);
+                            eprintln!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, kick.side, kick.playerid, prev.time, kick.time, dtime);
                             return;
                         }
                     }
@@ -226,7 +228,7 @@ impl ActionsInfo {
                     if prev.action == tackle.action {
                         let dtime = tackle.time as isize - prev.time as isize;
                         if dtime < REPEAT_TACKLE_MINTIME {
-                            eprintln!("DBUG:PPGND:ProcAction:{}:{}:Skipping TOO SOON repeat tackle????:{}:{}:{}", tackle.side, tackle.playerid, prev.time, tackle.time, dtime);
+                            eprintln!("DBUG:{}:{}:{}:Skipping TOO SOON repeat tackle????:{}:{}:{}", MTAG, tackle.side, tackle.playerid, prev.time, tackle.time, dtime);
                             return;
                         }
                     }
@@ -247,18 +249,18 @@ impl ActionsInfo {
     fn summary_simple(&self) {
         for i in 0..self.players.aplayers.len() {
             let player = &self.players.aplayers[i];
-            eprintln!("DBUG:PPGND:Proc:Passes:A:{:02}:{}", player.0, player.1.score);
+            eprintln!("DBUG:{}:A:{:02}:{}", MTAG, player.0, player.1.score);
         }
         for i in 0..self.players.bplayers.len() {
             let player = &self.players.bplayers[i];
-            eprintln!("DBUG:PPGND:Proc:Passes:B:{:02}:{}", player.0, player.1.score);
+            eprintln!("DBUG:{}:B:{:02}:{}", MTAG, player.0, player.1.score);
         }
     }
 
     fn summary_asciiart(&self) {
         for i in 0..self.players.aplayers.len() {
             let player = &self.players.aplayers[i];
-            eprint!("DBUG:PPGND:Proc:Passes:A:{:02}:", player.0);
+            eprint!("DBUG:{}:A:{:02}:", MTAG, player.0);
             for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
@@ -266,7 +268,7 @@ impl ActionsInfo {
         }
         for i in 0..self.players.bplayers.len() {
             let player = &self.players.bplayers[i];
-            eprint!("DBUG:PPGND:Proc:Passes:B:{:02}:", player.0);
+            eprint!("DBUG:{}:B:{:02}:", MTAG, player.0);
             for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
