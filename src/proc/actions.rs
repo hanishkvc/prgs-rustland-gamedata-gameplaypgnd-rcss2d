@@ -16,7 +16,8 @@ use crate::sdlx::SdlX;
 const SELF_PASS_MINTIME: isize = 10;
 const SCORE_BAD_PASS: f32 = -0.5;
 const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
-const SCORE_GOOD_PASS: f32 = 1.0;
+const SCORE_GOOD_PASS_SENT: f32 = 1.0;
+const SCORE_GOOD_PASS_GOT: f32 = 0.4;
 const SCORE_SELF_PASS: f32 = 0.05;
 const SCORE_TACKLE: f32 = 0.5;
 const SCORE_CATCH: f32 = 1.0;
@@ -160,7 +161,8 @@ impl ActionsInfo {
                     }
                     self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
                 } else {
-                    self.players.score(prev.side, prev.playerid, SCORE_GOOD_PASS);
+                    self.players.score(prev.side, prev.playerid, SCORE_GOOD_PASS_SENT);
+                    self.players.score(kick.side, kick.playerid, SCORE_GOOD_PASS_GOT);
                 }
             }
         }
