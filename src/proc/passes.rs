@@ -76,6 +76,7 @@ pub struct KickData {
     time: usize,
     side: char,
     playerid: usize,
+    #[allow(dead_code)]
     pos: (f32, f32),
 }
 
@@ -137,6 +138,7 @@ impl Passes {
         self.kicks.push(kick);
     }
 
+    #[allow(dead_code)]
     fn summary_simple(&self) {
         for i in 0..self.players.aplayers.len() {
             let player = self.players.aplayers[i];
