@@ -10,7 +10,7 @@ use loggerk::{ldebug, log_d};
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
-use crate::proc::passes::{Passes, KickData};
+use crate::proc::passes::{Passes, ActionData};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
 use crate::playdata::{PlayerCodedData, self};
 
@@ -102,7 +102,7 @@ impl<'a> Team<'a> {
                             playdata::Action::Kick(good) => {
                                 if good {
                                     // TODO: Need to handle time and position
-                                    passes.add_kick(KickData::new(timecounter, self.name.chars().nth(0).unwrap(), pi, (0.0,0.0)));
+                                    passes.add_kick(ActionData::new(timecounter, self.name.chars().nth(0).unwrap(), pi, (0.0,0.0)));
                                     Color::BLUE
                                 } else {
                                     Color::GRAY

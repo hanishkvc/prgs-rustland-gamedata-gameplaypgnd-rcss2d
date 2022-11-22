@@ -101,7 +101,7 @@ impl Players {
 
 
 #[derive(Debug)]
-pub struct KickData {
+pub struct ActionData {
     time: usize,
     side: char,
     playerid: usize,
@@ -109,10 +109,10 @@ pub struct KickData {
     pos: (f32, f32),
 }
 
-impl KickData {
+impl ActionData {
 
-    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32)) -> KickData {
-        KickData {
+    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32)) -> ActionData {
+        ActionData {
             time: time,
             side: side,
             playerid: playerid,
@@ -125,7 +125,7 @@ impl KickData {
 #[derive(Debug)]
 pub struct Passes {
     players: Players,
-    kicks: Vec<KickData>,
+    kicks: Vec<ActionData>,
 }
 
 impl Passes {
@@ -145,7 +145,7 @@ impl Passes {
     /// * if same player, reward to some extent
     ///   * provided ball maintained for a minimum sufficient time
     /// * if new player, reward prev player for a good pass.
-    pub fn add_kick(&mut self, kick: KickData) {
+    pub fn add_kick(&mut self, kick: ActionData) {
         let ik = self.kicks.len();
         if ik > 0 {
             let prev = &self.kicks[ik-1];
