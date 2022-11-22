@@ -8,7 +8,7 @@ use sdl2::ttf::Font;
 
 use crate::sdlx::{SdlX, XRect};
 use crate::playdata::PlayUpdate;
-use crate::proc::actions::Passes;
+use crate::proc::actions::ActionsInfo;
 
 
 const ENTITY_WIDTH: u32 = 16;
@@ -66,7 +66,7 @@ pub(crate) struct PGEntities<'a> {
     /// If extra pitch markers should be shown or not.
     pub showxtrapitchmarkers: bool,
     /// Info from Data
-    pub passes: Passes,
+    pub passes: ActionsInfo,
 }
 
 impl<'a> PGEntities<'a> {
@@ -101,7 +101,7 @@ impl<'a> PGEntities<'a> {
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
             pitch: pitch,
             showxtrapitchmarkers: true,
-            passes: Passes::new(anplayers as usize, bnplayers as usize),
+            passes: ActionsInfo::new(anplayers as usize, bnplayers as usize),
         }
     }
 

@@ -123,15 +123,15 @@ impl ActionData {
 }
 
 #[derive(Debug)]
-pub struct Passes {
+pub struct ActionsInfo {
     players: Players,
     kicks: Vec<ActionData>,
 }
 
-impl Passes {
+impl ActionsInfo {
 
-    pub fn new(acnt: usize, bcnt: usize) -> Passes {
-        Passes {
+    pub fn new(acnt: usize, bcnt: usize) -> ActionsInfo {
+        ActionsInfo {
             players: Players::new(acnt, bcnt),
             kicks: Vec::new(),
         }

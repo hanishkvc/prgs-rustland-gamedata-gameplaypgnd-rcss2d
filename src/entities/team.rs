@@ -10,7 +10,7 @@ use loggerk::{ldebug, log_d};
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
-use crate::proc::actions::{Passes, ActionData};
+use crate::proc::actions::{ActionsInfo, ActionData};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
 use crate::playdata::{PlayerCodedData, self};
 
@@ -55,7 +55,7 @@ impl<'a> Team<'a> {
         team
     }
 
-    pub fn update(&mut self, timecounter: usize, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, passes: &mut Passes) {
+    pub fn update(&mut self, timecounter: usize, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, passes: &mut ActionsInfo) {
         for player in playersdata {
             ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, player));
             let pi = player.0 as usize;
