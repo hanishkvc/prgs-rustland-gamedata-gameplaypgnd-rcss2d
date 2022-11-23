@@ -315,10 +315,10 @@ fn main() {
 
         // Draw info
         if gui.showinfoactions {
-            gui.pgentities.actionsinfo.summary_score(&mut sx, gui.actionsinfo_summarytype);
+            gui.pgentities.actionsinfo.summary_score_sdl(&mut sx, gui.actionsinfo_summarytype);
         }
         if gui.showaidistances {
-            gui.pgentities.actionsinfo.summary_dist(&mut sx, gui.aidistances_summarytype);
+            gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
         }
 
         // Present screen update to user
