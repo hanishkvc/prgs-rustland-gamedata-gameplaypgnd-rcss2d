@@ -126,11 +126,23 @@ One can use the following keys to control the behaviour as noted below.
 
   * any other key -> exit send-record-coded-mode
 
-* Internal debug cmds
+* d -> enters internal-debug-mode
 
   * d -> to dump current data associated with entities in the playground
 
-    * ie players, ball, msgs
+    * ie players, ball, msgs, actions info, ...
+
+  * a -> to show ActionsInfo relative perf summary based on best team
+    local performance.
+
+  * A -> to show ActionsInfo relative perf summary based on best perf
+    across both teams.
+
+  * NOTE: Pressing <a> when already in <a> mode, clears it. Same with <A>.
+    However pressing <a> when in <A> or otherway, changes the summary type.
+
+  * any other key -> exit internal-debug-mode
+
 
 Msgs
 =====

@@ -5,6 +5,8 @@
 
 use sdl2::keyboard::{Keycode, Mod};
 
+use loggerk::{ldebug, log_d};
+
 use crate::sdlx::SdlX;
 
 pub enum ProgramEvent {
@@ -69,7 +71,8 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
                 return ProgramEvent::DumpActionsInfoSummary('a');
             }
         },
-        _ => (),
+        Keycode::LShift | Keycode::RShift => return ProgramEvent::NeedMore,
+        _ => ldebug!(&format!("DBUG:PPGND:Keys:DCmds:{}:{}", keycode, keymod)),
     }
     return ProgramEvent::None;
 }
