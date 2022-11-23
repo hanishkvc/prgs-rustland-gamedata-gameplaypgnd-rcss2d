@@ -7,6 +7,7 @@ use std::env;
 use std::time;
 
 use sdl2::pixels::Color;
+use sdl2::rect::Rect;
 use sdl2::ttf::Font;
 
 use loggerk::{log_init, ldebug, log_d};
@@ -323,6 +324,12 @@ fn main() {
 
         // Present screen update to user
         sx.wc.present();
+
+        // Save raw screen data
+        if (gui.frame % 1) == 0 {
+            let imgdata = sx.wc.read_pixels(Some(Rect::new(0,0,entities::SCREEN_WIDTH,entities::SCREEN_HEIGHT)), sdl2::pixels::PixelFormatEnum::RGB24).unwrap();
+            std::fs::write(&format!("/tmp/ppgnd{:04}.rgb", gui.frame), imgdata).unwrap();
+        }
 
         // consume any remaining frame time
         gui.consume_frametime();
