@@ -23,6 +23,7 @@ pub enum ProgramEvent {
     SendRecordCoded(isize),
     DumpPGEntities,
     DumpActionsInfoSummary(char),
+    DumpAIDistancesSummary(char),
     Quit,
     NeedMore,
 }
@@ -69,6 +70,13 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
                 return ProgramEvent::DumpActionsInfoSummary('A');
             } else {
                 return ProgramEvent::DumpActionsInfoSummary('a');
+            }
+        },
+        Keycode::D => {
+            if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
+                return ProgramEvent::DumpAIDistancesSummary('D');
+            } else {
+                return ProgramEvent::DumpAIDistancesSummary('d');
             }
         },
         Keycode::LShift | Keycode::RShift => return ProgramEvent::NeedMore,

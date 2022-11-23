@@ -50,6 +50,10 @@ struct Gui<'a> {
     showinfoactions: bool,
     /// ActionsInfo summary type
     actionsinfo_summarytype: char,
+    /// ActionsInfo Distances summary show
+    showaidistances: bool,
+    /// ActionsInfo Distances summary type
+    aidistances_summarytype: char,
 }
 
 impl<'a> Gui<'a> {
@@ -97,6 +101,8 @@ impl<'a> Gui<'a> {
             pdata: pdata,
             showinfoactions: false,
             actionsinfo_summarytype: 'a',
+            showaidistances: false,
+            aidistances_summarytype: 'd',
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -268,7 +274,13 @@ fn main() {
                         gui.showinfoactions = !gui.showinfoactions;
                     }
                     gui.actionsinfo_summarytype = summarytype;
-                }
+                },
+                keys::ProgramEvent::DumpAIDistancesSummary(summarytype) => {
+                    if gui.aidistances_summarytype == summarytype {
+                        gui.showaidistances = !gui.showaidistances;
+                    }
+                    gui.aidistances_summarytype = summarytype;
+                },
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),
             }
@@ -303,7 +315,10 @@ fn main() {
 
         // Draw info
         if gui.showinfoactions {
-            gui.pgentities.actionsinfo.summary_sdl(&mut sx, gui.actionsinfo_summarytype);
+            gui.pgentities.actionsinfo.summary_score(&mut sx, gui.actionsinfo_summarytype);
+        }
+        if gui.showaidistances {
+            gui.pgentities.actionsinfo.summary_dist(&mut sx, gui.aidistances_summarytype);
         }
 
         // Present screen update to user

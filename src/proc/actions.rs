@@ -366,7 +366,7 @@ impl ActionsInfo {
 
     pub fn summary_dist(&self, sx: &mut SdlX, summarytype: char) {
         let (mut amax, mut bmax) = self.players.dist_max();
-        if summarytype == 'A' {
+        if summarytype == 'D' {
             amax = amax.max(bmax);
             bmax = amax;
         }
@@ -392,10 +392,6 @@ impl ActionsInfo {
             let yh = yh*(player.1.dist/bmax);
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
-    }
-
-    pub fn summary_sdl(&self, sx: &mut SdlX, summarytype: char) {
-        self.summary_dist(sx, summarytype);
     }
 
     pub fn summary(&self) {
