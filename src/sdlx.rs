@@ -5,10 +5,12 @@
 
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::rect::Rect;
+use sdl2::sys::image::IMG_SavePNG;
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
 use sdl2::render::{WindowCanvas, TextureCreator, Texture, BlendMode};
 use sdl2::video::WindowContext;
 pub use sdl2::pixels::Color;
+use sdl2::image::SaveSurface;
 
 
 pub const COLOR_INVISIBLE: Color = Color::RGBA(0, 0, 0, 0);
@@ -60,6 +62,11 @@ impl SdlX {
         let wctc = wc.texture_creator();
         // Setup events
         let ep = ctxt.event_pump().unwrap();
+        // Images ++
+        win.surface(&ep);
+        let img = sdl2::image::init(sdl2::image::InitFlag::PNG).unwrap();
+        IMG_SavePNG(surface, file)
+        wc.read_pixels(rect, format)
         // Font related
         //sdl2::gfx::primitives::set_font(fontdata, cw, ch);
         // Normal to Screen space
