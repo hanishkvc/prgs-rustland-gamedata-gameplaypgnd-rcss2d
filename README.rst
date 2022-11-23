@@ -166,3 +166,20 @@ to map to different player performance and or other characteristics
 * color and arc length of the arc around the player
   Currently it is mapped to actions like kick, tackle, catch
 
+
+Changelog
+###########
+
+20221123
+============
+
+Patched the latest external release wrt below and inturn rebased the currently
+internal exploration on top of the same
+
+* fixing Rcg helper to support non hex state info and stamina record at almost
+  any position within the player record.
+
+* add support for opting out of WM_PING mechanism in sdl helper
+
+* consume all events before handling the playback and related logic
+
