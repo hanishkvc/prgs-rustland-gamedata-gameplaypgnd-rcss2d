@@ -39,29 +39,34 @@ struct Score {
     kicks: usize,
     tackles: usize,
     catchs: usize,
+    dist: f32,
 }
 
 impl Score {
 
-    fn new(score: f32, kicks: usize, tackles: usize, catchs: usize) -> Score {
+    fn new(score: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32) -> Score {
         Score {
             score: score,
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
+            dist: dist,
         }
     }
 
     fn default() -> Score {
-        return Score::new(0.0, 0, 0, 0);
+        return Score::new(0.0, 0, 0, 0, 0.0);
     }
 
 }
 
+
+type Pos = (f32, f32);
+
 #[derive(Debug)]
 struct Players {
-    aplayers: Vec<(usize, Score)>,
-    bplayers: Vec<(usize, Score)>,
+    aplayers: Vec<(usize, Score, Pos)>,
+    bplayers: Vec<(usize, Score, Pos)>,
 }
 
 impl Players {
@@ -72,10 +77,10 @@ impl Players {
             bplayers: Vec::new(),
         };
         for i in 0..acnt {
-            players.aplayers.push((i, Score::default()));
+            players.aplayers.push((i, Score::default(), (99.0,99.0)));
         }
         for i in 0..bcnt {
-            players.bplayers.push((i, Score::default()));
+            players.bplayers.push((i, Score::default(), (99.0,99.0)));
         }
         return players;
     }
@@ -116,6 +121,25 @@ impl Players {
         eprintln!("DBUG:{}:{}:{}:{}", MTAG, side, playerid, stype);
     }
 
+    fn dist_update_from_pos(&mut self, side: char, playerid: usize, npos: Pos) {
+        let player;
+        if side == 'a' {
+            player = &mut self.aplayers[playerid];
+        } else {
+            player = &mut self.bplayers[playerid];
+        }
+        let opos = player.2;
+        if opos.0 == 99.0 && opos.1 == 99.0 {
+            player.2 = npos;
+            return;
+        }
+        let dx = npos.0-opos.0;
+        let dy = npos.1-opos.1;
+        let d = dx*dx + dy*dy;
+        player.1.dist += d;
+        player.2 = npos;
+    }
+
     /// Return the max player score for each of the teams
     fn score_max(&self) -> (f32, f32) {
         let mut amax = f32::MIN;
@@ -130,6 +154,25 @@ impl Players {
             let player = &self.bplayers[i];
             if bmax < player.1.score {
                 bmax = player.1.score;
+            }
+        }
+        (amax, bmax)
+    }
+
+    /// Return the max player distance traversed for each of the teams
+    fn dist_max(&self) -> (f32, f32) {
+        let mut amax = f32::MIN;
+        for i in 0..self.aplayers.len() {
+            let player = &self.aplayers[i];
+            if amax < player.1.dist {
+                amax = player.1.dist;
+            }
+        }
+        let mut bmax = f32::MIN;
+        for i in 0..self.bplayers.len() {
+            let player = &self.bplayers[i];
+            if bmax < player.1.dist {
+                bmax = player.1.dist;
             }
         }
         (amax, bmax)
@@ -246,6 +289,7 @@ impl ActionsInfo {
     }
 
     pub fn handle_action(&mut self, actiond: ActionData) {
+        self.players.dist_update_from_pos(actiond.side, actiond.playerid, actiond.pos);
         match actiond.action {
             Action::Kick(_) => {
                 self.handle_kick(actiond);
