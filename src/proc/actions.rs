@@ -343,7 +343,7 @@ impl ActionsInfo {
     ///
     /// SummaryType if 'a' => Bar relative to max in each team
     /// SummaryType if 'A' => Bar relative to max across both teams
-    pub fn summary_sdl(&self, sx: &mut SdlX, summarytype: char) {
+    pub fn summary_score(&self, sx: &mut SdlX, summarytype: char) {
         // let (amax, bmax) = (20.0, 20.0);
         let (mut amax, mut bmax) = self.players.score_max();
         if summarytype == 'A' {
@@ -362,6 +362,31 @@ impl ActionsInfo {
             sx.wc.set_blend_mode(BlendMode::Blend);
             sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/bmax), 0.04)
         }
+    }
+
+    pub fn summary_dist(&self, sx: &mut SdlX, summarytype: char) {
+        // let (amax, bmax) = (20.0, 20.0);
+        let (mut amax, mut bmax) = self.players.dist_max();
+        if summarytype == 'A' {
+            amax = amax.max(bmax);
+            bmax = amax;
+        }
+        for i in 0..self.players.aplayers.len() {
+            let player = &self.players.aplayers[i];
+            sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
+            sx.wc.set_blend_mode(BlendMode::Blend);
+            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1.dist/amax), 0.04)
+        }
+        for i in 0..self.players.bplayers.len() {
+            let player = &self.players.bplayers[i];
+            sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
+            sx.wc.set_blend_mode(BlendMode::Blend);
+            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.dist/bmax), 0.04)
+        }
+    }
+
+    pub fn summary_sdl(&self, sx: &mut SdlX, summarytype: char) {
+        self.summary_dist(sx, summarytype);
     }
 
     pub fn summary(&self) {
