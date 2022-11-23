@@ -136,7 +136,7 @@ impl Players {
         let dx = npos.0-opos.0;
         let dy = npos.1-opos.1;
         let d = dx*dx + dy*dy;
-        player.1.dist += d;
+        player.1.dist += d.sqrt();
         player.2 = npos;
     }
 
