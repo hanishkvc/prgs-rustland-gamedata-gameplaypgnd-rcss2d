@@ -153,7 +153,7 @@ impl<'a> GEntity<'a> {
         let nh = sx.n2s.o2dy(self.width_height.1 as f32);
         let nhw = nw/2.0;
         let nhh = nh/2.0;
-        let hlw = nh*0.1;
+        let hlw = nh*0.2;
         let vlw = hlw*(nh/nw); // nw*0.2;
         //eprintln!("DBUG:PPGND:GEntity:DrawOuterLines:{}=>{},{}=>{},{}-{}",self.width_height.0, nw, self.width_height.1, nh, vlw, hlw);
         // Top line
