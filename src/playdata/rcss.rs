@@ -28,7 +28,8 @@ pub fn handle_state(state: u32) -> (Action, Card) {
         card = Card::Red;
     } else if state & STATE_YELLOWCARD == STATE_YELLOWCARD {
         card = Card::Yellow;
-    } else if state & STATE_KICK == STATE_KICK {
+    }
+    if state & STATE_KICK == STATE_KICK {
         action = Action::Kick(true);
     } else if state & STATE_KICK_FAULT == STATE_KICK_FAULT {
         action = Action::Kick(false);
