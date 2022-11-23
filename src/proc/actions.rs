@@ -8,6 +8,7 @@
 //! * Add support for providing scores for tackle/catch/etal
 //!
 
+use loggerk::{ldebug, log_d};
 use sdl2::{pixels::Color, render::BlendMode};
 
 use crate::sdlx::SdlX;
@@ -118,7 +119,7 @@ impl Players {
                 player.1.tackles += 1;
             },
         }
-        eprintln!("DBUG:{}:{}:{}:{}", MTAG, side, playerid, stype);
+        ldebug!(&format!("DBUG:{}:{}:{}:{}", MTAG, side, playerid, stype));
     }
 
     fn dist_update_from_pos(&mut self, side: char, playerid: usize, npos: Pos) {
@@ -244,7 +245,7 @@ impl ActionsInfo {
                     if prev.action == kick.action {
                         let dtime = kick.time as isize - prev.time as isize;
                         if dtime < SELF_PASS_MINTIME {
-                            eprintln!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, kick.side, kick.playerid, prev.time, kick.time, dtime);
+                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, kick.side, kick.playerid, prev.time, kick.time, dtime));
                             return;
                         }
                     }
@@ -271,7 +272,7 @@ impl ActionsInfo {
                     if prev.action == tackle.action {
                         let dtime = tackle.time as isize - prev.time as isize;
                         if dtime < REPEAT_TACKLE_MINTIME {
-                            eprintln!("DBUG:{}:{}:{}:Skipping TOO SOON repeat tackle????:{}:{}:{}", MTAG, tackle.side, tackle.playerid, prev.time, tackle.time, dtime);
+                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat tackle????:{}:{}:{}", MTAG, tackle.side, tackle.playerid, prev.time, tackle.time, dtime));
                             return;
                         }
                     }

@@ -48,14 +48,14 @@ impl SdlX {
     /// If required pass hint to WM during window creation, that
     /// we dont want to participate in _NET_WM_PING mechanism
     ///
-    pub fn init_plus(width: u32, height: u32, ignore_wmping: bool) -> SdlX {
+    pub fn init_plus(title: &str, width: u32, height: u32, ignore_wmping: bool) -> SdlX {
         let ctxt = sdl2::init().unwrap();
         // Setup window
         let vs = ctxt.video().unwrap();
         if ignore_wmping {
             sdl2::hint::set(&String::from_utf8(sdl2::sys::SDL_HINT_VIDEO_X11_NET_WM_PING.to_vec()).unwrap(), "0");
         }
-        let win = vs.window("Playback", width, height).build().unwrap();
+        let win = vs.window(title, width, height).build().unwrap();
         let wc = win.into_canvas().build().unwrap();
         let wctc = wc.texture_creator();
         // Setup events

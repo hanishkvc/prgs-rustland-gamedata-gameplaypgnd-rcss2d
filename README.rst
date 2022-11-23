@@ -128,7 +128,7 @@ One can use the following keys to control the behaviour as noted below.
 
 * d -> enters internal-debug-mode
 
-  * d -> to dump current data associated with entities in the playground
+  * e -> to dump current data associated with entities in the playground
 
     * ie players, ball, msgs, actions info, ...
 
@@ -140,6 +140,12 @@ One can use the following keys to control the behaviour as noted below.
 
   * NOTE: Pressing <a> when already in <a> mode, clears it. Same with <A>.
     However pressing <a> when in <A> or otherway, changes the summary type.
+
+  * d -> to show ActionsInfo relative distance traversed summary based on
+    most distance traversed wrt own team players.
+
+  * D -> to show ActionsInfo relative distance traversed summary based on
+    most distance traversed across both teams.
 
   * any other key -> exit internal-debug-mode
 
@@ -179,6 +185,18 @@ to map to different player performance and or other characteristics
   Currently it is mapped to actions like kick, tackle, catch
 
 
+Notes
+#######
+
+During a pass, if the recieving player foolishly or due to lack of experience
+/skills, fails to take the pass, currently the logic will only penalise the
+sender of the pass and not the failed reciever. Which in a way may be fine,
+in real world as the sender should know whether the receiver is capable or
+not, in a way to an extent !?! However wrt current robocup teams, I may have
+to look at position of ball and players and inturn penalise really nearby
+players, during a failed/bad pass to some extent ???
+
+
 Changelog
 ###########
 
@@ -194,4 +212,8 @@ internal exploration on top of the same
 * add support for opting out of WM_PING mechanism in sdl helper
 
 * consume all events before handling the playback and related logic
+
+Infer passes and their success or failure and inturn score the same. Also track
+the distance moved/traversed by players. Allow comparing these wrt best in same
+team as well as across both teams.
 

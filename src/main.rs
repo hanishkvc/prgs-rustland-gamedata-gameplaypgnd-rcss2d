@@ -46,10 +46,10 @@ struct Gui<'a> {
     pgentities: PGEntities<'a>,
     /// Playdata source
     pdata: Box<dyn PlayData>,
-    /// Show ActionsInfo summary
-    showinfoactions: bool,
-    /// ActionsInfo summary type
-    actionsinfo_summarytype: char,
+    /// Show ActionsInfo Scores summary
+    showaiscores: bool,
+    /// ActionsInfo Scores summary type
+    aiscores_summarytype: char,
     /// ActionsInfo Distances summary show
     showaidistances: bool,
     /// ActionsInfo Distances summary type
@@ -99,8 +99,8 @@ impl<'a> Gui<'a> {
             curframetime: ctime,
             pgentities: pgentities,
             pdata: pdata,
-            showinfoactions: false,
-            actionsinfo_summarytype: 'a',
+            showaiscores: false,
+            aiscores_summarytype: 'a',
             showaidistances: false,
             aidistances_summarytype: 'd',
         };
@@ -235,7 +235,7 @@ fn main() {
         std::process::exit(10);
     }
     let font = font.unwrap();
-    let mut sx = sdlx::SdlX::init_plus(entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, false);
+    let mut sx = sdlx::SdlX::init_plus("PlaybackPGND", entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, false);
 
     // Get the gui program related entity
     let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32, &font);
@@ -268,12 +268,12 @@ fn main() {
                 },
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
                 keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
-                keys::ProgramEvent::DumpActionsInfoSummary(summarytype) => {
+                keys::ProgramEvent::DumpAIScoresSummary(summarytype) => {
                     gui.pgentities.actionsinfo.summary();
-                    if gui.actionsinfo_summarytype == summarytype {
-                        gui.showinfoactions = !gui.showinfoactions;
+                    if gui.aiscores_summarytype == summarytype {
+                        gui.showaiscores = !gui.showaiscores;
                     }
-                    gui.actionsinfo_summarytype = summarytype;
+                    gui.aiscores_summarytype = summarytype;
                 },
                 keys::ProgramEvent::DumpAIDistancesSummary(summarytype) => {
                     if gui.aidistances_summarytype == summarytype {
@@ -314,8 +314,8 @@ fn main() {
         }
 
         // Draw info
-        if gui.showinfoactions {
-            gui.pgentities.actionsinfo.summary_score_sdl(&mut sx, gui.actionsinfo_summarytype);
+        if gui.showaiscores {
+            gui.pgentities.actionsinfo.summary_score_sdl(&mut sx, gui.aiscores_summarytype);
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);

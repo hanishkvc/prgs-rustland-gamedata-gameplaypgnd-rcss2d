@@ -22,7 +22,7 @@ pub enum ProgramEvent {
     AdjustFPS(f32),
     SendRecordCoded(isize),
     DumpPGEntities,
-    DumpActionsInfoSummary(char),
+    DumpAIScoresSummary(char),
     DumpAIDistancesSummary(char),
     Quit,
     NeedMore,
@@ -67,9 +67,9 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
         },
         Keycode::A => {
             if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
-                return ProgramEvent::DumpActionsInfoSummary('A');
+                return ProgramEvent::DumpAIScoresSummary('A');
             } else {
-                return ProgramEvent::DumpActionsInfoSummary('a');
+                return ProgramEvent::DumpAIScoresSummary('a');
             }
         },
         Keycode::D => {
