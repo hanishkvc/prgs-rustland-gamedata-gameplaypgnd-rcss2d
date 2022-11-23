@@ -12,7 +12,7 @@ use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
 use crate::proc::actions::{ActionsInfo, ActionData};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
-use crate::playdata::{PlayerCodedData, self};
+use crate::playdata::{PlayerCodedData, self, Action};
 
 
 
@@ -56,12 +56,18 @@ impl<'a> Team<'a> {
     }
 
     pub fn update(&mut self, timecounter: usize, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, actionsinfo: &mut ActionsInfo) {
+        let side = self.name.chars().nth(0).unwrap();
         for player in playersdata {
             ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, player));
             let pi = player.0 as usize;
+            let mut px = 0.0;
+            let mut py = 0.0;
+            let mut pact = Action::None;
             for pd in player.1 {
                 match pd {
                     playdata::PlayerData::Pos(fx, fy) => {
+                        px = fx;
+                        py = fy;
                         // Position
                         if babsolute {
                             self.players[pi].pos_set_abs(fx, fy);
@@ -98,12 +104,10 @@ impl<'a> Team<'a> {
                         self.players[pi].set_bl_color(card_color);
                     },
                     playdata::PlayerData::Action(action) => {
-                        let side = self.name.chars().nth(0).unwrap();
                         let mut action_color = match action {
                             playdata::Action::Kick(good) => {
                                 if good {
-                                    // TODO: Need to handle/update position
-                                    actionsinfo.handle_kick(ActionData::new(timecounter, side, pi, (0.0,0.0), action));
+                                    pact = action;
                                     Color::BLUE
                                 } else {
                                     Color::GRAY
@@ -111,7 +115,7 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Catch(good) => {
                                 if good {
-                                    actionsinfo.handle_catch(ActionData::new(timecounter, side, pi, (0.0,0.0), action));
+                                    pact = action;
                                     Color::WHITE
                                 } else {
                                     Color::GRAY
@@ -119,7 +123,7 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Tackle(good) => {
                                 if good {
-                                    actionsinfo.handle_tackle(ActionData::new(timecounter, side, pi, (0.0,0.0), action));
+                                    pact = action;
                                     Color::CYAN
                                 } else {
                                     Color::GRAY
@@ -134,6 +138,7 @@ impl<'a> Team<'a> {
                     }
                 }
             }
+            actionsinfo.handle_action(ActionData::new(timecounter, side, pi, (px,py), pact));
         }
     }
 

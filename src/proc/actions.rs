@@ -245,6 +245,23 @@ impl ActionsInfo {
         self.players.count_increment(catch.side, catch.playerid, Action::Catch(true));
     }
 
+    pub fn handle_action(&mut self, actiond: ActionData) {
+        match actiond.action {
+            Action::Kick(_) => {
+                self.handle_kick(actiond);
+            },
+            Action::Tackle(_) => {
+                self.handle_tackle(actiond);
+            },
+            Action::Catch(_) => {
+                self.handle_catch(actiond);
+            },
+            Action::None => {
+
+            }
+        }
+    }
+
     #[allow(dead_code)]
     fn summary_simple(&self) {
         for i in 0..self.players.aplayers.len() {
