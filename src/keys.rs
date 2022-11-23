@@ -3,7 +3,7 @@
 //! HanishKVC, 2022
 //!
 
-use sdl2::keyboard::Keycode;
+use sdl2::keyboard::{Keycode, Mod};
 
 use crate::sdlx::SdlX;
 
@@ -20,7 +20,7 @@ pub enum ProgramEvent {
     AdjustFPS(f32),
     SendRecordCoded(isize),
     DumpPGEntities,
-    DumpPasses,
+    DumpActionsInfoSummary(char),
     Quit,
     NeedMore,
 }
@@ -57,13 +57,17 @@ fn handle_c_cmds(keycode: Keycode) -> ProgramEvent {
     return ProgramEvent::None;
 }
 
-fn handle_d_cmds(keycode: Keycode) -> ProgramEvent {
+fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
     match keycode {
         Keycode::E => {
             return ProgramEvent::DumpPGEntities;
         },
-        Keycode::P => {
-            return ProgramEvent::DumpPasses;
+        Keycode::A => {
+            if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
+                return ProgramEvent::DumpActionsInfoSummary('A');
+            } else {
+                return ProgramEvent::DumpActionsInfoSummary('a');
+            }
         },
         _ => (),
     }
@@ -73,11 +77,10 @@ fn handle_d_cmds(keycode: Keycode) -> ProgramEvent {
 pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
     for ev in sx.ep.poll_iter() {
         use sdl2::event::Event;
-        use sdl2::keyboard::Mod;
         if skey.len() > 0 {
             match ev {
                 Event::Quit { timestamp: _} => return ProgramEvent::Quit,
-                Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod: _, repeat: _ } => {
+                Event::KeyDown { timestamp: _, window_id: _, keycode, scancode: _, keymod, repeat: _ } => {
                     let mut pev = ProgramEvent::None;
                     if skey == "s" {
                         pev = handle_s_cmds(keycode.unwrap());
@@ -86,7 +89,7 @@ pub fn get_programevents(sx: &mut SdlX, skey: &mut String) -> ProgramEvent {
                         pev = handle_c_cmds(keycode.unwrap());
                     }
                     if skey == "d" {
-                        pev = handle_d_cmds(keycode.unwrap());
+                        pev = handle_d_cmds(keycode.unwrap(), keymod);
                     }
                     if let ProgramEvent::None = pev {
                         skey.clear();

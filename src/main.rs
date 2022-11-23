@@ -46,8 +46,10 @@ struct Gui<'a> {
     pgentities: PGEntities<'a>,
     /// Playdata source
     pdata: Box<dyn PlayData>,
-    /// Show Passes summary
+    /// Show ActionsInfo summary
     showinfoactions: bool,
+    /// ActionsInfo summary type
+    actionsinfo_summarytype: char,
 }
 
 impl<'a> Gui<'a> {
@@ -94,6 +96,7 @@ impl<'a> Gui<'a> {
             pgentities: pgentities,
             pdata: pdata,
             showinfoactions: false,
+            actionsinfo_summarytype: 'a',
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -259,9 +262,12 @@ fn main() {
                 },
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
                 keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
-                keys::ProgramEvent::DumpPasses => {
+                keys::ProgramEvent::DumpActionsInfoSummary(summarytype) => {
                     gui.pgentities.actionsinfo.summary();
-                    gui.showinfoactions = !gui.showinfoactions;
+                    if gui.actionsinfo_summarytype == summarytype {
+                        gui.showinfoactions = !gui.showinfoactions;
+                    }
+                    gui.actionsinfo_summarytype = summarytype;
                 }
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),
@@ -297,7 +303,7 @@ fn main() {
 
         // Draw info
         if gui.showinfoactions {
-            gui.pgentities.actionsinfo.summary_sdl(&mut sx);
+            gui.pgentities.actionsinfo.summary_sdl(&mut sx, gui.actionsinfo_summarytype);
         }
 
         // Present screen update to user

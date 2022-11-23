@@ -276,12 +276,19 @@ impl ActionsInfo {
         }
     }
 
-    /// Graphics Summary (a relative graph)
+    /// Graphics Summary (a relative performance graph)
     /// Take the max score across players wrt each team and
     /// plot score bar relative to that max score.
-    pub fn summary_sdl(&self, sx: &mut SdlX) {
+    ///
+    /// SummaryType if 'a' => Bar relative to max in each team
+    /// SummaryType if 'A' => Bar relative to max across both teams
+    pub fn summary_sdl(&self, sx: &mut SdlX, summarytype: char) {
         // let (amax, bmax) = (20.0, 20.0);
-        let (amax, bmax) = self.players.score_max();
+        let (mut amax, mut bmax) = self.players.score_max();
+        if summarytype == 'A' {
+            amax = amax.max(bmax);
+            bmax = amax;
+        }
         for i in 0..self.players.aplayers.len() {
             let player = &self.players.aplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
