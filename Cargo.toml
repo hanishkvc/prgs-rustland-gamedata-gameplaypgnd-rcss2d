@@ -12,7 +12,7 @@ license = "GPL-3.0-or-later"
 inbetween_frames = []
 
 [dependencies]
-sdl2 = { version="0.35.2", features = ["gfx", "ttf", "image"] }
+sdl2 = { version="0.35.2", features = ["gfx", "ttf"] }
 rand = "0.8.5"
 tokensk = { git="https://github.com/hanishkvc/prgs-rustland-libs-tokensk" }
 #tokensk = { path="../../tokensk" }
