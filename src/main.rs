@@ -238,24 +238,26 @@ fn main() {
         sx.n_msg(entities::MSG_FPS_POS.0, entities::MSG_FPS_POS.1, &format!("[{}] [{},{}]", skey, &gui.pgentities.fps().round(), gui.actualfps), sdlx::Color::BLUE);
 
         // handle any pending/queued program events
-        let prgev= keys::get_programevents(&mut sx, &mut skey);
-        match prgev {
-            keys::ProgramEvent::None => (),
-            keys::ProgramEvent::Pause => gui.pause = !gui.pause,
-            keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
-            keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
-            keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
-            keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
-            keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
-            keys::ProgramEvent::SeekBackward => gui.pdata.seek(-50),
-            keys::ProgramEvent::SeekForward => gui.pdata.seek(50),
-            keys::ProgramEvent::AdjustFPS(ratio) => {
-                gui.fps_adjust(ratio);
-            },
-            keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
-            keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
-            keys::ProgramEvent::Quit => break 'mainloop,
-            keys::ProgramEvent::NeedMore => (),
+        'eventloop: loop {
+            let prgev= keys::get_programevents(&mut sx, &mut skey);
+            match prgev {
+                keys::ProgramEvent::None => break 'eventloop,
+                keys::ProgramEvent::Pause => gui.pause = !gui.pause,
+                keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
+                keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
+                keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
+                keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
+                keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
+                keys::ProgramEvent::SeekBackward => gui.pdata.seek(-50),
+                keys::ProgramEvent::SeekForward => gui.pdata.seek(50),
+                keys::ProgramEvent::AdjustFPS(ratio) => {
+                    gui.fps_adjust(ratio);
+                },
+                keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
+                keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
+                keys::ProgramEvent::Quit => break 'mainloop,
+                keys::ProgramEvent::NeedMore => (),
+            }
         }
 
         // Update the entities
