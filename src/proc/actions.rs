@@ -365,23 +365,32 @@ impl ActionsInfo {
     }
 
     pub fn summary_dist(&self, sx: &mut SdlX, summarytype: char) {
-        // let (amax, bmax) = (20.0, 20.0);
         let (mut amax, mut bmax) = self.players.dist_max();
         if summarytype == 'A' {
             amax = amax.max(bmax);
             bmax = amax;
         }
+        let xs = 0.05;
+        let xw = 0.4;
+        let xu = xw/self.players.aplayers.len() as f32;
+        let yb = 0.8;
+        let yh = 0.1;
         for i in 0..self.players.aplayers.len() {
             let player = &self.players.aplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1.dist/amax), 0.04)
+            let x = xs + (i as f32 * xu);
+            let yh = yh*(player.1.dist/amax);
+            sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
+        let xs = 0.55;
         for i in 0..self.players.bplayers.len() {
             let player = &self.players.bplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.dist/bmax), 0.04)
+            let x = xs + (i as f32 * xu);
+            let yh = yh*(player.1.dist/bmax);
+            sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
     }
 
