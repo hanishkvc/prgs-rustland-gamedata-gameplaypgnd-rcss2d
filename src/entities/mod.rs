@@ -45,6 +45,7 @@ pub mod objects;
 use objects::Ball;
 use objects::FixedPosMessage;
 pub mod simobjs;
+use simobjs::SimBall;
 
 
 #[derive(Debug)]
@@ -68,6 +69,11 @@ pub(crate) struct PGEntities<'a> {
     pub showxtrapitchmarkers: bool,
     /// Info from Data
     pub actionsinfo: ActionsInfo,
+    /// A simulated / interpolated ball
+    /// The graphical simulated ball on the screen
+    oball: Ball<'a>,
+    /// The SimBall object containing the key position datas wrt the ball.
+    simball: Option<SimBall>,
 }
 
 impl<'a> PGEntities<'a> {
@@ -98,6 +104,8 @@ impl<'a> PGEntities<'a> {
             vfpmsgs: vfpmsgs,
             ball: Ball::new(font),
             showball: true,
+            oball: Ball::new(font),
+            simball: None,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
             pitch: pitch,
@@ -130,6 +138,11 @@ impl<'a> PGEntities<'a> {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);
         }
+        if self.simball.is_some() {
+            let simball = self.simball.as_mut().unwrap();
+            let bpos = simball.next_record(pu.timecounter);
+            self.oball.update(bpos, babsolute, inframes);
+        }
         self.ball.update(pu.ball, babsolute, inframes);
         self.ateam.update(pu.timecounter, pu.ateamcoded, babsolute, inframes, &mut self.actionsinfo);
         self.bteam.update(pu.timecounter, pu.bteamcoded, babsolute, inframes, &mut self.actionsinfo);
@@ -138,6 +151,9 @@ impl<'a> PGEntities<'a> {
     /// If using interpolated updating of object positions,
     /// request them to generate their next interpolated position.
     pub fn next_frame(&mut self) {
+        if self.simball.is_some() {
+            self.oball.next_frame();
+        }
         self.ball.next_frame();
         self.ateam.next_frame();
         self.bteam.next_frame();
@@ -178,13 +194,19 @@ impl<'a> PGEntities<'a> {
         if self.showball {
             self.ball.draw(sx);
         }
+        if self.simball.is_some() {
+            self.oball.draw(sx);
+        }
     }
 
 }
 
 impl<'a> PGEntities<'a> {
 
-    pub fn adjust_teams(&mut self) {
+    pub fn adjust_members(&mut self, simball_fname: &str) {
+        if simball_fname.len() > 0 {
+            self.simball = Some(SimBall::new(simball_fname));
+        }
         self.ateam.adjust_players(0x0e); //9
         self.bteam.adjust_players(0x0e); //3
     }

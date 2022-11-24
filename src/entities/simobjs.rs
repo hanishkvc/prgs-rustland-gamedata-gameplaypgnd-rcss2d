@@ -3,8 +3,9 @@
 //! HanishKVC, 2022
 //!
 
+#[derive(Debug)]
 /// A interpolated ball
-struct SimBall {
+pub struct SimBall {
     vdata: Vec<String>,
     vin: usize,
     ltime: usize,
