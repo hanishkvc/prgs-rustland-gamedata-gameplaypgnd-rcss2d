@@ -14,13 +14,13 @@ crun:
 	cargo run --release
 
 rclive:
-	target/release/playbackpgnd live
+	target/release/playbackpgnd --mode rclive
 
 test1:
-	target/release/playbackpgnd gamedata/20210626230154-ThunderLeague_21-vs-Hades2D_0.rcg
+	target/release/playbackpgnd --mode rcg --src gamedata/20210626230154-ThunderLeague_21-vs-Hades2D_0.rcg
 
 test2:
-	target/release/playbackpgnd gamedata/20221118233608-tm01_3-vs-tm02_1.rcg
+	target/release/playbackpgnd --mode rcg --src gamedata/20221118233608-tm01_3-vs-tm02_1.rcg
 
 rgb2png:
 	gm convert -size 1024x600 -depth 8 -format rgb /tmp/ppgnd010.rgb /tmp/test.png

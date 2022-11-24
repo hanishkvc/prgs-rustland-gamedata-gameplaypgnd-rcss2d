@@ -42,20 +42,23 @@ Cmdline arg
 Rcg Playback
 --------------
 
-Pass the rcss rcg file as the 1st and only argument to the program.
+--mode rcg --src <path/file>
+
+Set the mode and specify the rcss rcg file as mentioned above.
 This will playback the contents of the rcg file.
 
-Live
-------
+RC Live
+--------
 
-By passing live as the 1st argument to the program, one can make the program
-work as a simple and currently very minimal robocup soccer sim monitor.
+--mode rclive [--src <nw address>]
+
+This runs the program as a simple and minimal robocup soccer sim monitor.
 It can be used to watch a game live as well as kick-start(kick-off) wrt the
 2 halfs+ if & when needed.
 
-One can pass a 2nd argument to the program, following live, and it will be
-used as the address of the robocup server to connect to. Else it will try
-to connect to the server on port 6000 on the local machine.
+If the --src argument is specified, it will be used as the address of the
+robocup server to connect to. Else it will try to connect to the server on
+port 6000 on the local machine.
 
 NOTE: Ideally one needs to start the rc server first, before starting this
 program, this will ensure tha tthe initial init handshake that is sent when
@@ -70,6 +73,18 @@ From then on this program cant connect to a freshly/newly started server, as
 the internally stored server address has changed. So If one wants to connect
 to new rc server again, after a previous successful handshake + msg, one needs
 to quit this program and start it fresh again.
+
+Saving playback frames
+-----------------------
+
+--save_interval <OnceEvery???Frames>
+
+Fps
+------
+
+--fps <The.Fps>
+
+Current flow, overrides this with the fps suggested by playdata source.
 
 
 Keys
@@ -200,7 +215,9 @@ players, during a failed/bad pass to some extent ???
 Changelog
 ###########
 
-20221123
+Look at git log in general, the below captures things only sometimes.
+
+20221123++
 ============
 
 Patched the latest external release wrt below and inturn rebased the currently
@@ -216,4 +233,6 @@ internal exploration on top of the same
 Infer passes and their success or failure and inturn score the same. Also track
 the distance moved/traversed by players. Allow comparing these wrt best in same
 team as well as across both teams.
+
+Add support for tagged commandline arguments.
 

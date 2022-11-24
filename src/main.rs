@@ -3,7 +3,6 @@
 //! HanishKVC, 2022
 //!
 
-use std::env;
 use std::time;
 
 use sdl2::pixels::Color;
@@ -149,8 +148,7 @@ impl<'a> Gui<'a> {
         let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, cfg.fps, font);
         pgentities.adjust_teams();
         // Playdata source
-        let clargs = env::args().collect::<Vec<String>>();
-        let (pdata, showhelp) = pdata_source(&clargs, pgentities.fps());
+        let (pdata, showhelp) = pdata_source(cfg, pgentities.fps());
 
         let ctime = time::Instant::now();
         let mut gui = Gui {
@@ -250,35 +248,28 @@ fn identify() {
 }
 
 ///
-/// Setup the playdata source based on passed args.
-/// * if no args, then start the random playdata source
-/// * if live passed as 1st arg to program, then try to
-///   connect to a running rcssserver.
-///   * if a 2nd argument is passed, use it has the nw
-///     address of the server to connect to.
-///   * else use the default address specified in rclive.
-/// * else use the 1st argument as the rcg file to playback.
+/// Setup the playdata source based on passed args,
+/// which have been processed into a Cfg struct.
+/// * mode:rclive: connect to a running rcssserver
+///   * if src specified, use has nw address of server to connect to
+///   * else use a default nw address specified in the program
+/// * mode:rcg: playback the rcg file specified using --src arg to prg.
+/// * mode:default: start the random playdata source
 ///
 /// Return the playdata source and whether help msgbox should be shown
 ///
-fn pdata_source(vargs: &Vec<String>, fps: f32) -> (Box<dyn PlayData>, bool) {
-    let src;
-    if vargs.len() > 1 {
-        src = vargs[1].as_str();
-    } else {
-        src = "";
-    }
-    if src == "live" {
+fn pdata_source(cfg: &Cfg, fps: f32) -> (Box<dyn PlayData>, bool) {
+    if cfg.mode == "rclive" {
         let nwaddr;
-        if vargs.len() > 2 {
-            nwaddr = vargs[2].as_str();
+        if cfg.src.len() > 2 {
+            nwaddr = cfg.src.as_str();
         } else {
             nwaddr = rclive::NWADDR_DEFAULT;
         }
         let pdrcl = RCLive::new(nwaddr);
         return (Box::new(pdrcl), false);
-    } else if src.len() > 0 {
-        let pdrcg = Rcg::new(src, fps);
+    } else if cfg.mode == "rcg" {
+        let pdrcg = Rcg::new(&cfg.src, fps);
         return (Box::new(pdrcg), false);
     } else {
         let pdrandom = RandomData::new(1.0/24.0, 11, 11);
