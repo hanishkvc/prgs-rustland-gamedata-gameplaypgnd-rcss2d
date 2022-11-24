@@ -128,6 +128,8 @@ struct Gui<'a> {
     showaidistances: bool,
     /// ActionsInfo Distances summary type
     aidistances_summarytype: char,
+    /// Whether virtball.csv file is already created or not
+    saved_virtball_csv: bool,
 }
 
 impl<'a> Gui<'a> {
@@ -176,6 +178,7 @@ impl<'a> Gui<'a> {
             aiscores_summarytype: 'a',
             showaidistances: false,
             aidistances_summarytype: 'd',
+            saved_virtball_csv: false,
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -289,7 +292,6 @@ fn pdata_source(cfg: &Cfg, fps: f32) -> (Box<dyn PlayData>, bool) {
 
 
 fn main() {
-    let mut saved_virtball = false;
     log_init();
     identify();
 
@@ -373,9 +375,9 @@ fn main() {
                     gui.pgentities.update(pu, true, 0.0);
                 }
             } else {
-                if !saved_virtball {
+                if !gui.saved_virtball_csv {
                     gui.pgentities.save_virtball_csv();
-                    saved_virtball = true;
+                    gui.saved_virtball_csv = true;
                 }
             }
         }

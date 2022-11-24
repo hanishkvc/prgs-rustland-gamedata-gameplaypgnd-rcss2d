@@ -58,6 +58,9 @@ impl VirtBall {
             }
             let sdata = &self.vdata[self.vin];
             self.vin += 1;
+            if sdata.trim().len() == 0 {
+                break;
+            }
             let sdata = sdata.split(',').collect::<Vec<&str>>();
             self.ltime = sdata[0].parse().unwrap();
             let fx = sdata[1].parse().unwrap();

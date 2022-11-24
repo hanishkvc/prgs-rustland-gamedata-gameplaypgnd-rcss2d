@@ -232,6 +232,12 @@ kick, tackle, catch, etal to interpolate a virtual ball.
 Use a two pass flow, where 1st capture the useful ball related game actions
 and inturn use it to visualise a virtual ball using interpolation.
 
+When the playdata source indicates that the playback has reached the end, the
+logic will automatically capture the required actions related data, into a
+tmp file.
+
+NOTE: The logic doesnt account for seeking in general, currently.
+
 
 Changelog
 ###########
