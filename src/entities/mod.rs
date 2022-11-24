@@ -221,4 +221,14 @@ impl<'a> PGEntities<'a> {
         self.bteam.toggle_bshowactions();
     }
 
+    pub fn save_simball_csv(&mut self) {
+        let mut sdata = String::new();
+        let actions = &self.actionsinfo.actions;
+        for i in 0..actions.len() {
+            let action = &actions[i];
+            sdata.push_str(&format!("{},{},{}\n", action.time, action.pos.0, action.pos.1));
+        }
+        std::fs::write("/tmp/simball.csv", sdata).unwrap();
+    }
+
 }

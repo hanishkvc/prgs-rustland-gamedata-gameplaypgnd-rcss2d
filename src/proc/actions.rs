@@ -184,11 +184,11 @@ impl Players {
 
 #[derive(Debug)]
 pub struct ActionData {
-    time: usize,
+    pub time: usize,
     side: char,
     playerid: usize,
     #[allow(dead_code)]
-    pos: (f32, f32),
+    pub pos: (f32, f32),
     action: Action,
 }
 
@@ -209,7 +209,7 @@ impl ActionData {
 #[derive(Debug)]
 pub struct ActionsInfo {
     players: Players,
-    actions: Vec<ActionData>,
+    pub actions: Vec<ActionData>,
 }
 
 impl ActionsInfo {

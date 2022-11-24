@@ -287,6 +287,7 @@ fn pdata_source(cfg: &Cfg, fps: f32) -> (Box<dyn PlayData>, bool) {
 
 
 fn main() {
+    let mut saved_simball = false;
     log_init();
     identify();
 
@@ -368,6 +369,11 @@ fn main() {
                 } else {
                     let pu = gui.pdata.next_record();
                     gui.pgentities.update(pu, true, 0.0);
+                }
+            } else {
+                if !saved_simball {
+                    gui.pgentities.save_simball_csv();
+                    saved_simball = true;
                 }
             }
         }
