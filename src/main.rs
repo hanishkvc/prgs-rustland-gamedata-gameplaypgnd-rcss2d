@@ -31,6 +31,7 @@ struct Cfg {
     src: String,
     save_interval: usize,
     fps: f32,
+    fsimball: String,
 }
 
 impl Cfg {
@@ -53,6 +54,7 @@ impl Cfg {
             src: String::new(),
             save_interval: 0,
             fps: entities::FRAMES_PER_SEC as f32,
+            fsimball: String::new(),
         };
 
         let mut ca = ArgsCmdLineSimpleManager::new();
@@ -80,6 +82,12 @@ impl Cfg {
             return 1;
         };
         ca.add_handler("--fps", &mut handle_saveinterval);
+
+        let mut handle_simball = |iarg: usize, args: &Vec<String>| -> usize {
+            cfg.fsimball = args[iarg+1].to_string();
+            return 1;
+        };
+        ca.add_handler("--simball", &mut handle_simball);
 
         ca.process_args();
 
@@ -146,7 +154,7 @@ impl<'a> Gui<'a> {
     fn new(cfg: &Cfg, font: &'a Font) -> Gui<'a> {
         // PGEntities
         let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, cfg.fps, font);
-        pgentities.adjust_teams();
+        pgentities.adjust_members(&cfg.fsimball);
         // Playdata source
         let (pdata, showhelp) = pdata_source(cfg, pgentities.fps());
 
