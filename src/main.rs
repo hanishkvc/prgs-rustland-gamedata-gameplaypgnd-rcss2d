@@ -326,7 +326,7 @@ fn main() {
         sx.wc.present();
 
         // Save raw screen data
-        if (gui.frame % 1) == 0 {
+        if (gui.frame % 10) == 0 {
             let imgdata = sx.wc.read_pixels(Some(Rect::new(0,0,entities::SCREEN_WIDTH,entities::SCREEN_HEIGHT)), sdl2::pixels::PixelFormatEnum::RGB24).unwrap();
             std::fs::write(&format!("/tmp/ppgnd{:04}.rgb", gui.frame), imgdata).unwrap();
         }
