@@ -12,6 +12,7 @@ pub struct SimBall {
     lpos: (f32, f32),
     cpos: (f32, f32),
     mov: (f32, f32),
+    lastgentime: usize,
 }
 
 impl SimBall {
@@ -30,10 +31,15 @@ impl SimBall {
             lpos: (0.0, 0.0),
             cpos: (0.0, 0.0),
             mov: (0.0, 0.0),
+            lastgentime: 0,
         }
     }
 
     pub fn next_record(&mut self, ctime: usize) -> (f32, f32) {
+        if ctime == self.lastgentime {
+            return self.cpos;
+        }
+        self.lastgentime = ctime;
         while ctime > self.ltime {
             let sdata = &self.vdata[self.vin];
             self.vin += 1;
