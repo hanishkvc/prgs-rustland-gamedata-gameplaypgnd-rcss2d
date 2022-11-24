@@ -206,7 +206,7 @@ impl<'a> PGEntities<'a> {
     pub fn adjust_members(&mut self, virtball_fname: &str) {
         if virtball_fname.len() > 0 {
             self.virtballd = Some(VirtBall::new(virtball_fname));
-            self.virtballg.set_color(Color::MAGENTA);
+            self.virtballg.set_color(Color::BLACK);
         }
         self.ateam.adjust_players(0x0e); //9
         self.bteam.adjust_players(0x0e); //3
