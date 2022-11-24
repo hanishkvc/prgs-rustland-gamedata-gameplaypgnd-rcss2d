@@ -11,6 +11,7 @@ use sdl2::rect::Rect;
 use sdl2::ttf::Font;
 
 use loggerk::{log_init, ldebug, log_d};
+use argsclsk::ArgsCmdLineSimpleManager;
 
 mod entities;
 mod sdlx;
@@ -25,6 +26,69 @@ use entities::PGEntities;
 mod testlib;
 mod keys;
 mod proc;
+
+struct Cfg {
+    mode: String,
+    src: String,
+    save_interval: usize,
+    fps: f32,
+}
+
+impl Cfg {
+
+    ///
+    /// Parse commandline args to configure the program
+    ///
+    /// --mode random
+    /// --mode rclive [--src <the network addr>]
+    /// --mode rcg --src <path/file>
+    ///
+    /// --save_interval <0 or above> # 0 disable saving playback screen
+    ///
+    /// --fps <playback fps>
+    ///
+    fn load() -> Cfg {
+
+        let mut cfg = Cfg {
+            mode: String::from("random"),
+            src: String::new(),
+            save_interval: 0,
+            fps: entities::FRAMES_PER_SEC as f32,
+        };
+
+        let mut ca = ArgsCmdLineSimpleManager::new();
+
+        let mut handle_mode = |iarg: usize, args: &Vec<String>| -> usize {
+            cfg.mode = args[iarg+1].to_string();
+            return 1;
+        };
+        ca.add_handler("--mode", &mut handle_mode);
+
+        let mut handle_src = |iarg: usize, args: &Vec<String>| -> usize {
+            cfg.src = args[iarg+1].to_string();
+            return 1;
+        };
+        ca.add_handler("--src", &mut handle_src);
+
+        let mut handle_saveinterval = |iarg: usize, args: &Vec<String>| -> usize {
+            cfg.save_interval = args[iarg+1].parse().unwrap();
+            return 1;
+        };
+        ca.add_handler("--save_interval", &mut handle_saveinterval);
+
+        let mut handle_saveinterval = |iarg: usize, args: &Vec<String>| -> usize {
+            cfg.fps = args[iarg+1].parse().unwrap();
+            return 1;
+        };
+        ca.add_handler("--fps", &mut handle_saveinterval);
+
+        ca.process_args();
+
+        cfg
+    }
+
+}
+
 
 struct Gui<'a> {
     /// Whether help msgbox should be shown or not in the current frame
@@ -80,9 +144,9 @@ impl<'a> Gui<'a> {
 
 impl<'a> Gui<'a> {
 
-    fn new(fps: f32, font: &'a Font) -> Gui<'a> {
+    fn new(cfg: &Cfg, font: &'a Font) -> Gui<'a> {
         // PGEntities
-        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, fps, font);
+        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, cfg.fps, font);
         pgentities.adjust_teams();
         // Playdata source
         let clargs = env::args().collect::<Vec<String>>();
@@ -93,7 +157,7 @@ impl<'a> Gui<'a> {
             showhelp: showhelp,
             pause: false,
             frame: 0,
-            frametime: Self::calc_frametime(fps),
+            frametime: Self::calc_frametime(cfg.fps),
             fpsframe: 0,
             fpstime: ctime,
             actualfps: 0,
@@ -238,8 +302,9 @@ fn main() {
     let font = font.unwrap();
     let mut sx = sdlx::SdlX::init_plus("PlaybackPGND", entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, false);
 
+    let cfg = Cfg::load();
     // Get the gui program related entity
-    let mut gui = Gui::new(entities::FRAMES_PER_SEC as f32, &font);
+    let mut gui = Gui::new(&cfg, &font);
 
     // The main loop of the program starts now
     let mut dcolor = 20;
@@ -326,7 +391,7 @@ fn main() {
         sx.wc.present();
 
         // Save raw screen data
-        if (gui.frame % 10) == 0 {
+        if (cfg.save_interval > 0) && ((gui.frame % cfg.save_interval) == 0) {
             let imgdata = sx.wc.read_pixels(Some(Rect::new(0,0,entities::SCREEN_WIDTH,entities::SCREEN_HEIGHT)), sdl2::pixels::PixelFormatEnum::RGB24).unwrap();
             std::fs::write(&format!("/tmp/ppgnd{:04}.rgb", gui.frame), imgdata).unwrap();
         }
