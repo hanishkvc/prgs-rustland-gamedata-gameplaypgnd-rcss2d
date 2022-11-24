@@ -44,6 +44,7 @@ pub mod team;
 pub mod objects;
 use objects::Ball;
 use objects::FixedPosMessage;
+pub mod simobjs;
 
 
 #[derive(Debug)]
