@@ -35,12 +35,27 @@ impl SimBall {
         }
     }
 
+    ///
+    /// Calculate the interpolated position wrt each requested time.
+    /// If the last time is repeated again, the same position is sent.
+    /// If there is no more data, keep the ball moving in the direction
+    /// it already is.
+    ///
+    /// It uses the current position and position of the ball wrt the
+    /// immidiate next action that will be there in the game future, to
+    /// help interpoloate the ball positions. This calculation is repeated/
+    /// done when ever the ball (or rather playback) has just gone past a
+    /// known game action time, wrt the next segment.
+    ///
     pub fn next_record(&mut self, ctime: usize) -> (f32, f32) {
         if ctime == self.lastgentime {
             return self.cpos;
         }
         self.lastgentime = ctime;
         while ctime > self.ltime {
+            if self.vin >= self.vdata.len() {
+                break;
+            }
             let sdata = &self.vdata[self.vin];
             self.vin += 1;
             let sdata = sdata.split(',').collect::<Vec<&str>>();
