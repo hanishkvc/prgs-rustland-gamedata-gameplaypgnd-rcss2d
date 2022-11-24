@@ -45,7 +45,7 @@ pub mod objects;
 use objects::Ball;
 use objects::FixedPosMessage;
 pub mod simobjs;
-use simobjs::SimBall;
+use simobjs::VirtBall;
 
 
 #[derive(Debug)]
@@ -69,11 +69,11 @@ pub(crate) struct PGEntities<'a> {
     pub showxtrapitchmarkers: bool,
     /// Info from Data
     pub actionsinfo: ActionsInfo,
-    /// A simulated / interpolated ball
-    /// The graphical simulated ball on the screen
-    oball: Ball<'a>,
-    /// The SimBall object containing the key position datas wrt the ball.
-    simball: Option<SimBall>,
+    /// A virtual interpolated ball
+    /// The graphical object representing virtual ball on the screen
+    virtballg: Ball<'a>,
+    /// The VirtBall object containing the key position datas wrt the ball.
+    virtballd: Option<VirtBall>,
 }
 
 impl<'a> PGEntities<'a> {
@@ -104,8 +104,8 @@ impl<'a> PGEntities<'a> {
             vfpmsgs: vfpmsgs,
             ball: Ball::new(font),
             showball: true,
-            oball: Ball::new(font),
-            simball: None,
+            virtballg: Ball::new(font),
+            virtballd: None,
             ateam: team::Team::new("ateam", Color::RED, anplayers, font),
             bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
             pitch: pitch,
@@ -138,10 +138,10 @@ impl<'a> PGEntities<'a> {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);
         }
-        if self.simball.is_some() {
-            let simball = self.simball.as_mut().unwrap();
-            let bpos = simball.next_record(pu.timecounter);
-            self.oball.update(bpos, babsolute, inframes);
+        if self.virtballd.is_some() {
+            let virtball = self.virtballd.as_mut().unwrap();
+            let bpos = virtball.next_record(pu.timecounter);
+            self.virtballg.update(bpos, babsolute, inframes);
         }
         self.ball.update(pu.ball, babsolute, inframes);
         self.ateam.update(pu.timecounter, pu.ateamcoded, babsolute, inframes, &mut self.actionsinfo);
@@ -151,8 +151,8 @@ impl<'a> PGEntities<'a> {
     /// If using interpolated updating of object positions,
     /// request them to generate their next interpolated position.
     pub fn next_frame(&mut self) {
-        if self.simball.is_some() {
-            self.oball.next_frame();
+        if self.virtballd.is_some() {
+            self.virtballg.next_frame();
         }
         self.ball.next_frame();
         self.ateam.next_frame();
@@ -194,8 +194,8 @@ impl<'a> PGEntities<'a> {
         if self.showball {
             self.ball.draw(sx);
         }
-        if self.simball.is_some() {
-            self.oball.draw(sx);
+        if self.virtballd.is_some() {
+            self.virtballg.draw(sx);
         }
     }
 
@@ -203,10 +203,10 @@ impl<'a> PGEntities<'a> {
 
 impl<'a> PGEntities<'a> {
 
-    pub fn adjust_members(&mut self, simball_fname: &str) {
-        if simball_fname.len() > 0 {
-            self.simball = Some(SimBall::new(simball_fname));
-            self.oball.set_color(Color::MAGENTA);
+    pub fn adjust_members(&mut self, virtball_fname: &str) {
+        if virtball_fname.len() > 0 {
+            self.virtballd = Some(VirtBall::new(virtball_fname));
+            self.virtballg.set_color(Color::MAGENTA);
         }
         self.ateam.adjust_players(0x0e); //9
         self.bteam.adjust_players(0x0e); //3
@@ -222,14 +222,14 @@ impl<'a> PGEntities<'a> {
         self.bteam.toggle_bshowactions();
     }
 
-    pub fn save_simball_csv(&mut self) {
+    pub fn save_virtball_csv(&mut self) {
         let mut sdata = String::new();
         let actions = &self.actionsinfo.actions;
         for i in 0..actions.len() {
             let action = &actions[i];
             sdata.push_str(&format!("{},{},{}\n", action.time, action.pos.0, action.pos.1));
         }
-        std::fs::write("/tmp/simball.csv", sdata).unwrap();
+        std::fs::write("/tmp/virtball.csv", sdata).unwrap();
     }
 
 }

@@ -31,7 +31,7 @@ struct Cfg {
     src: String,
     save_interval: usize,
     fps: f32,
-    fsimball: String,
+    fvirtball: String,
 }
 
 impl Cfg {
@@ -47,6 +47,8 @@ impl Cfg {
     ///
     /// --fps <playback fps>
     ///
+    /// --virtball <path/virtball.csv>
+    ///
     fn load() -> Cfg {
 
         let mut cfg = Cfg {
@@ -54,7 +56,7 @@ impl Cfg {
             src: String::new(),
             save_interval: 0,
             fps: entities::FRAMES_PER_SEC as f32,
-            fsimball: String::new(),
+            fvirtball: String::new(),
         };
 
         let mut ca = ArgsCmdLineSimpleManager::new();
@@ -83,11 +85,11 @@ impl Cfg {
         };
         ca.add_handler("--fps", &mut handle_saveinterval);
 
-        let mut handle_simball = |iarg: usize, args: &Vec<String>| -> usize {
-            cfg.fsimball = args[iarg+1].to_string();
+        let mut handle_virtball = |iarg: usize, args: &Vec<String>| -> usize {
+            cfg.fvirtball = args[iarg+1].to_string();
             return 1;
         };
-        ca.add_handler("--simball", &mut handle_simball);
+        ca.add_handler("--virtball", &mut handle_virtball);
 
         ca.process_args();
 
@@ -154,7 +156,7 @@ impl<'a> Gui<'a> {
     fn new(cfg: &Cfg, font: &'a Font) -> Gui<'a> {
         // PGEntities
         let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, 11, 11, cfg.fps, font);
-        pgentities.adjust_members(&cfg.fsimball);
+        pgentities.adjust_members(&cfg.fvirtball);
         // Playdata source
         let (pdata, showhelp) = pdata_source(cfg, pgentities.fps());
 
@@ -287,7 +289,7 @@ fn pdata_source(cfg: &Cfg, fps: f32) -> (Box<dyn PlayData>, bool) {
 
 
 fn main() {
-    let mut saved_simball = false;
+    let mut saved_virtball = false;
     log_init();
     identify();
 
@@ -371,9 +373,9 @@ fn main() {
                     gui.pgentities.update(pu, true, 0.0);
                 }
             } else {
-                if !saved_simball {
-                    gui.pgentities.save_simball_csv();
-                    saved_simball = true;
+                if !saved_virtball {
+                    gui.pgentities.save_virtball_csv();
+                    saved_virtball = true;
                 }
             }
         }

@@ -5,7 +5,7 @@
 
 #[derive(Debug)]
 /// A interpolated ball
-pub struct SimBall {
+pub struct VirtBall {
     vdata: Vec<String>,
     vin: usize,
     ltime: usize,
@@ -15,16 +15,16 @@ pub struct SimBall {
     lastgentime: usize,
 }
 
-impl SimBall {
+impl VirtBall {
 
-    pub fn new(fname: &str) -> SimBall {
+    pub fn new(fname: &str) -> VirtBall {
         let sdata = String::from_utf8(std::fs::read(fname).unwrap()).unwrap();
         let tdata = sdata.split('\n').collect::<Vec<&str>>();
         let mut vdata = Vec::new();
         for data in tdata {
             vdata.push(data.to_string());
         }
-        SimBall {
+        VirtBall {
             vdata: vdata,
             vin: 0,
             ltime: 0,

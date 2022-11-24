@@ -3,7 +3,7 @@ Playback Playground
 ####################
 
 Author: HanishKVC
-Version: 20221120IST2244
+Version: 20221124IST2148
 License: GPL-3.0+
 
 
@@ -85,6 +85,15 @@ Fps
 --fps <The.Fps>
 
 Current flow, overrides this with the fps suggested by playdata source.
+
+Virtual ball
+--------------
+
+--virtball <path/virtball.csv>
+
+VirtBall.CSV should be a csv file containing a series of records, consisting
+of time stamp/counter, ball x, ball y. Inturn the logic will show a virtual
+ball, by interpolating where required.
 
 
 Keys
@@ -203,6 +212,9 @@ to map to different player performance and or other characteristics
 Notes
 #######
 
+Scoring wrt Bad pass
+======================
+
 During a pass, if the recieving player foolishly or due to lack of experience
 /skills, fails to take the pass, currently the logic will only penalise the
 sender of the pass and not the failed reciever. Which in a way may be fine,
@@ -210,6 +222,15 @@ in real world as the sender should know whether the receiver is capable or
 not, in a way to an extent !?! However wrt current robocup teams, I may have
 to look at position of ball and players and inturn penalise really nearby
 players, during a failed/bad pass to some extent ???
+
+Virtual Ball
+================
+
+If there is no ball information along with game data, use game actions like
+kick, tackle, catch, etal to interpolate a virtual ball.
+
+Use a two pass flow, where 1st capture the useful ball related game actions
+and inturn use it to visualise a virtual ball using interpolation.
 
 
 Changelog
@@ -235,4 +256,6 @@ the distance moved/traversed by players. Allow comparing these wrt best in same
 team as well as across both teams.
 
 Add support for tagged commandline arguments.
+
+Virtual ball, if required.
 
