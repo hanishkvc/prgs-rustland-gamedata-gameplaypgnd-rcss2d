@@ -206,6 +206,7 @@ impl<'a> PGEntities<'a> {
     pub fn adjust_members(&mut self, simball_fname: &str) {
         if simball_fname.len() > 0 {
             self.simball = Some(SimBall::new(simball_fname));
+            self.oball.set_color(Color::MAGENTA);
         }
         self.ateam.adjust_players(0x0e); //9
         self.bteam.adjust_players(0x0e); //3

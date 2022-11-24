@@ -35,6 +35,10 @@ impl<'a> Ball<'a> {
         }
     }
 
+    pub fn set_color(&mut self, color: Color) {
+        self.bge.set_color(color);
+    }
+
     /// Update the position of the ball on the screen.
     ///
     /// babsolute

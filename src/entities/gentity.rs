@@ -90,6 +90,10 @@ impl<'a> GEntity<'a> {
         }
     }
 
+    pub fn set_color(&mut self, color: Color) {
+        self.color = color;
+    }
+
     /// Ensure that the gentity remains within the 0.0-1.0 normal space,
     /// by wrapping it around to the other end, if required.
     ///
