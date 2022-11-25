@@ -8,6 +8,7 @@ use loggerk::{ldebug, log_d};
 use tokensk::TStr;
 
 use crate::playdata;
+use crate::playdata::GameState;
 use crate::playdata::rcss;
 use crate::playdata::PlayUpdate;
 use crate::playdata::PlayData;
@@ -184,6 +185,11 @@ impl PlayData for Rcg {
                 }
                 break;
             } else if toks[0].starts_with("playmode") {
+                if toks[2] == "goal_r" {
+                    pu.state = GameState::Goal('r');
+                } else if toks[2] == "goal_l" {
+                    pu.state = GameState::Goal('l');
+                }
                 pu.msgs.insert("game".to_string(), self.lines[self.iline as usize].clone());
             } else if toks[0].starts_with("team") {
                 pu.msgs.insert("score".to_string(), self.lines[self.iline as usize].clone());

@@ -10,9 +10,9 @@ use loggerk::{ldebug, log_d};
 
 use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
-use crate::proc::actions::{ActionsInfo, ActionData};
+use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
-use crate::playdata::{PlayerCodedData, self, Action};
+use crate::playdata::{PlayerCodedData, self};
 
 
 
@@ -62,7 +62,7 @@ impl<'a> Team<'a> {
             let pi = player.0 as usize;
             let mut px = 0.0;
             let mut py = 0.0;
-            let mut pact = Action::None;
+            let mut pact = AIAction::None;
             for pd in player.1 {
                 match pd {
                     playdata::PlayerData::Pos(fx, fy) => {
@@ -107,7 +107,7 @@ impl<'a> Team<'a> {
                         let mut action_color = match action {
                             playdata::Action::Kick(good) => {
                                 if good {
-                                    pact = action;
+                                    pact = AIAction::Kick;
                                     Color::BLUE
                                 } else {
                                     Color::GRAY
@@ -115,7 +115,7 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Catch(good) => {
                                 if good {
-                                    pact = action;
+                                    pact = AIAction::Catch;
                                     Color::WHITE
                                 } else {
                                     Color::GRAY
@@ -123,7 +123,7 @@ impl<'a> Team<'a> {
                             },
                             playdata::Action::Tackle(good) => {
                                 if good {
-                                    pact = action;
+                                    pact = AIAction::Tackle;
                                     Color::CYAN
                                 } else {
                                     Color::GRAY

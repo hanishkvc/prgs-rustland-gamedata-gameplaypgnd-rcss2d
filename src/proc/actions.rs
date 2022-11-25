@@ -13,6 +13,7 @@ use sdl2::{pixels::Color, render::BlendMode};
 
 use crate::sdlx::SdlX;
 use crate::playdata::Action;
+use crate::entities;
 
 
 const MTAG: &str = "PPGND:ProcActions";
@@ -182,6 +183,16 @@ impl Players {
 }
 
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum AIAction {
+    None,
+    Kick,
+    Tackle,
+    Catch,
+    Goal,
+}
+
+
 #[derive(Debug, Clone)]
 pub struct ActionData {
     pub time: usize,
@@ -189,12 +200,12 @@ pub struct ActionData {
     playerid: usize,
     #[allow(dead_code)]
     pub pos: (f32, f32),
-    action: Action,
+    action: AIAction,
 }
 
 impl ActionData {
 
-    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32), action: Action) -> ActionData {
+    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32), action: AIAction) -> ActionData {
         ActionData {
             time: time,
             side: side,
@@ -294,19 +305,23 @@ impl ActionsInfo {
     pub fn handle_action(&mut self, actiond: ActionData) {
         self.players.dist_update_from_pos(actiond.side, actiond.playerid, actiond.pos);
         match actiond.action {
-            Action::Kick(_) => {
+            AIAction::Kick => {
                 self.rawactions.push(actiond.clone());
                 self.handle_kick(actiond);
             },
-            Action::Tackle(_) => {
+            AIAction::Tackle => {
                 self.rawactions.push(actiond.clone());
                 self.handle_tackle(actiond);
             },
-            Action::Catch(_) => {
+            AIAction::Catch => {
                 self.rawactions.push(actiond.clone());
                 self.handle_catch(actiond);
             },
-            Action::None => {
+            AIAction::Goal => {
+                self.rawactions.push(actiond.clone());
+                self.actions.push(actiond.clone());
+            }
+            AIAction::None => {
 
             }
         }

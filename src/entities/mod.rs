@@ -7,9 +7,12 @@ use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
 use crate::sdlx::{SdlX, XRect};
-use crate::playdata::PlayUpdate;
-use crate::proc::actions::ActionsInfo;
+use crate::playdata::{PlayUpdate, GameState};
+use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 
+pub const SIDE_L: char = 'l';
+pub const SIDE_R: char = 'r';
+pub const XPLAYERID_UNKNOWN: usize = 1001;
 
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
@@ -146,6 +149,14 @@ impl<'a> PGEntities<'a> {
         self.ball.update(pu.ball, babsolute, inframes);
         self.ateam.update(pu.timecounter, pu.ateamcoded, babsolute, inframes, &mut self.actionsinfo);
         self.bteam.update(pu.timecounter, pu.bteamcoded, babsolute, inframes, &mut self.actionsinfo);
+        match pu.state {
+            GameState::Goal(side)=> {
+                self.actionsinfo.handle_action(ActionData::new(pu.timecounter, side, XPLAYERID_UNKNOWN, pu.ball, AIAction::Goal))
+            },
+            _ => {
+
+            }
+        }
     }
 
     /// If using interpolated updating of object positions,

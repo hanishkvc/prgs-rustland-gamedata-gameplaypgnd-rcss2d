@@ -38,6 +38,14 @@ pub type VPlayerData = Vec<PlayerData>;
 
 pub type PlayerCodedData = (TPlayerId, VPlayerData);
 
+#[derive(Debug)]
+pub enum GameState {
+    None,
+    PlayPaused,
+    PlayOn,
+    Goal(char),
+}
+
 pub type Messages = HashMap<String, String>;
 
 #[derive(Debug)]
@@ -50,6 +58,7 @@ pub type Messages = HashMap<String, String>;
 /// * stamina of the players
 pub struct PlayUpdate {
     pub timecounter: usize,
+    pub state: GameState,
     pub msgs: Messages,
     pub ball: (f32, f32),
     pub ateamcoded: Vec<PlayerCodedData>,
@@ -61,6 +70,7 @@ impl PlayUpdate {
     pub fn new() -> PlayUpdate {
         PlayUpdate {
             timecounter: 0,
+            state: GameState::None,
             msgs: Messages::new(),
             ball: (0.0,0.0),
             ateamcoded: Vec::new(),
