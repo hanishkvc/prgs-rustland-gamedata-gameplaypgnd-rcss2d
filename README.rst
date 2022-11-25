@@ -3,7 +3,7 @@ Playback Playground
 ####################
 
 Author: HanishKVC
-Version: 20221124IST2148
+Version: 20221125IST1911
 License: GPL-3.0+
 
 
@@ -14,18 +14,22 @@ Allow controlled playback and look at captued game data like from robocup
 soccer simulator for example. Also allow connecting to a live server to get
 and display the game data.
 
-In the long run additionally allow augumenting of displayed player movements
-playback additionally with info captured manually or automatically (during
-the game or later). This can include
+Additionally allow augumenting of displayed player movements playback with
+info captured manually or automatically (during the game or later). This
+can include
 
 * game actions captured like goal, kick/tackle/... and good/bad pass/...,
   penalty, cards, ...
+
+  * try infer good/bad passes/goal, also performance scoring based on
+    infered/otherwise game actions
 
 * color coding ++ of
 
   * performance from captured game actions.
 
-    * some internal explorations for now
+    * if reqd in future. Currently shown has a relative bar graph,
+      if requested.
 
   * coarse grained view of captured/tracked health params like stamina, ...
 
@@ -236,7 +240,8 @@ When the playdata source indicates that the playback has reached the end, the
 logic will automatically capture the required actions related data, into a
 tmp file.
 
-NOTE: The logic doesnt account for seeking in general, currently.
+NOTE: The logic accounts for seeking in a crude way, currently, which should
+be ok to an extent.
 
 
 Changelog
@@ -264,4 +269,6 @@ team as well as across both teams.
 Add support for tagged commandline arguments.
 
 Virtual ball, if required.
+
+Infer goal as a good or a self goal and identify the player responsible for same
 

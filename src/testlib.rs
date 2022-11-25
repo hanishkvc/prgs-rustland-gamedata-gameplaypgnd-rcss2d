@@ -6,7 +6,8 @@
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
-use crate::sdlx;
+use crate::playdata::GameState;
+use crate::{sdlx, entities};
 use crate::entities::gentity::GEntity;
 
 pub fn test_ncolor() {
@@ -21,4 +22,9 @@ pub fn test_gentity(font: &Font) {
     let mut g1 = GEntity::new("test01", (0.5,0.5), (16,16), Color::WHITE, font);
     g1.set_fcolor(0.25, 1.0);
     g1.set_nxarc(1.2, 0.98, Color::RED);
+}
+
+#[allow(dead_code)]
+pub fn test_dummy() {
+    eprintln!("{},{:?}", entities::SIDE_R, GameState::PlayPaused);
 }

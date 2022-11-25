@@ -189,6 +189,8 @@ impl PlayData for Rcg {
                     pu.state = GameState::Goal('r');
                 } else if toks[2] == "goal_l" {
                     pu.state = GameState::Goal('l');
+                } else if toks[2] == "play_on" {
+                    pu.state = GameState::PlayOn;
                 }
                 pu.msgs.insert("game".to_string(), self.lines[self.iline as usize].clone());
             } else if toks[0].starts_with("team") {

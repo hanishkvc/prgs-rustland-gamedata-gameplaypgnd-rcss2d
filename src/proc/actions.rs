@@ -33,6 +33,7 @@ const SCORE_GOOD_PASS_GOT: f32 = 0.4;
 const SCORE_SELF_PASS: f32 = 0.06;
 const SCORE_TACKLE: f32 = 0.6;
 const SCORE_CATCH: f32 = 1.0;
+const SCORE_GOAL: f32 = 1.0;
 
 
 #[derive(Debug)]
@@ -237,21 +238,28 @@ impl ActionsInfo {
     /// Add a kick data and inturn adjust the scores
     /// If a kick has changed sides, then
     /// * penalise prev side player and reward current side player
-    /// * TODO: This needs to account for goal/half-time/...
+    ///   * However if prev was a goal, dont penalise prev
+    ///   * TODO: This needs to account for half-time/...
     /// Else
     /// * if same player, reward to some extent
     ///   provided ball was maintained for a sufficiently minimum time
     /// * if diff players, reward both players for a good pass.
+    /// * NOTE: Small score_self_pass wrt self goal case, is not explicitly avoided for now.
     ///
     /// ALERT: prev and current actions dont matter wrt current list of actions,
     /// except for the self pass case. However in future, if new actions are
     /// added, the logical flow will have to be evaluated and updated if reqd.
+    ///
+    /// NOTE: Scoring wrt goal +ve or -ve is handled in handle_action itself.
+    ///
     pub fn handle_kick(&mut self, kick: ActionData) {
         let ik = self.actions.len();
         if ik > 0 {
             let prev = &self.actions[ik-1];
             if prev.side != kick.side {
-                self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
+                if prev.action != AIAction::Goal {
+                    self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
+                }
                 self.players.score(kick.side, kick.playerid, SCORE_HIJACK_PASS);
             } else {
                 if prev.playerid == kick.playerid {
@@ -264,7 +272,9 @@ impl ActionsInfo {
                     }
                     self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
                 } else {
-                    self.players.score(prev.side, prev.playerid, SCORE_GOOD_PASS_SENT);
+                    if prev.action != AIAction::Goal { // ie not a self goal
+                        self.players.score(prev.side, prev.playerid, SCORE_GOOD_PASS_SENT);
+                    }
                     self.players.score(kick.side, kick.playerid, SCORE_GOOD_PASS_GOT);
                 }
             }
@@ -302,28 +312,58 @@ impl ActionsInfo {
         self.players.count_increment(catch.side, catch.playerid, Action::Catch(true));
     }
 
+    /// Goal action is handled here itself,
+    /// other are passed to respective handlers
     pub fn handle_action(&mut self, actiond: ActionData) {
-        self.players.dist_update_from_pos(actiond.side, actiond.playerid, actiond.pos);
+        let mut bupdatedist = true;
         match actiond.action {
             AIAction::Kick => {
                 self.rawactions.push(actiond.clone());
-                self.handle_kick(actiond);
+                self.handle_kick(actiond.clone());
             },
             AIAction::Tackle => {
                 self.rawactions.push(actiond.clone());
-                self.handle_tackle(actiond);
+                self.handle_tackle(actiond.clone());
             },
             AIAction::Catch => {
                 self.rawactions.push(actiond.clone());
-                self.handle_catch(actiond);
+                self.handle_catch(actiond.clone());
             },
             AIAction::Goal => {
-                self.rawactions.push(actiond.clone());
-                self.actions.push(actiond.clone());
+                bupdatedist = false;
+                let ik = self.actions.len();
+                let mut curact = actiond.clone();
+                if ik > 0 {
+                    let prevact = &self.actions[ik-1];
+                    if prevact.action == AIAction::Kick {
+                        if curact.playerid == entities::XPLAYERID_UNKNOWN {
+                            // Fill the player responsible for the goal bcas
+                            // One doesnt know whether a kick will become a goal or not
+                            // at the time of the kick, in general.
+                            curact.playerid = prevact.playerid;
+                        } else {
+                            eprintln!("WARN:{}:HandleAction:Goal {:?}:Player already set; PrevAction kick {:?}", MTAG, curact, prevact);
+                        }
+                    } else {
+                        panic!("DBUG:{}:HandleAction:Goal {:?}:PrevAction not kick {:?}", MTAG, curact, prevact);
+                    }
+                    if prevact.side == curact.side {
+                        // A successful goal
+                        self.players.score(curact.side, curact.playerid, SCORE_GOAL);
+                    } else {
+                        // a self goal !?!
+                        self.players.score(curact.side, curact.playerid, -SCORE_GOAL);
+                    }
+                }
+                self.rawactions.push(curact.clone());
+                self.actions.push(curact);
             }
             AIAction::None => {
-
+                // usual player movements on the field
             }
+        }
+        if bupdatedist {
+            self.players.dist_update_from_pos(actiond.side, actiond.playerid, actiond.pos);
         }
     }
 
