@@ -331,7 +331,14 @@ fn main() {
             let prgev= keys::get_programevents(&mut sx, &mut skey);
             match prgev {
                 keys::ProgramEvent::None => break 'eventloop,
-                keys::ProgramEvent::Pause => gui.pause = !gui.pause,
+                keys::ProgramEvent::Pause => {
+                    gui.pause = !gui.pause;
+                    if gui.pause {
+                        gui.pgentities.timedmsg.update_direct("Paused...");
+                    } else {
+                        gui.pgentities.timedmsg.update_direct("UnPaused...");
+                    }
+                },
                 keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
                 keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
                 keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
@@ -350,12 +357,18 @@ fn main() {
                         gui.showaiscores = !gui.showaiscores;
                     }
                     gui.aiscores_summarytype = summarytype;
+                    if gui.showaiscores {
+                        gui.pgentities.timedmsg.update_direct(&format!("PerfScores:{}", summarytype));
+                    }
                 },
                 keys::ProgramEvent::DumpAIDistancesSummary(summarytype) => {
                     if gui.aidistances_summarytype == summarytype {
                         gui.showaidistances = !gui.showaidistances;
                     }
                     gui.aidistances_summarytype = summarytype;
+                    if gui.showaidistances {
+                        gui.pgentities.timedmsg.update_direct(&format!("Distances:{}", summarytype));
+                    }
                 },
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),

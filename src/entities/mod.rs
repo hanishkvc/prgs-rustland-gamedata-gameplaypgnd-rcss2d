@@ -30,6 +30,9 @@ pub const MSG_STIME_POS: (f32,f32)      = (0.50,0.01);
 pub const MSG_FPS_POS: (f32,f32)        = (0.80,0.01);
 pub const MSG_GAME_POS: (f32,f32)       = (0.01,0.98);
 pub const MSG_UNKNOWN_POS: (f32,f32)    = (0.50,0.98);
+pub const MSG_TIMED_POS: (f32, f32)     = (0.01,0.08);
+
+const MSG_TIMED_NUMFRAMES: isize = 40;
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
@@ -77,6 +80,8 @@ pub(crate) struct PGEntities<'a> {
     virtballg: Ball<'a>,
     /// The VirtBall object containing the key position datas wrt the ball.
     virtballd: Option<VirtBall>,
+    /// Timed Msg
+    pub timedmsg: FixedPosMessage,
 }
 
 impl<'a> PGEntities<'a> {
@@ -102,6 +107,8 @@ impl<'a> PGEntities<'a> {
         vfpmsgs.push(gamemsg);
         let unknownmsg = FixedPosMessage::new("unknown", MSG_UNKNOWN_POS, false, -1);
         vfpmsgs.push(unknownmsg);
+        let mut timedmsg = FixedPosMessage::new("timedmsg", MSG_TIMED_POS, true, MSG_TIMED_NUMFRAMES);
+        timedmsg.update_direct("");
         PGEntities {
             fps: fps,
             vfpmsgs: vfpmsgs,
@@ -114,6 +121,7 @@ impl<'a> PGEntities<'a> {
             pitch: pitch,
             showxtrapitchmarkers: true,
             actionsinfo: ActionsInfo::new(lnplayers as usize, rnplayers as usize),
+            timedmsg: timedmsg,
         }
     }
 
@@ -208,6 +216,7 @@ impl<'a> PGEntities<'a> {
         if self.virtballd.is_some() {
             self.virtballg.draw(sx);
         }
+        self.timedmsg.draw(sx);
     }
 
 }

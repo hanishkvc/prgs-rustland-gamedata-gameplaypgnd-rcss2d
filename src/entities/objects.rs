@@ -90,15 +90,15 @@ pub struct FixedPosMessage {
     allowemptyupdate: bool,
     /// Control whether the message auto clears after a given count of frames
     /// If -ve, autoclear is disabled.
-    autoclearchk: i32,
+    autoclearchk: isize,
     /// Track the remaining frames wrt autoclear logic
-    autoclearcnt: i32,
+    autoclearcnt: isize,
 }
 
 impl FixedPosMessage {
 
     /// Create a new instance of FixedPosMessage
-    pub fn new(key: &str, npos: (f32,f32), ballowemptyupdate: bool, autoclearchk: i32) -> FixedPosMessage {
+    pub fn new(key: &str, npos: (f32,f32), ballowemptyupdate: bool, autoclearchk: isize) -> FixedPosMessage {
         FixedPosMessage {
             key: key.to_string(),
             npos: npos,
