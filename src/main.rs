@@ -341,7 +341,14 @@ fn main() {
                 },
                 keys::ProgramEvent::BackgroundColorChange => dcolor = dcolor.wrapping_add(20),
                 keys::ProgramEvent::ToggleShowHelp => gui.showhelp = !gui.showhelp,
-                keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
+                keys::ProgramEvent::ToggleShowBall => {
+                    gui.pgentities.showball = !gui.pgentities.showball;
+                    if gui.pgentities.showball {
+                        gui.pgentities.timedmsg.update_direct("Ball:Show");
+                    } else {
+                        gui.pgentities.timedmsg.update_direct("Ball:Hide");
+                    }
+                },
                 keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
                 keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
                 keys::ProgramEvent::SeekBackward => gui.seek(-50),
@@ -358,7 +365,7 @@ fn main() {
                     }
                     gui.aiscores_summarytype = summarytype;
                     if gui.showaiscores {
-                        gui.pgentities.timedmsg.update_direct(&format!("PerfScores:{}", summarytype));
+                        gui.pgentities.timedmsg.update_direct(&format!("PerfBars:{}", summarytype));
                     }
                 },
                 keys::ProgramEvent::DumpAIDistancesSummary(summarytype) => {
@@ -367,7 +374,7 @@ fn main() {
                     }
                     gui.aidistances_summarytype = summarytype;
                     if gui.showaidistances {
-                        gui.pgentities.timedmsg.update_direct(&format!("Distances:{}", summarytype));
+                        gui.pgentities.timedmsg.update_direct(&format!("DistBars:{}", summarytype));
                     }
                 },
                 keys::ProgramEvent::Quit => break 'mainloop,

@@ -25,5 +25,8 @@ test1_vb:
 test2:
 	target/release/playbackpgnd --mode rcg --src gamedata/20221118233608-tm01_3-vs-tm02_1.rcg
 
+test2_vb:
+	target/release/playbackpgnd --mode rcg --src gamedata/20221118233608-tm01_3-vs-tm02_1.rcg --virtball gamedata/20221118233608-tm01_3-vs-tm02_1.virtball.csv
+
 rgb2png:
 	gm convert -size 1024x600 -depth 8 -format rgb /tmp/ppgnd010.rgb /tmp/test.png

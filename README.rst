@@ -21,8 +21,8 @@ can include
 * game actions captured like goal, kick/tackle/... and good/bad pass/...,
   penalty, cards, ...
 
-  * try infer good/bad passes/goal, also performance scoring based on
-    infered/otherwise game actions
+  * try infer good/bad passes (minimal logic for now), good/self goal,
+    also performance scoring based on infered/otherwise game actions
 
 * color coding ++ of
 
@@ -272,5 +272,5 @@ Virtual ball, if required.
 
 Infer goal as a good or a self goal and identify the player responsible for same
 
-Timed messages box
+Timed messages box for user config change at runtime
 

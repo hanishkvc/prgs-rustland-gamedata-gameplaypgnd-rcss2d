@@ -233,13 +233,23 @@ impl<'a> PGEntities<'a> {
     }
 
     pub fn toggle_bstamina(&mut self) {
-        self.lteam.toggle_bstamina();
-        self.rteam.toggle_bstamina();
+        let lshow = self.lteam.toggle_bstamina();
+        let rshow = self.rteam.toggle_bstamina();
+        if lshow && rshow {
+            self.timedmsg.update_direct("Stamina:Show");
+        } else {
+            self.timedmsg.update_direct("Stamina:Hide");
+        }
     }
 
     pub fn toggle_bshowactions(&mut self) {
-        self.lteam.toggle_bshowactions();
-        self.rteam.toggle_bshowactions();
+        let lshow = self.lteam.toggle_bshowactions();
+        let rshow = self.rteam.toggle_bshowactions();
+        if lshow && rshow {
+            self.timedmsg.update_direct("Actions:Show");
+        } else {
+            self.timedmsg.update_direct("Actions:Hide");
+        }
     }
 
     pub fn seek(&mut self, seekdelta: isize) {

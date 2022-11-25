@@ -164,12 +164,14 @@ impl<'a> Team<'a> {
         }
     }
 
-    pub fn toggle_bstamina(&mut self) {
+    pub fn toggle_bstamina(&mut self) -> bool {
         self.bstamina = !self.bstamina;
+        self.bstamina
     }
 
-    pub fn toggle_bshowactions(&mut self) {
+    pub fn toggle_bshowactions(&mut self) -> bool {
         self.bshowactions = !self.bshowactions;
+        self.bshowactions
     }
 
 }
