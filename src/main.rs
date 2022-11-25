@@ -221,6 +221,11 @@ impl<'a> Gui<'a> {
         }
     }
 
+    fn seek(&mut self, seekdelta: isize) {
+        self.pdata.seek(seekdelta);
+        self.pgentities.seek(seekdelta);
+    }
+
 }
 
 fn show_help(sx: &mut SdlX) {
@@ -332,8 +337,8 @@ fn main() {
                 keys::ProgramEvent::ToggleShowBall => gui.pgentities.showball = !gui.pgentities.showball,
                 keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
                 keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
-                keys::ProgramEvent::SeekBackward => gui.pdata.seek(-50),
-                keys::ProgramEvent::SeekForward => gui.pdata.seek(50),
+                keys::ProgramEvent::SeekBackward => gui.seek(-50),
+                keys::ProgramEvent::SeekForward => gui.seek(50),
                 keys::ProgramEvent::AdjustFPS(ratio) => {
                     gui.fps_adjust(ratio);
                 },

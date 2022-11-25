@@ -100,4 +100,12 @@ impl VirtBall {
         self.cpos
     }
 
+    pub fn seek(&mut self, seekdelta: isize) {
+        let mut newindex = self.vin as isize + seekdelta;
+        if newindex < 0 {
+            newindex = 0;
+        }
+        self.vin = newindex as usize;
+    }
+
 }

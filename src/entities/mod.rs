@@ -222,6 +222,13 @@ impl<'a> PGEntities<'a> {
         self.bteam.toggle_bshowactions();
     }
 
+    pub fn seek(&mut self, seekdelta: isize) {
+        if self.virtballd.is_none() {
+            return;
+        }
+        self.virtballd.as_mut().unwrap().seek(seekdelta);
+    }
+
     pub fn save_virtball_csv(&mut self) {
         let mut sdata = String::new();
         let actions = &self.actionsinfo.rawactions;
