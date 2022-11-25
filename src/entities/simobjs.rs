@@ -3,6 +3,8 @@
 //! HanishKVC, 2022
 //!
 
+use loggerk::{ldebug, log_d};
+
 #[derive(Debug)]
 /// A interpolated ball
 pub struct VirtBall {
@@ -52,6 +54,20 @@ impl VirtBall {
         self.cpos = (self.cpos.0 + self.mov.0, self.cpos.1 + self.mov.1);
     }
 
+    fn extract_nextdata(&mut self) -> bool {
+        let sdata = &self.vdata[self.vin];
+        self.vin += 1;
+        if sdata.trim().len() == 0 {
+            return false;
+        }
+        let sdata = sdata.split(',').collect::<Vec<&str>>();
+        self.ltime = sdata[0].parse().unwrap();
+        let fx = sdata[1].parse().unwrap();
+        let fy = sdata[2].parse().unwrap();
+        self.lpos = (fx, fy);
+        return true;
+    }
+
     ///
     /// Calculate the interpolated position wrt each requested time.
     /// If the last time is repeated again, the same position is sent.
@@ -73,16 +89,9 @@ impl VirtBall {
             if self.vin >= self.vdata.len() {
                 break;
             }
-            let sdata = &self.vdata[self.vin];
-            self.vin += 1;
-            if sdata.trim().len() == 0 {
+            if !self.extract_nextdata() {
                 break;
             }
-            let sdata = sdata.split(',').collect::<Vec<&str>>();
-            self.ltime = sdata[0].parse().unwrap();
-            let fx = sdata[1].parse().unwrap();
-            let fy = sdata[2].parse().unwrap();
-            self.lpos = (fx, fy);
             let dt = self.ltime as isize - ctime as isize;
             if dt < 0 {
                 continue;
@@ -100,12 +109,20 @@ impl VirtBall {
         self.cpos
     }
 
+    /// Try seek, but in a blind way for now
+    /// As action data is not at same nor uniform granularity like time data,
+    /// so the current seek logic below wont be perfect.
+    ///
+    /// seekdelta: time delta
+    ///
     pub fn seek(&mut self, seekdelta: isize) {
         let mut newindex = self.vin as isize + seekdelta;
         if newindex < 0 {
             newindex = 0;
         }
         self.vin = newindex as usize;
+        ldebug!(&format!("DBUG:PPGND:SimObjs:VirtBall:Seek:{}:{}", self.lastgentime as isize-seekdelta, self.vdata[self.vin]));
+        self.extract_nextdata();
     }
 
 }
