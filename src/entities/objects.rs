@@ -81,7 +81,7 @@ pub struct FixedPosMessage {
     /// The position is specified in the normalised space of 0.0-1.0
     npos: (f32, f32),
     /// Is the specified position mid or top-left, default false
-    pub posmid: bool,
+    posmid: bool,
     /// The message that is shown
     msg: String,
     /// Color to use wrt the message.
@@ -108,6 +108,15 @@ impl FixedPosMessage {
             autoclearchk: autoclearchk,
             autoclearcnt: autoclearchk,
             posmid: false,
+        }
+    }
+
+    pub fn config(&mut self, posmid: Option<bool>, color: Option<Color>) {
+        if posmid.is_some() {
+            self.posmid = posmid.unwrap();
+        }
+        if color.is_some() {
+            self.color = color.unwrap();
         }
     }
 

@@ -96,7 +96,7 @@ impl<'a> PGEntities<'a> {
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
         let mut stimemsg = FixedPosMessage::new("stime", MSG_STIME_POS, false, -1);
-        stimemsg.posmid = true;
+        stimemsg.config(Some(true), None);
         vfpmsgs.push(stimemsg);
         let gamemsg = FixedPosMessage::new("game", MSG_GAME_POS, false, -1);
         vfpmsgs.push(gamemsg);
