@@ -67,42 +67,42 @@ type Pos = (f32, f32);
 
 #[derive(Debug)]
 struct Players {
-    aplayers: Vec<(usize, Score, Pos)>,
-    bplayers: Vec<(usize, Score, Pos)>,
+    lplayers: Vec<(usize, Score, Pos)>,
+    rplayers: Vec<(usize, Score, Pos)>,
 }
 
 impl Players {
 
-    fn new(acnt: usize, bcnt: usize) -> Players {
+    fn new(lcnt: usize, rcnt: usize) -> Players {
         let mut players = Players {
-            aplayers: Vec::new(),
-            bplayers: Vec::new(),
+            lplayers: Vec::new(),
+            rplayers: Vec::new(),
         };
-        for i in 0..acnt {
-            players.aplayers.push((i, Score::default(), (99.0,99.0)));
+        for i in 0..lcnt {
+            players.lplayers.push((i, Score::default(), (99.0,99.0)));
         }
-        for i in 0..bcnt {
-            players.bplayers.push((i, Score::default(), (99.0,99.0)));
+        for i in 0..rcnt {
+            players.rplayers.push((i, Score::default(), (99.0,99.0)));
         }
         return players;
     }
 
     /// Help update the score of a specific player
     fn score(&mut self, side: char, playerid: usize, score: f32) {
-        if side == 'a' {
-            self.aplayers[playerid].1.score += score;
+        if side == entities::SIDE_L {
+            self.lplayers[playerid].1.score += score;
         } else {
-            self.bplayers[playerid].1.score += score;
+            self.rplayers[playerid].1.score += score;
         }
     }
 
     /// Help update the score of a specific player
     fn count_increment(&mut self, side: char, playerid: usize, atype: Action) {
         let player;
-        if side == 'a' {
-            player = &mut self.aplayers[playerid];
+        if side == entities::SIDE_L {
+            player = &mut self.lplayers[playerid];
         } else {
-            player = &mut self.bplayers[playerid];
+            player = &mut self.rplayers[playerid];
         }
         let stype;
         match atype {
@@ -125,10 +125,10 @@ impl Players {
 
     fn dist_update_from_pos(&mut self, side: char, playerid: usize, npos: Pos) {
         let player;
-        if side == 'a' {
-            player = &mut self.aplayers[playerid];
+        if side == entities::SIDE_L {
+            player = &mut self.lplayers[playerid];
         } else {
-            player = &mut self.bplayers[playerid];
+            player = &mut self.rplayers[playerid];
         }
         let opos = player.2;
         if opos.0 == 99.0 && opos.1 == 99.0 {
@@ -145,15 +145,15 @@ impl Players {
     /// Return the max player score for each of the teams
     fn score_max(&self) -> (f32, f32) {
         let mut amax = f32::MIN;
-        for i in 0..self.aplayers.len() {
-            let player = &self.aplayers[i];
+        for i in 0..self.lplayers.len() {
+            let player = &self.lplayers[i];
             if amax < player.1.score {
                 amax = player.1.score;
             }
         }
         let mut bmax = f32::MIN;
-        for i in 0..self.bplayers.len() {
-            let player = &self.bplayers[i];
+        for i in 0..self.rplayers.len() {
+            let player = &self.rplayers[i];
             if bmax < player.1.score {
                 bmax = player.1.score;
             }
@@ -164,15 +164,15 @@ impl Players {
     /// Return the max player distance traversed for each of the teams
     fn dist_max(&self) -> (f32, f32) {
         let mut amax = f32::MIN;
-        for i in 0..self.aplayers.len() {
-            let player = &self.aplayers[i];
+        for i in 0..self.lplayers.len() {
+            let player = &self.lplayers[i];
             if amax < player.1.dist {
                 amax = player.1.dist;
             }
         }
         let mut bmax = f32::MIN;
-        for i in 0..self.bplayers.len() {
-            let player = &self.bplayers[i];
+        for i in 0..self.rplayers.len() {
+            let player = &self.rplayers[i];
             if bmax < player.1.dist {
                 bmax = player.1.dist;
             }
@@ -329,27 +329,27 @@ impl ActionsInfo {
 
     #[allow(dead_code)]
     fn summary_simple(&self) {
-        for i in 0..self.players.aplayers.len() {
-            let player = &self.players.aplayers[i];
+        for i in 0..self.players.lplayers.len() {
+            let player = &self.players.lplayers[i];
             eprintln!("DBUG:{}:A:{:02}:{}", MTAG, player.0, player.1.score);
         }
-        for i in 0..self.players.bplayers.len() {
-            let player = &self.players.bplayers[i];
+        for i in 0..self.players.rplayers.len() {
+            let player = &self.players.rplayers[i];
             eprintln!("DBUG:{}:B:{:02}:{}", MTAG, player.0, player.1.score);
         }
     }
 
     fn summary_asciiart(&self) {
-        for i in 0..self.players.aplayers.len() {
-            let player = &self.players.aplayers[i];
+        for i in 0..self.players.lplayers.len() {
+            let player = &self.players.lplayers[i];
             eprint!("DBUG:{}:A:{:02}:", MTAG, player.0);
             for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
             eprintln!();
         }
-        for i in 0..self.players.bplayers.len() {
-            let player = &self.players.bplayers[i];
+        for i in 0..self.players.rplayers.len() {
+            let player = &self.players.rplayers[i];
             eprint!("DBUG:{}:B:{:02}:", MTAG, player.0);
             for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
@@ -366,51 +366,51 @@ impl ActionsInfo {
     /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char) {
         // let (amax, bmax) = (20.0, 20.0);
-        let (mut amax, mut bmax) = self.players.score_max();
+        let (mut lmax, mut rmax) = self.players.score_max();
         if summarytype == 'A' {
-            amax = amax.max(bmax);
-            bmax = amax;
+            lmax = lmax.max(rmax);
+            rmax = lmax;
         }
-        for i in 0..self.players.aplayers.len() {
-            let player = &self.players.aplayers[i];
+        for i in 0..self.players.lplayers.len() {
+            let player = &self.players.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/amax), 0.04)
+            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/lmax), 0.04)
         }
-        for i in 0..self.players.bplayers.len() {
-            let player = &self.players.bplayers[i];
+        for i in 0..self.players.rplayers.len() {
+            let player = &self.players.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/bmax), 0.04)
+            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/rmax), 0.04)
         }
     }
 
     pub fn summary_dist_sdl(&self, sx: &mut SdlX, summarytype: char) {
-        let (mut amax, mut bmax) = self.players.dist_max();
+        let (mut lmax, mut rmax) = self.players.dist_max();
         if summarytype == 'D' {
-            amax = amax.max(bmax);
-            bmax = amax;
+            lmax = lmax.max(rmax);
+            rmax = lmax;
         }
         let xs = 0.05;
         let xw = 0.4;
-        let xu = xw/self.players.aplayers.len() as f32;
+        let xu = xw/self.players.lplayers.len() as f32;
         let yb = 0.8;
         let yh = 0.1;
-        for i in 0..self.players.aplayers.len() {
-            let player = &self.players.aplayers[i];
+        for i in 0..self.players.lplayers.len() {
+            let player = &self.players.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let x = xs + (i as f32 * xu);
-            let yh = yh*(player.1.dist/amax);
+            let yh = yh*(player.1.dist/lmax);
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
         let xs = 0.55;
-        for i in 0..self.players.bplayers.len() {
-            let player = &self.players.bplayers[i];
+        for i in 0..self.players.rplayers.len() {
+            let player = &self.players.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let x = xs + (i as f32 * xu);
-            let yh = yh*(player.1.dist/bmax);
+            let yh = yh*(player.1.dist/rmax);
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
     }

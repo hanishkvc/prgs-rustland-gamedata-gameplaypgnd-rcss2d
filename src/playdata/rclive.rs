@@ -203,9 +203,9 @@ impl RCLive {
             pd.push(PlayerData::Card(card));
             pd.push(PlayerData::Action(action));
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.ateamcoded.push((pnum-1, pd));
+                pu.lteamcoded.push((pnum-1, pd));
             } else {
-                pu.bteamcoded.push((pnum-1, pd));
+                pu.rteamcoded.push((pnum-1, pd));
             }
         }
 

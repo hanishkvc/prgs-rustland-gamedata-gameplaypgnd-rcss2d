@@ -63,9 +63,9 @@ pub(crate) struct PGEntities<'a> {
     /// The ball in the playground
     ball: Ball<'a>,
     /// One of the two teams in the playground
-    ateam: team::Team<'a>,
+    lteam: team::Team<'a>,
     /// The other team in the playground.
-    bteam: team::Team<'a>,
+    rteam: team::Team<'a>,
     /// The pitch boundry within the screen, in normalised 0.0-1.0 space.
     pitch: XRect,
     /// If extra pitch markers should be shown or not.
@@ -84,14 +84,14 @@ impl<'a> PGEntities<'a> {
     /// Create a playground instance with
     /// * pitch: the dimensions of the pitch with in the screen,
     ///   in normalised 0.0-1.0 space.
-    /// * [a/b]nplayers: the number of players on both sides.
+    /// * [l/r]nplayers: the number of players on both sides.
     /// * font: the font used for creating the cached text image datas if any
     ///
     /// The following fixed position messages are supported on the screen
     /// * score: Give the current score, if any.
     /// * stime: Provide any time related info wrt the game.
     /// * game: show any game related messages.
-    pub fn new(pitch: XRect, anplayers: i32, bnplayers: i32, fps: f32, font: &'a Font) -> PGEntities<'a> {
+    pub fn new(pitch: XRect, lnplayers: i32, rnplayers: i32, fps: f32, font: &'a Font) -> PGEntities<'a> {
         let mut vfpmsgs = Vec::new();
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
@@ -109,11 +109,11 @@ impl<'a> PGEntities<'a> {
             showball: true,
             virtballg: Ball::new(font),
             virtballd: None,
-            ateam: team::Team::new("ateam", Color::RED, anplayers, font),
-            bteam: team::Team::new("bteam", Color::BLUE, bnplayers, font),
+            lteam: team::Team::new("lteam", Color::RED, lnplayers, font),
+            rteam: team::Team::new("rteam", Color::BLUE, rnplayers, font),
             pitch: pitch,
             showxtrapitchmarkers: true,
-            actionsinfo: ActionsInfo::new(anplayers as usize, bnplayers as usize),
+            actionsinfo: ActionsInfo::new(lnplayers as usize, rnplayers as usize),
         }
     }
 
@@ -147,8 +147,8 @@ impl<'a> PGEntities<'a> {
             self.virtballg.update(bpos, babsolute, inframes);
         }
         self.ball.update(pu.ball, babsolute, inframes);
-        self.ateam.update(pu.timecounter, pu.ateamcoded, babsolute, inframes, &mut self.actionsinfo);
-        self.bteam.update(pu.timecounter, pu.bteamcoded, babsolute, inframes, &mut self.actionsinfo);
+        self.lteam.update(pu.timecounter, pu.lteamcoded, babsolute, inframes, &mut self.actionsinfo);
+        self.rteam.update(pu.timecounter, pu.rteamcoded, babsolute, inframes, &mut self.actionsinfo);
         match pu.state {
             GameState::Goal(side)=> {
                 self.actionsinfo.handle_action(ActionData::new(pu.timecounter, side, XPLAYERID_UNKNOWN, pu.ball, AIAction::Goal))
@@ -166,8 +166,8 @@ impl<'a> PGEntities<'a> {
             self.virtballg.next_frame();
         }
         self.ball.next_frame();
-        self.ateam.next_frame();
-        self.bteam.next_frame();
+        self.lteam.next_frame();
+        self.rteam.next_frame();
     }
 
     /// Draw the pitch on the screen, along with the boundries and any markers.
@@ -200,8 +200,8 @@ impl<'a> PGEntities<'a> {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.draw(sx);
         }
-        self.ateam.draw(sx);
-        self.bteam.draw(sx);
+        self.lteam.draw(sx);
+        self.rteam.draw(sx);
         if self.showball {
             self.ball.draw(sx);
         }
@@ -219,18 +219,18 @@ impl<'a> PGEntities<'a> {
             self.virtballd = Some(VirtBall::new(virtball_fname));
             self.virtballg.set_color(Color::BLACK);
         }
-        self.ateam.adjust_players(0x0e); //9
-        self.bteam.adjust_players(0x0e); //3
+        self.lteam.adjust_players(0x0e); //9
+        self.rteam.adjust_players(0x0e); //3
     }
 
     pub fn toggle_bstamina(&mut self) {
-        self.ateam.toggle_bstamina();
-        self.bteam.toggle_bstamina();
+        self.lteam.toggle_bstamina();
+        self.rteam.toggle_bstamina();
     }
 
     pub fn toggle_bshowactions(&mut self) {
-        self.ateam.toggle_bshowactions();
-        self.bteam.toggle_bshowactions();
+        self.lteam.toggle_bshowactions();
+        self.rteam.toggle_bshowactions();
     }
 
     pub fn seek(&mut self, seekdelta: isize) {

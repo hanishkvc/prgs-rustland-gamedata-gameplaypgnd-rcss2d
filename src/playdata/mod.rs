@@ -61,8 +61,8 @@ pub struct PlayUpdate {
     pub state: GameState,
     pub msgs: Messages,
     pub ball: (f32, f32),
-    pub ateamcoded: Vec<PlayerCodedData>,
-    pub bteamcoded: Vec<PlayerCodedData>,
+    pub lteamcoded: Vec<PlayerCodedData>,
+    pub rteamcoded: Vec<PlayerCodedData>,
 }
 
 impl PlayUpdate {
@@ -73,8 +73,8 @@ impl PlayUpdate {
             state: GameState::None,
             msgs: Messages::new(),
             ball: (0.0,0.0),
-            ateamcoded: Vec::new(),
-            bteamcoded: Vec::new(),
+            lteamcoded: Vec::new(),
+            rteamcoded: Vec::new(),
         }
     }
 

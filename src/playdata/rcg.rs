@@ -116,9 +116,9 @@ impl Rcg {
         }
         // Fill in the player data
         if steam == "l" {
-            pu.ateamcoded.push((iplayer-1, pd));
+            pu.lteamcoded.push((iplayer-1, pd));
         } else {
-            pu.bteamcoded.push((iplayer-1, pd));
+            pu.rteamcoded.push((iplayer-1, pd));
         }
     }
 
