@@ -20,6 +20,10 @@ pub struct VirtBall {
     mov: (f32, f32),
     /// The time stamp for which position was generated in the last call
     lastgentime: usize,
+    /// unit step size
+    stepsize: f32,
+    /// % of steps done wrt current interpolation block in 0.0-1.0 form
+    stepdone: f32,
 }
 
 impl VirtBall {
@@ -39,6 +43,8 @@ impl VirtBall {
             cpos: (0.0, 0.0),
             mov: (0.0, 0.0),
             lastgentime: 0,
+            stepsize: 0.0,
+            stepdone: 0.0,
         }
     }
 
@@ -84,6 +90,8 @@ impl VirtBall {
                 self.cpos = self.lpos;
                 return self.lpos;
             }
+            self.stepsize = 1.0/dt as f32;
+            self.stepdone = 0.0;
             let dx = (self.lpos.0 - self.cpos.0)/(dt as f32 +1.0);
             let dy = (self.lpos.1 - self.cpos.1)/(dt as f32 +1.0);
             self.mov = (dx,dy);
