@@ -6,12 +6,19 @@
 #[derive(Debug)]
 /// A interpolated ball
 pub struct VirtBall {
+    /// The raw data records
     vdata: Vec<String>,
+    /// current index into the data records
     vin: usize,
+    /// Timestamp wrt next action/ball movement change
     ltime: usize,
+    /// Starting position of next action/ball movement change
     lpos: (f32, f32),
+    /// Position of the ball as it stands now
     cpos: (f32, f32),
+    /// Base amount of change to apply wrt ball position, per step
     mov: (f32, f32),
+    /// The time stamp for which position was generated in the last call
     lastgentime: usize,
 }
 
@@ -33,6 +40,10 @@ impl VirtBall {
             mov: (0.0, 0.0),
             lastgentime: 0,
         }
+    }
+
+    fn next_cpos(&mut self) {
+        self.cpos = (self.cpos.0 + self.mov.0, self.cpos.1 + self.mov.1);
     }
 
     ///
@@ -77,7 +88,7 @@ impl VirtBall {
             let dy = (self.lpos.1 - self.cpos.1)/(dt as f32 +1.0);
             self.mov = (dx,dy);
         }
-        self.cpos = (self.cpos.0 + self.mov.0, self.cpos.1 + self.mov.1);
+        self.next_cpos();
         self.cpos
     }
 
