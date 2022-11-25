@@ -15,7 +15,7 @@ pub enum Card {
     Yellow,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Action {
     None,
     Kick(bool),

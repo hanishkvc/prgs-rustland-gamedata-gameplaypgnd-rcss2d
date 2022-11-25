@@ -182,7 +182,7 @@ impl Players {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ActionData {
     pub time: usize,
     side: char,
@@ -209,7 +209,8 @@ impl ActionData {
 #[derive(Debug)]
 pub struct ActionsInfo {
     players: Players,
-    pub actions: Vec<ActionData>,
+    actions: Vec<ActionData>,
+    pub rawactions: Vec<ActionData>,
 }
 
 impl ActionsInfo {
@@ -218,6 +219,7 @@ impl ActionsInfo {
         ActionsInfo {
             players: Players::new(acnt, bcnt),
             actions: Vec::new(),
+            rawactions: Vec::new(),
         }
     }
 
@@ -293,12 +295,15 @@ impl ActionsInfo {
         self.players.dist_update_from_pos(actiond.side, actiond.playerid, actiond.pos);
         match actiond.action {
             Action::Kick(_) => {
+                self.rawactions.push(actiond.clone());
                 self.handle_kick(actiond);
             },
             Action::Tackle(_) => {
+                self.rawactions.push(actiond.clone());
                 self.handle_tackle(actiond);
             },
             Action::Catch(_) => {
+                self.rawactions.push(actiond.clone());
                 self.handle_catch(actiond);
             },
             Action::None => {

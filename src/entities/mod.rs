@@ -224,7 +224,7 @@ impl<'a> PGEntities<'a> {
 
     pub fn save_virtball_csv(&mut self) {
         let mut sdata = String::new();
-        let actions = &self.actionsinfo.actions;
+        let actions = &self.actionsinfo.rawactions;
         for i in 0..actions.len() {
             let action = &actions[i];
             sdata.push_str(&format!("{},{},{}\n", action.time, action.pos.0, action.pos.1));
