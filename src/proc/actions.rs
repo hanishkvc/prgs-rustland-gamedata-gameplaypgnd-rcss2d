@@ -235,6 +235,27 @@ impl ActionsInfo {
         }
     }
 
+    /// Search through the actions list/vec in reverse order, till one finds
+    /// a action that one is looking for, or the amount of records to check
+    /// is exhausted.
+    ///
+    /// CheckMax: If 0, then check through all records, or else only check the
+    /// specified number of records.
+    fn find_actiondata_rev(&mut self, act: AIAction, checkmax: usize) -> Option<ActionData> {
+        let mut checkcnt = 0;
+        for i in (0..self.actions.len()-1).rev() {
+            checkcnt += 1;
+            if (checkmax > 0) && (checkcnt > checkmax) {
+                break;
+            }
+            let checkact = &self.actions[i];
+            if checkact.action == act {
+                return Some(checkact.clone());
+            }
+        }
+        None
+    }
+
     /// Add a kick data and inturn adjust the scores
     /// If a kick has changed sides, then
     /// * penalise prev side player and reward current side player
@@ -314,6 +335,11 @@ impl ActionsInfo {
 
     /// Goal action is handled here itself,
     /// other are passed to respective handlers
+    ///
+    /// TODO: If there is a catch inbetween, a kick and a goal,
+    /// then there is some issue with data, and the goal cant be
+    /// attributed to the immidiate previous kick. However this
+    /// is not taken care of currently.
     pub fn handle_action(&mut self, actiond: ActionData) {
         let mut bupdatedist = true;
         match actiond.action {
@@ -334,18 +360,15 @@ impl ActionsInfo {
                 let ik = self.actions.len();
                 let mut curact = actiond.clone();
                 if ik > 0 {
-                    let prevact = &self.actions[ik-1];
-                    if prevact.action == AIAction::Kick {
-                        if curact.playerid == entities::XPLAYERID_UNKNOWN {
-                            // Fill the player responsible for the goal bcas
-                            // One doesnt know whether a kick will become a goal or not
-                            // at the time of the kick, in general.
-                            curact.playerid = prevact.playerid;
-                        } else {
-                            eprintln!("WARN:{}:HandleAction:Goal {:?}:Player already set; PrevAction kick {:?}", MTAG, curact, prevact);
-                        }
+                    let prevact = self.find_actiondata_rev(AIAction::Kick, 4)
+                        .expect(&format!("DBUG:{}:HandleAction:Goal {:?}:No immidiate prev kick found:PrevAction {:?}", MTAG, curact, self.actions[ik-1]));
+                    if curact.playerid == entities::XPLAYERID_UNKNOWN {
+                        // Fill the player responsible for the goal bcas
+                        // One doesnt know whether a kick will become a goal or not
+                        // at the time of the kick, in general.
+                        curact.playerid = prevact.playerid;
                     } else {
-                        panic!("DBUG:{}:HandleAction:Goal {:?}:PrevAction not kick {:?}", MTAG, curact, prevact);
+                        eprintln!("WARN:{}:HandleAction:Goal {:?}:Player already set; PrevAction kick {:?}", MTAG, curact, prevact);
                     }
                     if prevact.side == curact.side {
                         // A successful goal

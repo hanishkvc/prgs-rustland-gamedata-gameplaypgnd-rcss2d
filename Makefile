@@ -19,6 +19,9 @@ rclive:
 test1:
 	target/release/playbackpgnd --mode rcg --src gamedata/20210626230154-ThunderLeague_21-vs-Hades2D_0.rcg
 
+test1_vb:
+	target/release/playbackpgnd --mode rcg --src gamedata/20210626230154-ThunderLeague_21-vs-Hades2D_0.rcg --virtball gamedata/20210626230154-ThunderLeague_21-vs-Hades2D_0.virtball.csv
+
 test2:
 	target/release/playbackpgnd --mode rcg --src gamedata/20221118233608-tm01_3-vs-tm02_1.rcg
 
