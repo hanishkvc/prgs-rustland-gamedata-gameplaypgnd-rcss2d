@@ -273,7 +273,7 @@ impl ActionsInfo {
     /// specified number of records.
     fn find_actiondata_rev(&mut self, act: AIAction, checkmax: usize) -> Option<ActionData> {
         let mut checkcnt = 0;
-        for i in (0..self.actions.len()-1).rev() {
+        for i in (0..self.actions.len()).rev() {
             checkcnt += 1;
             if (checkmax > 0) && (checkcnt > checkmax) {
                 break;
@@ -370,7 +370,7 @@ impl ActionsInfo {
     /// then there is some issue with data, and the goal cant be
     /// attributed to the immidiate previous kick. However this
     /// is not taken care of currently.
-    pub fn handle_action(&mut self, actiond: ActionData) {
+    pub fn handle_action_old(&mut self, actiond: ActionData) {
         let mut bupdatedist = true;
         match actiond.action {
             AIAction::Kick => {
@@ -569,13 +569,12 @@ impl ActionsInfo {
         }
     }
 
-    #[allow(dead_code)]
-    pub fn handle_actionx(&mut self, mut curactd: ActionData) {
+    pub fn handle_action(&mut self, mut curactd: ActionData) {
         let mut bupdate_actions = false;
         let mut bupdate_rawactions = true;
         let mut bupdate_dist = true;
         let mut lookbackcnt = 0;
-        for i in (0..self.actions.len()-1).rev() {
+        for i in (0..self.actions.len()).rev() {
             lookbackcnt += 1;
             if lookbackcnt > HA_LOOKBACK_MAX {
                 break;
