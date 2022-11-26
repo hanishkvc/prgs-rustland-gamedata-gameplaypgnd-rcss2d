@@ -514,12 +514,14 @@ impl ActionsInfo {
 
 }
 
+
+/// Helps tell what should one do after the handle helper returns
 pub enum HAReturn {
-    /// Continue checking the history further back
-    Continue,
-    /// Stop checking the history at this point.
+    /// Continue searching/checking the history further back, cas not yet done
+    ContinueSearch,
+    /// Stop checking the history at this point, ie be done with it.
     /// Inturn indicate whether to save the current action or not
-    Break(bool),
+    Done(bool),
 }
 
 impl ActionsInfo {
@@ -536,7 +538,7 @@ impl ActionsInfo {
                         let dtime = curactd.time-prevactd.time;
                         if dtime < SELF_PASS_MINTIME as usize {
                             ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
-                            return HAReturn::Break(false);
+                            return HAReturn::Done(false);
                         }
                         ppscore *= SCORE_SELF_PASS_RATIO;
                         cpscore *= SCORE_SELF_PASS_RATIO;
@@ -549,7 +551,7 @@ impl ActionsInfo {
                     let pscore = score.0 * score.4;
                     self.players.score(curactd.side, curactd.playerid, pscore);
                 }
-                return HAReturn::Break(true);
+                return HAReturn::Done(true);
             },
             AIAction::Goal => {
                 if prevactd.side == curactd.side {
@@ -561,7 +563,7 @@ impl ActionsInfo {
                     // This is like a no effort kick potentially, ie after a goal, so low score
                     let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
                     self.players.score(curactd.side, curactd.playerid, pscore);
-                    return HAReturn::Break(true);
+                    return HAReturn::Done(true);
                 }
             },
         }
@@ -585,7 +587,7 @@ impl ActionsInfo {
                     break;
                 },
                 AIAction::Kick => {
-                    if let HAReturn::Break(save) = self.handle_kickx(&mut curactd, &prevactd) {
+                    if let HAReturn::Done(save) = self.handle_kickx(&mut curactd, &prevactd) {
                         bupdate_actions = save;
                         break;
                     }
