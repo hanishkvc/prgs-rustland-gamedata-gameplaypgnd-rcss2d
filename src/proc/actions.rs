@@ -35,6 +35,7 @@ const SCORE_TACKLE: f32 = 0.6;
 const SCORE_CATCH: f32 = 1.0;
 const SCORE_GOAL: f32 = 1.0;
 
+const HA_LOOKBACK_MAX: usize = 4;
 
 #[derive(Debug)]
 /// Maintain the scoring related to a player
@@ -243,9 +244,13 @@ impl ActionData {
 }
 
 #[derive(Debug)]
+/// Contains info about game actions and inturn performance of the players
+/// NOTE: Movement is not a action, but only a perf characteristics
 pub struct ActionsInfo {
     players: Players,
+    /// Contains significant game actions
     actions: Vec<ActionData>,
+    /// Contains all game actions, even same actions which are too near in time.
     pub rawactions: Vec<ActionData>,
 }
 
@@ -504,6 +509,81 @@ impl ActionsInfo {
 
     pub fn summary(&self) {
         self.summary_asciiart();
+    }
+
+}
+
+pub enum HAReturn {
+    Continue,
+    Break(bool),
+}
+
+impl ActionsInfo {
+
+    pub fn handle_kickx(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+        match prevactd.action {
+            AIAction::None => todo!(),
+            AIAction::Kick => {
+                let score = curactd.action.scoring();
+                if prevactd.side == curactd.side {
+                    let pscore = score.0 * score.1;
+                    self.players.score(prevactd.side, prevactd.playerid, pscore);
+                    let pscore = score.0 * score.2;
+                    self.players.score(curactd.side, curactd.playerid, pscore);
+                } else {
+                    let pscore = score.0 * score.3;
+                    self.players.score(prevactd.side, prevactd.playerid, pscore);
+                    let pscore = score.0 * score.4;
+                    self.players.score(curactd.side, curactd.playerid, pscore);
+                }
+                return HAReturn::Break(true);
+            },
+            AIAction::Tackle => todo!(),
+            AIAction::Catch => todo!(),
+            AIAction::Goal => todo!(),
+        }
+        HAReturn::Break(false)
+    }
+
+    #[allow(dead_code)]
+    pub fn handle_actionx(&mut self, mut curactd: ActionData) {
+        let mut bupdate_actions = false;
+        let mut bupdate_rawactions = true;
+        let mut bupdate_dist = true;
+        let mut lookbackcnt = 0;
+        for i in (0..self.actions.len()-1).rev() {
+            lookbackcnt += 1;
+            if lookbackcnt > HA_LOOKBACK_MAX {
+                break;
+            }
+            let prevactd = self.actions[i].clone();
+            match curactd.action {
+                AIAction::None => {
+                    bupdate_rawactions = false;
+                    break;
+                },
+                AIAction::Kick => {
+                    if let HAReturn::Break(save) = self.handle_kickx(&mut curactd, &prevactd) {
+                        bupdate_actions = save;
+                        break;
+                    }
+                },
+                AIAction::Tackle => todo!(),
+                AIAction::Catch => todo!(),
+                AIAction::Goal => {
+                    bupdate_dist = false;
+                },
+            }
+        }
+        if bupdate_dist {
+            self.players.dist_update_from_pos(curactd.side, curactd.playerid, curactd.pos);
+        }
+        if bupdate_actions {
+            self.actions.push(curactd.clone());
+        }
+        if bupdate_rawactions {
+            self.rawactions.push(curactd);
+        }
     }
 
 }
