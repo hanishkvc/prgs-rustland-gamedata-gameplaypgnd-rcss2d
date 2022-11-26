@@ -525,10 +525,10 @@ pub enum HAReturn {
 impl ActionsInfo {
 
     pub fn handle_kickx(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+        let score = curactd.action.scoring();
         match prevactd.action {
             AIAction::None => panic!("DBUG:{}:HandleKick:Unexpect None{:?}->Kick{:?}", MTAG, prevactd, curactd),
             AIAction::Kick | AIAction::Catch | AIAction::Tackle => {
-                let score = curactd.action.scoring();
                 if prevactd.side == curactd.side {
                     let mut ppscore = score.0 * score.1;
                     let mut cpscore = score.0 * score.2;
@@ -551,7 +551,19 @@ impl ActionsInfo {
                 }
                 return HAReturn::Break(true);
             },
-            AIAction::Goal => todo!(),
+            AIAction::Goal => {
+                if prevactd.side == curactd.side {
+                    // After a side gets a goal, the otherside should kick
+                    // The person who has kicked currently has taken ball from the other side immidiately itself!
+                    // This shouldnt occur normally???
+                    panic!("DBUG:{}:HandleKick:Goal->Kick wrt same side???:{:?}-{:?}", MTAG, prevactd, curactd);
+                } else {
+                    // This is like a no effort kick potentially, ie after a goal, so low score
+                    let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
+                    self.players.score(curactd.side, curactd.playerid, pscore);
+                    return HAReturn::Break(true);
+                }
+            },
         }
     }
 
