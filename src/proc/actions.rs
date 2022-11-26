@@ -37,11 +37,17 @@ const SCORE_GOAL: f32 = 1.0;
 
 
 #[derive(Debug)]
+/// Maintain the scoring related to a player
 struct Score {
+    /// The overall score
     score: f32,
+    /// The number of kicks
     kicks: usize,
+    /// The number of tackles
     tackles: usize,
+    /// The number of catchs
     catchs: usize,
+    /// The total distance traversed
     dist: f32,
 }
 
