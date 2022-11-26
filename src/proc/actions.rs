@@ -100,6 +100,8 @@ impl Players {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
             return;
+        } else {
+            eprintln!("DBUG:{}:Players:Score:{}-{}:{}", MTAG, side, playerid, score);
         }
         if side == entities::SIDE_L {
             self.lplayers[playerid].1.score += score;
@@ -315,7 +317,7 @@ impl ActionsInfo {
     ///
     /// NOTE: Scoring wrt goal +ve or -ve is handled in handle_action itself.
     ///
-    pub fn handle_kick(&mut self, kick: ActionData) {
+    pub fn handle_kick_old(&mut self, kick: ActionData) {
         let ik = self.actions.len();
         if ik > 0 {
             let prev = &self.actions[ik-1];
@@ -349,7 +351,7 @@ impl ActionsInfo {
     /// Assumes a merged (be it kicks/tackles) actions vector.
     /// If the same player has repeat adjacent tackles, within a predefined short time,
     /// then the repeated tackle will be ignored.
-    pub fn handle_tackle(&mut self, tackle: ActionData) {
+    pub fn handle_tackle_old(&mut self, tackle: ActionData) {
         let it = self.actions.len();
         if it > 0 {
             let prev = &self.actions[it-1];
@@ -370,7 +372,7 @@ impl ActionsInfo {
         self.actions.push(tackle);
     }
 
-    pub fn handle_catch(&mut self, catch: ActionData) {
+    pub fn handle_catch_old(&mut self, catch: ActionData) {
         self.players.score(catch.side, catch.playerid, SCORE_CATCH);
         self.players.count_increment(catch.side, catch.playerid, AIAction::Catch);
     }
@@ -387,15 +389,15 @@ impl ActionsInfo {
         match actiond.action {
             AIAction::Kick => {
                 self.rawactions.push(actiond.clone());
-                self.handle_kick(actiond.clone());
+                self.handle_kick_old(actiond.clone());
             },
             AIAction::Tackle => {
                 self.rawactions.push(actiond.clone());
-                self.handle_tackle(actiond.clone());
+                self.handle_tackle_old(actiond.clone());
             },
             AIAction::Catch => {
                 self.rawactions.push(actiond.clone());
-                self.handle_catch(actiond.clone());
+                self.handle_catch_old(actiond.clone());
             },
             AIAction::Goal => {
                 bupdatedist = false;
@@ -609,6 +611,7 @@ impl ActionsInfo {
         }
     }
 
+    /// Handle the passed action.
     pub fn handle_action(&mut self, mut curactd: ActionData) {
         let mut bupdate_actions = false;
         let mut bupdate_rawactions = true;
@@ -642,6 +645,13 @@ impl ActionsInfo {
                 },
             }
         }
+        // Handle the special case of 1st action
+        if self.actions.len() == 0 {
+            if let AIAction::Kick = curactd.action {
+                bupdate_actions = true;
+            }
+        }
+        // Update things as required.
         if bupdate_dist {
             self.players.dist_update_from_pos(curactd.side, curactd.playerid, curactd.pos);
         }
