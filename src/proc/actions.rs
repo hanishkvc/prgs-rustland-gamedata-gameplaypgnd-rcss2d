@@ -36,6 +36,7 @@ const SCORE_CATCH: f32 = 1.0;
 const SCORE_GOAL: f32 = 1.0;
 
 const HA_LOOKBACK_MAX: usize = 4;
+const SCORE_SELF_PASS_RATIO: f32 = 0.05;
 
 #[derive(Debug)]
 /// Maintain the scoring related to a player
@@ -209,7 +210,7 @@ impl AIAction {
     pub fn scoring(&self) -> (f32, f32,f32, f32,f32) {
         match self {
             AIAction::None => (0.0, 0.0,0.0, 0.0,0.0),
-            AIAction::Kick => (0.6, 0.5,0.5, 0.5,-0.5),
+            AIAction::Kick => (0.6, 0.5,0.5, -0.8,0.8),
             AIAction::Tackle => (0.2, 0.0,0.0, 1.0,0.0),
             AIAction::Catch => (1.0, 0.0,0.0, 0.2,0.8),
             AIAction::Goal => (1.0, 1.0,0.0, -1.0,0.0),
@@ -514,7 +515,10 @@ impl ActionsInfo {
 }
 
 pub enum HAReturn {
+    /// Continue checking the history further back
     Continue,
+    /// Stop checking the history at this point.
+    /// Inturn indicate whether to save the current action or not
     Break(bool),
 }
 
@@ -522,14 +526,23 @@ impl ActionsInfo {
 
     pub fn handle_kickx(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         match prevactd.action {
-            AIAction::None => todo!(),
-            AIAction::Kick => {
+            AIAction::None => panic!("DBUG:{}:HandleKick:Unexpect None{:?}->Kick{:?}", MTAG, prevactd, curactd),
+            AIAction::Kick | AIAction::Catch | AIAction::Tackle => {
                 let score = curactd.action.scoring();
                 if prevactd.side == curactd.side {
-                    let pscore = score.0 * score.1;
-                    self.players.score(prevactd.side, prevactd.playerid, pscore);
-                    let pscore = score.0 * score.2;
-                    self.players.score(curactd.side, curactd.playerid, pscore);
+                    let mut ppscore = score.0 * score.1;
+                    let mut cpscore = score.0 * score.2;
+                    if (prevactd.playerid == curactd.playerid) && (prevactd.action == AIAction::Kick) {
+                        let dtime = curactd.time-prevactd.time;
+                        if dtime < SELF_PASS_MINTIME as usize {
+                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
+                            return HAReturn::Break(false);
+                        }
+                        ppscore *= SCORE_SELF_PASS_RATIO;
+                        cpscore *= SCORE_SELF_PASS_RATIO;
+                    }
+                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
+                    self.players.score(curactd.side, curactd.playerid, cpscore);
                 } else {
                     let pscore = score.0 * score.3;
                     self.players.score(prevactd.side, prevactd.playerid, pscore);
@@ -538,11 +551,8 @@ impl ActionsInfo {
                 }
                 return HAReturn::Break(true);
             },
-            AIAction::Tackle => todo!(),
-            AIAction::Catch => todo!(),
             AIAction::Goal => todo!(),
         }
-        HAReturn::Break(false)
     }
 
     #[allow(dead_code)]
