@@ -199,6 +199,24 @@ pub enum AIAction {
     Goal,
 }
 
+impl AIAction {
+
+    /// (TheScore, OwnPrevRatio,OwnCurRatio, OtherPrevRatio,OwnCurRatio)
+    ///
+    /// Wrt Goal the curside is the side which got the goal and curplayerid is unknown by default
+    /// the prev player who delivered the kick leading to the goal is the player who scored the goal
+    pub fn scoring(&self) -> (f32, f32,f32, f32,f32) {
+        match self {
+            AIAction::None => (0.0, 0.0,0.0, 0.0,0.0),
+            AIAction::Kick => (0.6, 0.5,0.5, 0.5,-0.5),
+            AIAction::Tackle => (0.2, 0.0,0.0, 1.0,0.0),
+            AIAction::Catch => (1.0, 0.0,0.0, 0.2,0.8),
+            AIAction::Goal => (1.0, 1.0,0.0, -1.0,0.0),
+        }
+    }
+
+}
+
 
 #[derive(Debug, Clone)]
 pub struct ActionData {
