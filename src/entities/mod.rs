@@ -12,7 +12,9 @@ use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 
 pub const SIDE_L: char = 'l';
 pub const SIDE_R: char = 'r';
-pub const XPLAYERID_UNKNOWN: usize = 1001;
+pub const XPLAYERID_START: usize = 0x1000;
+pub const XPLAYERID_UNKNOWN: usize = 0x1001;
+pub const XPLAYERID_OOPS_OTHERSIDE_START: usize = 0x8000;
 
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;

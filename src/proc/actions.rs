@@ -12,7 +12,6 @@ use loggerk::{ldebug, log_d};
 use sdl2::{pixels::Color, render::BlendMode};
 
 use crate::sdlx::SdlX;
-use crate::playdata::Action;
 use crate::entities;
 
 
@@ -98,6 +97,10 @@ impl Players {
 
     /// Help update the score of a specific player
     fn score(&mut self, side: char, playerid: usize, score: f32) {
+        if playerid >= entities::XPLAYERID_START {
+            ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
+            return;
+        }
         if side == entities::SIDE_L {
             self.lplayers[playerid].1.score += score;
         } else {
@@ -107,6 +110,10 @@ impl Players {
 
     /// Help update the count wrt specified action of a specific player
     fn count_increment(&mut self, side: char, playerid: usize, atype: AIAction) {
+        if playerid >= entities::XPLAYERID_START {
+            ldebug!(&format!("WARN:{}:Players:CountInc:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
+            return;
+        }
         let player;
         if side == entities::SIDE_L {
             player = &mut self.lplayers[playerid];
@@ -134,6 +141,10 @@ impl Players {
     }
 
     fn dist_update_from_pos(&mut self, side: char, playerid: usize, npos: Pos) {
+        if playerid >= entities::XPLAYERID_START {
+            ldebug!(&format!("WARN:{}:Players:DistUpdateFromPos:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
+            return;
+        }
         let player;
         if side == entities::SIDE_L {
             player = &mut self.lplayers[playerid];
@@ -405,7 +416,7 @@ impl ActionsInfo {
                         // A successful goal
                         self.players.score(curact.side, curact.playerid, SCORE_GOAL);
                     } else {
-                        // a self goal !?!
+                        // a self goal !?! // Oops below should have been prevact.side
                         self.players.score(curact.side, curact.playerid, -SCORE_GOAL);
                     }
                 }
@@ -570,6 +581,34 @@ impl ActionsInfo {
         }
     }
 
+    fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+        match prevactd.action {
+            AIAction::None | AIAction::Catch | AIAction::Goal => {
+                panic!("DBUG:{}:HandleAction:Goal:None/Catch/Goal{:?}->Goal{:?} shouldnt occur", MTAG, prevactd, curactd);
+            },
+            AIAction::Kick => {
+                if curactd.playerid >= entities::XPLAYERID_START {
+                    // Fill the player responsible for the goal bcas
+                    // One doesnt know whether a kick will become a goal or not
+                    // at the time of the kick, in general.
+                    curactd.playerid = prevactd.playerid;
+                } else {
+                    eprintln!("WARN:{}:HandleAction:Goal {:?}:Player already set; PrevAction kick {:?}", MTAG, curactd, prevactd);
+                }
+                if prevactd.side == curactd.side {
+                    // A successful goal
+                    self.players.score(curactd.side, curactd.playerid, SCORE_GOAL);
+                } else {
+                    // a self goal !?!
+                    curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
+                    self.players.score(prevactd.side, prevactd.playerid, -SCORE_GOAL);
+                }
+                HAReturn::ContinueSearch
+            },
+            AIAction::Tackle => HAReturn::ContinueSearch,
+        }
+    }
+
     pub fn handle_action(&mut self, mut curactd: ActionData) {
         let mut bupdate_actions = false;
         let mut bupdate_rawactions = true;
@@ -596,6 +635,10 @@ impl ActionsInfo {
                 AIAction::Catch => todo!(),
                 AIAction::Goal => {
                     bupdate_dist = false;
+                    if let HAReturn::Done(save) = self.handle_goal(&mut curactd, &prevactd) {
+                        bupdate_actions = save;
+                        break;
+                    }
                 },
             }
         }
