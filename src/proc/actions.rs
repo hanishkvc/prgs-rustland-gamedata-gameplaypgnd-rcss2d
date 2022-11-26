@@ -105,8 +105,8 @@ impl Players {
         }
     }
 
-    /// Help update the score of a specific player
-    fn count_increment(&mut self, side: char, playerid: usize, atype: Action) {
+    /// Help update the count wrt specified action of a specific player
+    fn count_increment(&mut self, side: char, playerid: usize, atype: AIAction) {
         let player;
         if side == entities::SIDE_L {
             player = &mut self.lplayers[playerid];
@@ -115,21 +115,22 @@ impl Players {
         }
         let stype;
         match atype {
-            Action::None => todo!(),
-            Action::Kick(_) => {
+            AIAction::None => stype = "None",
+            AIAction::Kick => {
                 stype = "Kick";
                 player.1.kicks += 1;
             },
-            Action::Catch(_) => {
+            AIAction::Catch => {
                 stype = "Catch";
                 player.1.catchs += 1;
             },
-            Action::Tackle(_) => {
+            AIAction::Tackle => {
                 stype = "Tackle";
                 player.1.tackles += 1;
             },
+            AIAction::Goal => stype = "Goal",
         }
-        ldebug!(&format!("DBUG:{}:{}:{}:{}", MTAG, side, playerid, stype));
+        ldebug!(&format!("DBUG:{}:CountInc:{}:{}:{}", MTAG, side, playerid, stype));
     }
 
     fn dist_update_from_pos(&mut self, side: char, playerid: usize, npos: Pos) {
@@ -330,7 +331,7 @@ impl ActionsInfo {
                 }
             }
         }
-        self.players.count_increment(kick.side, kick.playerid, Action::Kick(true));
+        self.players.count_increment(kick.side, kick.playerid, AIAction::Kick);
         self.actions.push(kick);
     }
 
@@ -354,13 +355,13 @@ impl ActionsInfo {
             }
         }
         self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
-        self.players.count_increment(tackle.side, tackle.playerid, Action::Tackle(true));
+        self.players.count_increment(tackle.side, tackle.playerid, AIAction::Tackle);
         self.actions.push(tackle);
     }
 
     pub fn handle_catch(&mut self, catch: ActionData) {
         self.players.score(catch.side, catch.playerid, SCORE_CATCH);
-        self.players.count_increment(catch.side, catch.playerid, Action::Catch(true));
+        self.players.count_increment(catch.side, catch.playerid, AIAction::Catch);
     }
 
     /// Goal action is handled here itself,
@@ -605,6 +606,7 @@ impl ActionsInfo {
             self.actions.push(curactd.clone());
         }
         if bupdate_rawactions {
+            self.players.count_increment(curactd.side, curactd.playerid, curactd.action.clone());
             self.rawactions.push(curactd);
         }
     }
