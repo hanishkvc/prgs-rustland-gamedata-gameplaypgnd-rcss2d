@@ -241,17 +241,19 @@ pub struct ActionData {
     playerid: usize,
     #[allow(dead_code)]
     pub pos: (f32, f32),
+    ballpos: (f32, f32),
     action: AIAction,
 }
 
 impl ActionData {
 
-    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32), action: AIAction) -> ActionData {
+    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32), ballpos: (f32,f32), action: AIAction) -> ActionData {
         ActionData {
             time: time,
             side: side,
             playerid: playerid,
             pos: pos,
+            ballpos: ballpos,
             action: action,
         }
     }
