@@ -250,11 +250,11 @@ impl AIAction {
 
 
 #[derive(Debug, Clone)]
+/// Maintain the required info wrt a game action.
 pub struct ActionData {
     pub time: usize,
     side: char,
     playerid: usize,
-    #[allow(dead_code)]
     pub pos: (f32, f32),
     action: AIAction,
 }
@@ -624,6 +624,7 @@ impl ActionsInfo {
     /// as tackle action data wrt rcss may also involve
     /// contact btw oppositie side players and no ball in picture, potentially (need to check this bit more)
     fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+        let score = curactd.action.scoring();
         match prevactd.action {
             AIAction::None | AIAction::Catch | AIAction::Goal => {
                 panic!("DBUG:{}:HandleGoal:None/Catch/Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
@@ -639,11 +640,13 @@ impl ActionsInfo {
                 }
                 if prevactd.side == curactd.side {
                     // A successful goal
-                    self.players.score(curactd.side, curactd.playerid, SCORE_GOAL);
+                    let pscore = score.0 * score.1;
+                    self.players.score(curactd.side, curactd.playerid, pscore);
                 } else {
                     // a self goal !?!
+                    let pscore = score.0 * score.3;
                     curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
-                    self.players.score(prevactd.side, prevactd.playerid, -SCORE_GOAL);
+                    self.players.score(prevactd.side, prevactd.playerid, pscore);
                 }
                 HAReturn::Done(true)
             },
