@@ -155,40 +155,40 @@ impl Players {
 
     /// Return the max player score for each of the teams
     fn score_max(&self) -> (f32, f32) {
-        let mut amax = f32::MIN;
+        let mut lmax = f32::MIN;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if amax < player.1.score {
-                amax = player.1.score;
+            if lmax < player.1.score {
+                lmax = player.1.score;
             }
         }
-        let mut bmax = f32::MIN;
+        let mut rmax = f32::MIN;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if bmax < player.1.score {
-                bmax = player.1.score;
+            if rmax < player.1.score {
+                rmax = player.1.score;
             }
         }
-        (amax, bmax)
+        (lmax, rmax)
     }
 
     /// Return the max player distance traversed for each of the teams
     fn dist_max(&self) -> (f32, f32) {
-        let mut amax = f32::MIN;
+        let mut lmax = f32::MIN;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if amax < player.1.dist {
-                amax = player.1.dist;
+            if lmax < player.1.dist {
+                lmax = player.1.dist;
             }
         }
-        let mut bmax = f32::MIN;
+        let mut rmax = f32::MIN;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if bmax < player.1.dist {
-                bmax = player.1.dist;
+            if rmax < player.1.dist {
+                rmax = player.1.dist;
             }
         }
-        (amax, bmax)
+        (lmax, rmax)
     }
 
 }
@@ -328,18 +328,18 @@ impl ActionsInfo {
     fn summary_simple(&self) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
-            eprintln!("DBUG:{}:A:{:02}:{}", MTAG, player.0, player.1.score);
+            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.0, player.1.score);
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
-            eprintln!("DBUG:{}:B:{:02}:{}", MTAG, player.0, player.1.score);
+            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.0, player.1.score);
         }
     }
 
     fn summary_asciiart(&self) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
-            eprint!("DBUG:{}:A:{:02}:", MTAG, player.0);
+            eprint!("DBUG:{}:L{:02}:", MTAG, player.0);
             for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
@@ -347,7 +347,7 @@ impl ActionsInfo {
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
-            eprint!("DBUG:{}:B:{:02}:", MTAG, player.0);
+            eprint!("DBUG:{}:R{:02}:", MTAG, player.0);
             for _j in 0..player.1.score.round() as usize {
                 eprint!("#");
             }
