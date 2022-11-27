@@ -69,14 +69,14 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
             if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
                 return ProgramEvent::DumpAIScoresSummary('A');
             } else {
-                return ProgramEvent::DumpAIScoresSummary('a');
+                return ProgramEvent::DumpAIScoresSummary('T');
             }
         },
         Keycode::D => {
             if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
-                return ProgramEvent::DumpAIDistancesSummary('D');
+                return ProgramEvent::DumpAIDistancesSummary('A');
             } else {
-                return ProgramEvent::DumpAIDistancesSummary('d');
+                return ProgramEvent::DumpAIDistancesSummary('T');
             }
         },
         Keycode::LShift | Keycode::RShift => return ProgramEvent::NeedMore,

@@ -370,7 +370,7 @@ impl ActionsInfo {
     /// Take the max score across players wrt each team and
     /// plot score bar relative to that max score.
     ///
-    /// SummaryType if 'a' => Bar relative to max in each team
+    /// SummaryType if 'T' => Bar relative to max in each team
     /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char) {
         // let (amax, bmax) = (20.0, 20.0);
@@ -397,9 +397,11 @@ impl ActionsInfo {
         }
     }
 
+    /// SummaryType if 'T' => Bar relative to max in each team
+    /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_dist_sdl(&self, sx: &mut SdlX, summarytype: char) {
         let (mut lmax, mut rmax) = self.players.dist_max();
-        if summarytype == 'D' {
+        if summarytype == 'A' {
             lmax = lmax.max(rmax);
             rmax = lmax;
         }

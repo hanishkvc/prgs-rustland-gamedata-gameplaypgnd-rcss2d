@@ -286,3 +286,5 @@ logic.
 
 Determine program window resolution dynamically at runtime based on screen res.
 
+Use generic summary relative calc type identification chars T(eam) & A(ll)
+

@@ -175,9 +175,9 @@ impl<'a> Gui<'a> {
             pgentities: pgentities,
             pdata: pdata,
             showaiscores: false,
-            aiscores_summarytype: 'a',
+            aiscores_summarytype: 'T',
             showaidistances: false,
-            aidistances_summarytype: 'd',
+            aidistances_summarytype: 'T',
             saved_virtball_csv: false,
         };
         // sync up fps to spr
