@@ -577,7 +577,7 @@ impl ActionsInfo {
     pub fn handle_kick(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
-            AIAction::None => panic!("DBUG:{}:HandleKick:Unexpect None{:?}->Kick{:?}", MTAG, prevactd, curactd),
+            AIAction::None => panic!("DBUG:{}:HandleKick:Unexpect None{}->Kick{}", MTAG, prevactd, curactd),
             AIAction::Kick | AIAction::Catch | AIAction::Tackle => {
                 if prevactd.side == curactd.side {
                     let mut ppscore = score.0 * score.1;
@@ -585,7 +585,7 @@ impl ActionsInfo {
                     if (prevactd.playerid == curactd.playerid) && (prevactd.action == AIAction::Kick) {
                         let dtime = curactd.time-prevactd.time;
                         if dtime < SELF_PASS_MINTIME as usize {
-                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
+                            ldebug!(&format!("DBUG:{}:{}{:02}:HandleKick:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
                             return HAReturn::Done(false);
                         }
                         ppscore *= SCORE_SELF_PASS_RATIO;
@@ -606,7 +606,7 @@ impl ActionsInfo {
                     // After a side gets a goal, the otherside should kick
                     // The person who has kicked currently has taken ball from the other side immidiately itself!
                     // This shouldnt occur normally???
-                    panic!("DBUG:{}:HandleKick:Goal->Kick wrt same side???:{:?}-{:?}", MTAG, prevactd, curactd);
+                    panic!("DBUG:{}:HandleKick:Goal{}->Kick{}, wrt same side???", MTAG, prevactd, curactd);
                 } else {
                     // This is like a no effort kick potentially, ie after a goal, so low score
                     let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
@@ -626,7 +626,7 @@ impl ActionsInfo {
     fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         match prevactd.action {
             AIAction::None | AIAction::Catch | AIAction::Goal => {
-                panic!("DBUG:{}:HandleAction:Goal:None/Catch/Goal{:?}->Goal{:?} shouldnt occur", MTAG, prevactd, curactd);
+                panic!("DBUG:{}:HandleGoal:None/Catch/Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
             },
             AIAction::Kick | AIAction::Tackle => {
                 if curactd.playerid >= entities::XPLAYERID_START {
@@ -635,7 +635,7 @@ impl ActionsInfo {
                     // at the time of the kick, in general.
                     curactd.playerid = prevactd.playerid;
                 } else {
-                    eprintln!("WARN:{}:HandleAction:Goal {:?}:Player already set; PrevAction kick {:?}", MTAG, curactd, prevactd);
+                    eprintln!("WARN:{}:HandleGoal:{}:Player already set; PrevAction Kick{}", MTAG, curactd, prevactd);
                 }
                 if prevactd.side == curactd.side {
                     // A successful goal
@@ -654,7 +654,7 @@ impl ActionsInfo {
         let score = curactd.action.scoring();
         match prevactd.action {
             AIAction::None => {
-                panic!("DBUG:{}:HandleAction:Tackle:None{:?}->Tackle{:?} shouldnt occur", MTAG, prevactd, curactd);
+                panic!("DBUG:{}:HandleTackle:None{}->Tackle{} shouldnt occur", MTAG, prevactd, curactd);
             },
             AIAction::Kick => {
                 if prevactd.side != curactd.side {
@@ -670,7 +670,7 @@ impl ActionsInfo {
                     if prevactd.playerid == curactd.playerid {
                         let dtime = curactd.time-prevactd.time;
                         if dtime < REPEAT_TACKLE_MINTIME as usize {
-                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat tackle data!?!:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
+                            ldebug!(&format!("DBUG:{}:{}{:02}:HandleTackle:Skipping TOO SOON repeat tackle data!?!:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
                             return HAReturn::Done(false);
                         }
                     }
@@ -684,7 +684,7 @@ impl ActionsInfo {
             },
             AIAction::Catch | AIAction::Goal => {
                 // Shouldnt occur (there should be a kick after these), however if it occurs, ignore for now
-                eprintln!("WARN:{}:HandleAction:Tackle:Catch/Goal{:?}->Tackle{:?} shouldnt occur, ignoring...", MTAG, prevactd, curactd);
+                eprintln!("WARN:{}:HandleTackle:Catch/Goal{}->Tackle{} shouldnt occur, ignoring...", MTAG, prevactd, curactd);
                 return HAReturn::Done(false);
             },
         }
@@ -694,7 +694,7 @@ impl ActionsInfo {
         let score = curactd.action.scoring();
         match prevactd.action {
             AIAction::None => {
-                panic!("DBUG:{}:HandleAction:Catch:None{:?}->Catch{:?} shouldnt occur", MTAG, prevactd, curactd);
+                panic!("DBUG:{}:HandleCatch:None{}->Catch{} shouldnt occur", MTAG, prevactd, curactd);
             },
             AIAction::Kick | AIAction::Tackle => {
                 let ppscore;
@@ -712,7 +712,7 @@ impl ActionsInfo {
             },
             AIAction::Catch | AIAction::Goal => {
                 // Shouldnt occur (there should be a kick after these), however if it occurs, ignore for now
-                eprintln!("WARN:{}:HandleAction:Tackle:Catch/Goal{:?}->Catch{:?} shouldnt occur, ignoring...", MTAG, prevactd, curactd);
+                eprintln!("WARN:{}:HandleCatch:Catch/Goal{}->Catch{} shouldnt occur, ignoring...", MTAG, prevactd, curactd);
                 return HAReturn::Done(false);
             },
         }
