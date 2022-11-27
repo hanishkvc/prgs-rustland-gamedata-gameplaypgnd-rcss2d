@@ -98,10 +98,10 @@ impl Players {
     /// Help update the score of a specific player
     fn score(&mut self, side: char, playerid: usize, score: f32) {
         if playerid >= entities::XPLAYERID_START {
-            ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
+            ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         } else {
-            eprintln!("DBUG:{}:Players:Score:{}-{}:{}", MTAG, side, playerid, score);
+            eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, score);
         }
         if side == entities::SIDE_L {
             self.lplayers[playerid].1.score += score;
@@ -113,7 +113,7 @@ impl Players {
     /// Help update the count wrt specified action of a specific player
     fn count_increment(&mut self, side: char, playerid: usize, atype: AIAction) {
         if playerid >= entities::XPLAYERID_START {
-            ldebug!(&format!("WARN:{}:Players:CountInc:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
+            ldebug!(&format!("WARN:{}:Players:CountInc:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         }
         let player;
@@ -139,12 +139,12 @@ impl Players {
             },
             AIAction::Goal => stype = "Goal",
         }
-        ldebug!(&format!("DBUG:{}:CountInc:{}:{}:{}", MTAG, side, playerid, stype));
+        ldebug!(&format!("DBUG:{}:CountInc:{}{:02}:{}", MTAG, side, playerid, stype));
     }
 
     fn dist_update_from_pos(&mut self, side: char, playerid: usize, npos: Pos) {
         if playerid >= entities::XPLAYERID_START {
-            ldebug!(&format!("WARN:{}:Players:DistUpdateFromPos:SpecialPlayerId:{}-{}:Ignoring...", MTAG, side, playerid));
+            ldebug!(&format!("WARN:{}:Players:DistUpdateFromPos:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         }
         let player;
@@ -331,7 +331,7 @@ impl ActionsInfo {
                     if prev.action == kick.action {
                         let dtime = kick.time as isize - prev.time as isize;
                         if dtime < SELF_PASS_MINTIME {
-                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, kick.side, kick.playerid, prev.time, kick.time, dtime));
+                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, kick.side, kick.playerid, prev.time, kick.time, dtime));
                             return;
                         }
                     }
@@ -360,7 +360,7 @@ impl ActionsInfo {
                     if prev.action == tackle.action {
                         let dtime = tackle.time as isize - prev.time as isize;
                         if dtime < REPEAT_TACKLE_MINTIME {
-                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat tackle????:{}:{}:{}", MTAG, tackle.side, tackle.playerid, prev.time, tackle.time, dtime));
+                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat tackle????:{}:{}:{}", MTAG, tackle.side, tackle.playerid, prev.time, tackle.time, dtime));
                             return;
                         }
                     }
@@ -551,7 +551,7 @@ impl ActionsInfo {
                     if (prevactd.playerid == curactd.playerid) && (prevactd.action == AIAction::Kick) {
                         let dtime = curactd.time-prevactd.time;
                         if dtime < SELF_PASS_MINTIME as usize {
-                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
+                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
                             return HAReturn::Done(false);
                         }
                         ppscore *= SCORE_SELF_PASS_RATIO;
@@ -636,7 +636,7 @@ impl ActionsInfo {
                     if prevactd.playerid == curactd.playerid {
                         let dtime = curactd.time-prevactd.time;
                         if dtime < REPEAT_TACKLE_MINTIME as usize {
-                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat tackle data!?!:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
+                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat tackle data!?!:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
                             return HAReturn::Done(false);
                         }
                     }
