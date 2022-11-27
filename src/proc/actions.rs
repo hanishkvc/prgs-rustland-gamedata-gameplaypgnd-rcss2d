@@ -8,6 +8,8 @@
 //! * Add support for providing scores for tackle/catch/etal
 //!
 
+use std::fmt::Display;
+
 use loggerk::{ldebug, log_d};
 use sdl2::{pixels::Color, render::BlendMode};
 
@@ -215,6 +217,19 @@ pub enum AIAction {
     Goal,
 }
 
+impl Display for AIAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let data = match self {
+            AIAction::None => "None",
+            AIAction::Kick => "Kick",
+            AIAction::Tackle => "Tackle",
+            AIAction::Catch => "Catch",
+            AIAction::Goal => "Goal",
+        };
+        f.write_str(data)
+    }
+}
+
 impl AIAction {
 
     /// (TheScore, OwnPrevRatio,OwnCurRatio, OtherPrevRatio,OwnCurRatio)
@@ -256,6 +271,25 @@ impl ActionData {
         }
     }
 
+    fn print(&self, print_aia_none: bool) {
+        let mut bprint = true;
+        match self.action {
+            AIAction::None => {
+                bprint = print_aia_none;
+            },
+            _ => (),
+        }
+        if bprint {
+            eprintln!("DBUG:{}:ActionData:{}", MTAG, self);
+        }
+    }
+
+}
+
+impl Display for ActionData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("[{}:{}{:02}:{}:({},{})]", self.time, self.side, self.playerid, self.action, self.pos.0, self.pos.1))
+    }
 }
 
 #[derive(Debug)]
@@ -686,6 +720,7 @@ impl ActionsInfo {
 
     /// Handle the passed action.
     pub fn handle_action(&mut self, mut curactd: ActionData) {
+        curactd.print(false);
         let mut bupdate_actions = false;
         let mut bupdate_rawactions = true;
         let mut bupdate_dist = true;
