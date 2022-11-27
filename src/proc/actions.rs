@@ -225,7 +225,7 @@ impl AIAction {
         match self {
             AIAction::None => (0.0, 0.0,0.0, 0.0,0.0),
             AIAction::Kick => (0.6, 0.5,0.5, -0.8,0.8),
-            AIAction::Tackle => (0.2, 0.0,0.0, 1.0,0.0),
+            AIAction::Tackle => (0.4, 0.0,0.0, -0.5,0.5),
             AIAction::Catch => (1.0, 0.0,0.0, 0.2,0.8),
             AIAction::Goal => (1.0, 1.0,0.0, -1.0,0.0),
         }
@@ -616,6 +616,46 @@ impl ActionsInfo {
         }
     }
 
+    fn handle_tackle(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+        let score = curactd.action.scoring();
+        match prevactd.action {
+            AIAction::None => {
+                panic!("DBUG:{}:HandleAction:Tackle:None{:?}->Tackle{:?} shouldnt occur", MTAG, prevactd, curactd);
+            },
+            AIAction::Kick => {
+                if prevactd.side != curactd.side {
+                    let ppscore = score.0 * score.3;
+                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
+                    let cpscore = score.0 * score.4;
+                    self.players.score(curactd.side, curactd.playerid, cpscore);
+                }
+                return HAReturn::Done(true);
+            },
+            AIAction::Tackle => {
+                if prevactd.side == curactd.side {
+                    if prevactd.playerid == curactd.playerid {
+                        let dtime = curactd.time-prevactd.time;
+                        if dtime < REPEAT_TACKLE_MINTIME as usize {
+                            ldebug!(&format!("DBUG:{}:{}:{}:Skipping TOO SOON repeat tackle data!?!:{}:{}:{}", MTAG, curactd.side, curactd.playerid, prevactd.time, curactd.time, dtime));
+                            return HAReturn::Done(false);
+                        }
+                    }
+                } else {
+                    let ppscore = score.0 * score.3;
+                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
+                    let cpscore = score.0 * score.4;
+                    self.players.score(curactd.side, curactd.playerid, cpscore);
+                }
+                return HAReturn::Done(true);
+            },
+            AIAction::Catch | AIAction::Goal => {
+                // Shouldnt occur (there should be a kick after these), however if it occurs, ignore for now
+                eprintln!("WARN:{}:HandleAction:Tackle:Catch/Goal{:?}->Tackle{:?} shouldnt occur, ignoring...", MTAG, prevactd, curactd);
+                return HAReturn::Done(false);
+            },
+        }
+    }
+
     /// Handle the passed action.
     pub fn handle_action(&mut self, mut curactd: ActionData) {
         let mut bupdate_actions = false;
@@ -639,7 +679,12 @@ impl ActionsInfo {
                         break;
                     }
                 },
-                AIAction::Tackle => (),
+                AIAction::Tackle => {
+                    if let HAReturn::Done(save) = self.handle_tackle(&mut curactd, &prevactd) {
+                        bupdate_actions = save;
+                        break;
+                    }
+                },
                 AIAction::Catch => (),
                 AIAction::Goal => {
                     bupdate_dist = false;
