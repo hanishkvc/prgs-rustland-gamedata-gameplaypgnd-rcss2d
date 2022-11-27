@@ -3,9 +3,9 @@
 //! HanishKVC, 2022
 //!
 //! TODO:
-//! * Track for goals/halftime/etal and avoid providing -ve scoring
+//! * Track for halftime/etal and avoid providing -ve scoring
 //!   due to any of these shifting side that will kick
-//! * Add support for providing scores for tackle/catch/etal
+//! * Allow -ve scoring to goalie, if they allow a goal to occur.
 //!
 
 use std::fmt::Display;
@@ -24,6 +24,9 @@ const SELF_PASS_MINTIME: isize = 10;
 
 const HA_LOOKBACK_MAX: usize = 4;
 const SCORE_SELF_PASS_RATIO: f32 = 0.05;
+/// Let goalie get a lesser penalty wrt self goal due to missed/unsuccessful catch,
+/// bcas they have atleast tried to catch the goal related kick from other/own side.
+const SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO: f32 = 0.5;
 
 #[derive(Debug)]
 /// Maintain the scoring related to a player
@@ -496,10 +499,10 @@ impl ActionsInfo {
     fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
-            AIAction::None | AIAction::Catch | AIAction::Goal => {
-                panic!("DBUG:{}:HandleGoal:None/Catch/Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
+            AIAction::None | AIAction::Goal => {
+                panic!("DBUG:{}:HandleGoal:None/Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
             },
-            AIAction::Kick | AIAction::Tackle => {
+            AIAction::Kick | AIAction::Tackle | AIAction::Catch => {
                 if curactd.playerid >= entities::XPLAYERID_START {
                     // Fill the player responsible for the goal bcas
                     // One doesnt know whether a kick will become a goal or not
@@ -514,8 +517,11 @@ impl ActionsInfo {
                     self.players.score(curactd.side, curactd.playerid, pscore);
                 } else {
                     // a self goal !?!
-                    let pscore = score.0 * score.3;
+                    let mut pscore = score.0 * score.3;
                     curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
+                    if prevactd.action == AIAction::Catch {
+                        pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
+                    }
                     self.players.score(prevactd.side, prevactd.playerid, pscore);
                 }
                 HAReturn::Done(true)
