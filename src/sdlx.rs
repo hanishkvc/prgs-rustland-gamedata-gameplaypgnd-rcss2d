@@ -21,6 +21,26 @@ pub const TTF_FONT: &str = "/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf"
 pub const TTF_FONT_SIZE: u16 = 16;
 
 
+pub static mut PRG_WIDTH: u32 = 1024;
+pub static mut PRG_HEIGHT: u32 = 600;
+
+fn update_prg_resolution(width: u32, height: u32) {
+    unsafe {
+        PRG_WIDTH = width;
+        PRG_HEIGHT = height;
+    }
+}
+
+pub fn get_prg_resolution() -> (u32, u32) {
+    let w;
+    let h;
+    unsafe {
+        w = PRG_WIDTH;
+        h = PRG_HEIGHT;
+    }
+    return (w, h)
+}
+
 /// Initialises and maintains the SDL contexts wrt Video and Events.
 pub struct SdlX {
     _ctxt: Sdl,
@@ -32,6 +52,23 @@ pub struct SdlX {
 }
 
 impl SdlX {
+
+    /// If able to get screen resolution, then use a ratio of it has the prg resolution
+    pub fn find_prg_resolution(vs: &VideoSubsystem, w: u32, h: u32) -> (u32, u32) {
+        let dm = vs.desktop_display_mode(0);
+        if dm.is_err() {
+            return (w, h);
+        }
+        let dm = dm.unwrap();
+        let dub_rect = vs.display_usable_bounds(0).unwrap();
+        let db_rect = vs.display_bounds(0).unwrap();
+        let fw = db_rect.w as f32;
+        let fh = db_rect.h as f32;
+        let pw = (fw*0.8).round() as u32;
+        let ph = (fh*0.8).round() as u32;
+        eprintln!("DBUG:SdlX:VS:{:?}:DispR:{:?}:DispU:{:?}:PrgWH:{}x{}", dm, db_rect, dub_rect, pw, ph);
+        (pw as u32, ph as u32)
+    }
 
     /// Initialise SDL
     ///
@@ -52,6 +89,8 @@ impl SdlX {
         let ctxt = sdl2::init().unwrap();
         // Setup window
         let vs = ctxt.video().unwrap();
+        let (width, height) = Self::find_prg_resolution(&vs, width, height);
+        update_prg_resolution(width, height);
         if ignore_wmping {
             sdl2::hint::set(&String::from_utf8(sdl2::sys::SDL_HINT_VIDEO_X11_NET_WM_PING.to_vec()).unwrap(), "0");
         }

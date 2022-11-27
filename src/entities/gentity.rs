@@ -11,10 +11,7 @@ use sdl2::render::BlendMode;
 
 use crate::sdlx::{self, SdlX};
 
-use super::SCREEN_WIDTH;
-use super::SCREEN_HEIGHT;
 use sdlx::COLOR_INVISIBLE;
-
 
 
 
@@ -118,7 +115,8 @@ impl<'a> GEntity<'a> {
 
     /// Convert the gentity's position into screen space from normal space
     pub fn ipos(&self) -> (i32, i32) {
-        ((self.npos.0 * SCREEN_WIDTH as f32).round() as i32, (self.npos.1 * SCREEN_HEIGHT as f32).round() as i32)
+        let (prgw, prgh) = sdlx::get_prg_resolution();
+        ((self.npos.0 * prgw as f32).round() as i32, (self.npos.1 * prgh as f32).round() as i32)
     }
 
     /// Set absolute position of the gentity in normal 0.0-1.0 space

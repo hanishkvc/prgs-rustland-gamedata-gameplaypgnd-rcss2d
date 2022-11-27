@@ -6,6 +6,7 @@
 use rand;
 
 use crate::entities;
+use crate::sdlx;
 use crate::sdlx::XSpaces;
 
 use super::PlayData;
@@ -13,9 +14,6 @@ use super::PlayUpdate;
 use super::VPlayerData;
 use super::PlayerData;
 
-
-use crate::entities::SCREEN_WIDTH;
-use crate::entities::SCREEN_HEIGHT;
 
 const FRAMES_NORMAL_SPR_MULT: f32 = 2.0;
 #[cfg(feature="inbetween_frames")]
@@ -32,12 +30,13 @@ struct Team {
 impl Team {
 
     fn new(cnt: usize) -> Team {
+        let (prgw, prgh) = sdlx::get_prg_resolution();
         let mut pos = Vec::new();
         let mut mov = Vec::new();
         let mut chg = Vec::new();
         for _i in 0..cnt {
-            let fx = (rand::random::<u32>() % entities::SCREEN_WIDTH) as f32;
-            let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
+            let fx = (rand::random::<u32>() % prgw) as f32;
+            let fy = (rand::random::<u32>() % prgh) as f32;
             pos.push((fx, fy));
             mov.push((0.0, 0.0));
             chg.push(1 + (rand::random::<usize>() % 128)*(FRAMES_NORMAL_SPR_MULT as usize));
@@ -52,16 +51,17 @@ impl Team {
     }
 
     fn fpos_fix(mut pos: (f32, f32)) -> (f32, f32) {
+        let (prgw, prgh) = sdlx::get_prg_resolution();
         if pos.0 < 0.0 {
-            pos.0 = SCREEN_WIDTH as f32;
+            pos.0 = prgw as f32;
         }
-        if pos.0 > (SCREEN_WIDTH as f32) {
+        if pos.0 > (prgw as f32) {
             pos.0 = 0.0;
         }
         if pos.1 < 0.0 {
-            pos.1 = SCREEN_HEIGHT as f32;
+            pos.1 = prgh as f32;
         }
-        if pos.1 > (SCREEN_HEIGHT as f32) {
+        if pos.1 > (prgh as f32) {
             pos.1 = 0.0;
         }
         return pos;
@@ -123,7 +123,8 @@ impl RandomData {
     ///
     /// base_spr: the smallest fraction of a second, at which the logic works internally wrt movemens
     pub fn new(base_spr: f32, acnt: usize, bcnt: usize) -> RandomData {
-        let srect = ((-20.0, -20.0), (SCREEN_WIDTH as f32 + 20.0, SCREEN_HEIGHT as f32 + 20.0));
+        let (prgw, prgh) = sdlx::get_prg_resolution();
+        let srect = ((-20.0, -20.0), (prgw as f32 + 20.0, prgh as f32 + 20.0));
         let nrect = ((0.0,0.0), (1.0,1.0));
         let ateam = Team::new(acnt);
         let bteam = Team::new(bcnt);

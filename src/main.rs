@@ -310,7 +310,8 @@ fn main() {
         std::process::exit(10);
     }
     let font = font.unwrap();
-    let mut sx = sdlx::SdlX::init_plus("PlaybackPGND", entities::SCREEN_WIDTH, entities::SCREEN_HEIGHT, false);
+    let mut sx = sdlx::SdlX::init_plus("PlaybackPGND", entities::BASE_SCREEN_WIDTH, entities::BASE_SCREEN_HEIGHT, false);
+    let (prgw, prgh) = sdlx::get_prg_resolution();
 
     let cfg = Cfg::load();
     // Get the gui program related entity
@@ -427,7 +428,7 @@ fn main() {
 
         // Save raw screen data
         if (cfg.save_interval > 0) && ((gui.frame % cfg.save_interval) == 0) {
-            let imgdata = sx.wc.read_pixels(Some(Rect::new(0,0,entities::SCREEN_WIDTH,entities::SCREEN_HEIGHT)), sdl2::pixels::PixelFormatEnum::RGB24).unwrap();
+            let imgdata = sx.wc.read_pixels(Some(Rect::new(0,0,prgw,prgh)), sdl2::pixels::PixelFormatEnum::RGB24).unwrap();
             std::fs::write(&format!("/tmp/ppgnd{:04}.rgb", gui.frame), imgdata).unwrap();
         }
 

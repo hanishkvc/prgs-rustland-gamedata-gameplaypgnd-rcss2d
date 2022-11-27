@@ -284,3 +284,5 @@ manner.
 Account for -ve scores, wrt the relative perf bars based graphical score summary
 logic.
 
+Determine program window resolution dynamically at runtime based on screen res.
+

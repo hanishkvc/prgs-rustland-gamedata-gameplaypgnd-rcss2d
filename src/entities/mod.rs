@@ -19,8 +19,8 @@ pub const XPLAYERID_OOPS_OTHERSIDE_START: usize = 0x8000;
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
 
-pub const SCREEN_WIDTH: u32 = 1024;
-pub const SCREEN_HEIGHT: u32 = 600;
+pub const BASE_SCREEN_WIDTH: u32 = 1024;
+pub const BASE_SCREEN_HEIGHT: u32 = 600;
 pub const SCREEN_COLOR_BG: Color = Color::RGB(20, 200, 20);
 
 pub const FRAMES_PER_SEC: usize = 24;

@@ -8,7 +8,7 @@ use sdl2::ttf::Font;
 
 use loggerk::{ldebug, log_d};
 
-use crate::entities::{self, ENTITY_WIDTH, ENTITY_HEIGHT};
+use crate::entities::{ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::GEntity;
 use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
@@ -39,10 +39,11 @@ impl<'a> Team<'a> {
             bstamina: true,
             bshowactions: true,
         };
-        let bx = (rand::random::<u32>() % entities::SCREEN_WIDTH) as f32;
+        let (prgw, prgh) = sdlx::get_prg_resolution();
+        let bx = (rand::random::<u32>() % prgw) as f32;
         for i in 0..nplayers {
-            let fx = (rand::random::<u32>() % (entities::SCREEN_WIDTH/4)) as f32;
-            let fy = (rand::random::<u32>() % entities::SCREEN_HEIGHT) as f32;
+            let fx = (rand::random::<u32>() % (prgw/4)) as f32;
+            let fy = (rand::random::<u32>() % prgh) as f32;
             team.players.push(GEntity::new(i.to_string().as_str(), (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
             team.pmoves.push((0.0,0.0));
             let mut chgmov = fx.round() as i32;
