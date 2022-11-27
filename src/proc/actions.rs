@@ -583,12 +583,18 @@ impl ActionsInfo {
         }
     }
 
+    /// Handle a Goal Action, by trying to find the kick or tackle
+    /// which might have lead to the goal.
+    ///
+    /// TODO: Need to check if Tackle is related to a possible contact with Ball (by checking for ball to be very near),
+    /// as tackle action data wrt rcss may also involve
+    /// contact btw oppositie side players and no ball in picture, potentially (need to check this bit more)
     fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         match prevactd.action {
             AIAction::None | AIAction::Catch | AIAction::Goal => {
                 panic!("DBUG:{}:HandleAction:Goal:None/Catch/Goal{:?}->Goal{:?} shouldnt occur", MTAG, prevactd, curactd);
             },
-            AIAction::Kick => {
+            AIAction::Kick | AIAction::Tackle => {
                 if curactd.playerid >= entities::XPLAYERID_START {
                     // Fill the player responsible for the goal bcas
                     // One doesnt know whether a kick will become a goal or not
@@ -607,7 +613,6 @@ impl ActionsInfo {
                 }
                 HAReturn::Done(true)
             },
-            AIAction::Tackle => HAReturn::ContinueSearch,
         }
     }
 
