@@ -375,18 +375,22 @@ impl ActionsInfo {
         if summarytype == 'A' {
             lmax = lmax.max(rmax);
             rmax = lmax;
+            lmin = lmin.min(rmin);
+            rmin = lmin;
         }
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/lmax), 0.04)
+            let lpscore = player.1.score - lmin;
+            sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(lpscore/(lmax-lmin)), 0.04)
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(player.1.score/rmax), 0.04)
+            let rpscore = player.1.score - rmin;
+            sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(rpscore/(rmax-rmin)), 0.04)
         }
     }
 
