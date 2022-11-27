@@ -605,7 +605,7 @@ impl ActionsInfo {
                     curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
                     self.players.score(prevactd.side, prevactd.playerid, -SCORE_GOAL);
                 }
-                HAReturn::ContinueSearch
+                HAReturn::Done(true)
             },
             AIAction::Tackle => HAReturn::ContinueSearch,
         }
@@ -634,8 +634,8 @@ impl ActionsInfo {
                         break;
                     }
                 },
-                AIAction::Tackle => todo!(),
-                AIAction::Catch => todo!(),
+                AIAction::Tackle => (),
+                AIAction::Catch => (),
                 AIAction::Goal => {
                     bupdate_dist = false;
                     if let HAReturn::Done(save) = self.handle_goal(&mut curactd, &prevactd) {
