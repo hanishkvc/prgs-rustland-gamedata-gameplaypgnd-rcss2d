@@ -274,3 +274,13 @@ Infer goal as a good or a self goal and identify the player responsible for same
 
 Timed messages box for user config change at runtime
 
+20221126++
+============
+
+Update the handle action logic to check thro all possible prev and cur action
+sequence possibilities, to a greater extent, with the new flow, in a explicit
+manner.
+
+Account for -ve scores, wrt the relative perf bars based graphical score summary
+logic.
+

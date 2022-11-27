@@ -649,6 +649,8 @@ impl ActionsInfo {
         if self.actions.len() == 0 {
             if let AIAction::Kick = curactd.action {
                 bupdate_actions = true;
+            } else if let AIAction::None = curactd.action {
+                bupdate_rawactions = false;
             }
         }
         // Update things as required.
@@ -660,6 +662,7 @@ impl ActionsInfo {
         }
         if bupdate_rawactions {
             self.players.count_increment(curactd.side, curactd.playerid, curactd.action.clone());
+            ldebug!(&format!("DBUG:{}:RawActions:{}", MTAG, curactd));
             self.rawactions.push(curactd);
         }
     }
