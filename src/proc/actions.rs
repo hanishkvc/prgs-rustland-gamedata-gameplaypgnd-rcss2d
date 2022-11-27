@@ -468,7 +468,6 @@ impl ActionsInfo {
         }
     }
 
-    #[allow(dead_code)]
     fn summary_simple(&self) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
@@ -558,6 +557,7 @@ impl ActionsInfo {
 
     pub fn summary(&self) {
         self.summary_asciiart();
+        self.summary_simple();
     }
 
 }
