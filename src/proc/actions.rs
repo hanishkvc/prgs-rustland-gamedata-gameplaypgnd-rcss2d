@@ -22,20 +22,6 @@ const MTAG: &str = "PPGND:ProcActions";
 const REPEAT_TACKLE_MINTIME: isize = 10;
 const SELF_PASS_MINTIME: isize = 10;
 
-//
-// The scores are set such that a tackle followed by a
-// kick by the other side, will still lead to a +ve score
-// for the person who mounted the tackle (TACKLE-BADPASS)
-//
-const SCORE_BAD_PASS: f32 = -0.4;
-const SCORE_HIJACK_PASS: f32 = -SCORE_BAD_PASS;
-const SCORE_GOOD_PASS_SENT: f32 = 0.8;
-const SCORE_GOOD_PASS_GOT: f32 = 0.4;
-const SCORE_SELF_PASS: f32 = 0.06;
-const SCORE_TACKLE: f32 = 0.6;
-const SCORE_CATCH: f32 = 1.0;
-const SCORE_GOAL: f32 = 1.0;
-
 const HA_LOOKBACK_MAX: usize = 4;
 const SCORE_SELF_PASS_RATIO: f32 = 0.05;
 
@@ -236,6 +222,10 @@ impl AIAction {
     ///
     /// Wrt Goal the curside is the side which got the goal and curplayerid is unknown by default
     /// the prev player who delivered the kick leading to the goal is the player who scored the goal
+    ///
+    /// TOTHINK: Should scores be set such that a tackle followed by a kick by the other side, still
+    /// lead to a +ve score for the person who mounted the tackle (TACKLE+BADPASS) ???
+    ///
     pub fn scoring(&self) -> (f32, f32,f32, f32,f32) {
         match self {
             AIAction::None => (0.0, 0.0,0.0, 0.0,0.0),
@@ -313,6 +303,7 @@ impl ActionsInfo {
         }
     }
 
+    #[allow(dead_code)]
     /// Search through the actions list/vec in reverse order, till one finds
     /// a action that one is looking for, or the amount of records to check
     /// is exhausted.
@@ -332,140 +323,6 @@ impl ActionsInfo {
             }
         }
         None
-    }
-
-    /// Add a kick data and inturn adjust the scores
-    /// If a kick has changed sides, then
-    /// * penalise prev side player and reward current side player
-    ///   * However if prev was a goal, dont penalise prev
-    ///   * TODO: This needs to account for half-time/...
-    /// Else
-    /// * if same player, reward to some extent
-    ///   provided ball was maintained for a sufficiently minimum time
-    /// * if diff players, reward both players for a good pass.
-    /// * NOTE: Small score_self_pass wrt self goal case, is not explicitly avoided for now.
-    ///
-    /// ALERT: prev and current actions dont matter wrt current list of actions,
-    /// except for the self pass case. However in future, if new actions are
-    /// added, the logical flow will have to be evaluated and updated if reqd.
-    ///
-    /// NOTE: Scoring wrt goal +ve or -ve is handled in handle_action itself.
-    ///
-    pub fn handle_kick_old(&mut self, kick: ActionData) {
-        let ik = self.actions.len();
-        if ik > 0 {
-            let prev = &self.actions[ik-1];
-            if prev.side != kick.side {
-                if prev.action != AIAction::Goal {
-                    self.players.score(prev.side, prev.playerid, SCORE_BAD_PASS);
-                }
-                self.players.score(kick.side, kick.playerid, SCORE_HIJACK_PASS);
-            } else {
-                if prev.playerid == kick.playerid {
-                    if prev.action == kick.action {
-                        let dtime = kick.time as isize - prev.time as isize;
-                        if dtime < SELF_PASS_MINTIME {
-                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat (self pass) kick????:{}:{}:{}", MTAG, kick.side, kick.playerid, prev.time, kick.time, dtime));
-                            return;
-                        }
-                    }
-                    self.players.score(prev.side, prev.playerid, SCORE_SELF_PASS);
-                } else {
-                    if prev.action != AIAction::Goal { // ie not a self goal
-                        self.players.score(prev.side, prev.playerid, SCORE_GOOD_PASS_SENT);
-                    }
-                    self.players.score(kick.side, kick.playerid, SCORE_GOOD_PASS_GOT);
-                }
-            }
-        }
-        self.players.count_increment(kick.side, kick.playerid, AIAction::Kick);
-        self.actions.push(kick);
-    }
-
-    /// Assumes a merged (be it kicks/tackles) actions vector.
-    /// If the same player has repeat adjacent tackles, within a predefined short time,
-    /// then the repeated tackle will be ignored.
-    pub fn handle_tackle_old(&mut self, tackle: ActionData) {
-        let it = self.actions.len();
-        if it > 0 {
-            let prev = &self.actions[it-1];
-            if prev.side == tackle.side {
-                if prev.playerid == tackle.playerid {
-                    if prev.action == tackle.action {
-                        let dtime = tackle.time as isize - prev.time as isize;
-                        if dtime < REPEAT_TACKLE_MINTIME {
-                            ldebug!(&format!("DBUG:{}:{}{:02}:Skipping TOO SOON repeat tackle????:{}:{}:{}", MTAG, tackle.side, tackle.playerid, prev.time, tackle.time, dtime));
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        self.players.score(tackle.side, tackle.playerid, SCORE_TACKLE);
-        self.players.count_increment(tackle.side, tackle.playerid, AIAction::Tackle);
-        self.actions.push(tackle);
-    }
-
-    pub fn handle_catch_old(&mut self, catch: ActionData) {
-        self.players.score(catch.side, catch.playerid, SCORE_CATCH);
-        self.players.count_increment(catch.side, catch.playerid, AIAction::Catch);
-    }
-
-    /// Goal action is handled here itself,
-    /// other are passed to respective handlers
-    ///
-    /// TODO: If there is a catch inbetween, a kick and a goal,
-    /// then there is some issue with data, and the goal cant be
-    /// attributed to the immidiate previous kick. However this
-    /// is not taken care of currently.
-    pub fn handle_action_old(&mut self, actiond: ActionData) {
-        let mut bupdatedist = true;
-        match actiond.action {
-            AIAction::Kick => {
-                self.rawactions.push(actiond.clone());
-                self.handle_kick_old(actiond.clone());
-            },
-            AIAction::Tackle => {
-                self.rawactions.push(actiond.clone());
-                self.handle_tackle_old(actiond.clone());
-            },
-            AIAction::Catch => {
-                self.rawactions.push(actiond.clone());
-                self.handle_catch_old(actiond.clone());
-            },
-            AIAction::Goal => {
-                bupdatedist = false;
-                let ik = self.actions.len();
-                let mut curact = actiond.clone();
-                if ik > 0 {
-                    let prevact = self.find_actiondata_rev(AIAction::Kick, 4)
-                        .expect(&format!("DBUG:{}:HandleAction:Goal {:?}:No immidiate prev kick found:PrevAction {:?}", MTAG, curact, self.actions[ik-1]));
-                    if curact.playerid == entities::XPLAYERID_UNKNOWN {
-                        // Fill the player responsible for the goal bcas
-                        // One doesnt know whether a kick will become a goal or not
-                        // at the time of the kick, in general.
-                        curact.playerid = prevact.playerid;
-                    } else {
-                        eprintln!("WARN:{}:HandleAction:Goal {:?}:Player already set; PrevAction kick {:?}", MTAG, curact, prevact);
-                    }
-                    if prevact.side == curact.side {
-                        // A successful goal
-                        self.players.score(curact.side, curact.playerid, SCORE_GOAL);
-                    } else {
-                        // a self goal !?! // Oops below should have been prevact.side
-                        self.players.score(curact.side, curact.playerid, -SCORE_GOAL);
-                    }
-                }
-                self.rawactions.push(curact.clone());
-                self.actions.push(curact);
-            }
-            AIAction::None => {
-                // usual player movements on the field
-            }
-        }
-        if bupdatedist {
-            self.players.dist_update_from_pos(actiond.side, actiond.playerid, actiond.pos);
-        }
     }
 
     fn summary_simple(&self) {
@@ -566,6 +423,7 @@ impl ActionsInfo {
 /// Helps tell what should one do after the handle helper returns
 pub enum HAReturn {
     /// Continue searching/checking the history further back, cas not yet done
+    #[allow(dead_code)]
     ContinueSearch,
     /// Stop checking the history at this point, ie be done with it.
     /// Inturn indicate whether to save the current action or not
