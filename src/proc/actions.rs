@@ -240,7 +240,7 @@ impl AIAction {
         match self {
             AIAction::None => (0.0, 0.0,0.0, 0.0,0.0),
             AIAction::Kick => (0.6, 0.5,0.5, -0.8,0.8),
-            AIAction::Tackle => (0.4, 0.0,0.0, -0.5,0.5),
+            AIAction::Tackle => (0.4, 0.5,0.5, -0.5,0.5),
             AIAction::Catch => (1.0, 0.4,0.4, 0.2,0.8), // Give some score to otherprev player bcas they tried to achieve a goal
             AIAction::Goal => (1.0, 1.0,0.0, -1.0,0.0),
         }
@@ -657,15 +657,22 @@ impl ActionsInfo {
                 panic!("DBUG:{}:HandleTackle:None{}->Tackle{} shouldnt occur", MTAG, prevactd, curactd);
             },
             AIAction::Kick => {
-                if prevactd.side != curactd.side {
-                    let ppscore = score.0 * score.3;
-                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
-                    let cpscore = score.0 * score.4;
-                    self.players.score(curactd.side, curactd.playerid, cpscore);
+                let ppscore;
+                let cpscore;
+                if prevactd.side == curactd.side {
+                    ppscore = score.0 * score.1;
+                    cpscore = score.0 * score.2;
+                } else {
+                    ppscore = score.0 * score.3;
+                    cpscore = score.0 * score.4;
                 }
+                self.players.score(prevactd.side, prevactd.playerid, ppscore);
+                self.players.score(curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Tackle => {
+                let ppscore;
+                let cpscore;
                 if prevactd.side == curactd.side {
                     if prevactd.playerid == curactd.playerid {
                         let dtime = curactd.time-prevactd.time;
@@ -674,12 +681,14 @@ impl ActionsInfo {
                             return HAReturn::Done(false);
                         }
                     }
+                    ppscore = score.0 * score.1;
+                    cpscore = score.0 * score.2;
                 } else {
-                    let ppscore = score.0 * score.3;
-                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
-                    let cpscore = score.0 * score.4;
-                    self.players.score(curactd.side, curactd.playerid, cpscore);
+                    ppscore = score.0 * score.3;
+                    cpscore = score.0 * score.4;
                 }
+                self.players.score(prevactd.side, prevactd.playerid, ppscore);
+                self.players.score(curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
