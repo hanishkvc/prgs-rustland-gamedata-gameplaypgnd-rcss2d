@@ -154,22 +154,30 @@ impl Players {
     }
 
     /// Return the max player score for each of the teams
-    fn score_max(&self) -> (f32, f32) {
+    fn score_minmax(&self) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
+        let mut lmin = f32::MAX;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
             if lmax < player.1.score {
                 lmax = player.1.score;
             }
+            if lmin > player.1.score {
+                lmin = player.1.score;
+            }
         }
         let mut rmax = f32::MIN;
+        let mut rmin = f32::MAX;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
             if rmax < player.1.score {
                 rmax = player.1.score;
             }
+            if rmin > player.1.score {
+                rmin = player.1.score;
+            }
         }
-        (lmax, rmax)
+        ((lmin,lmax), (rmin,rmax))
     }
 
     /// Return the max player distance traversed for each of the teams
@@ -363,7 +371,7 @@ impl ActionsInfo {
     /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char) {
         // let (amax, bmax) = (20.0, 20.0);
-        let (mut lmax, mut rmax) = self.players.score_max();
+        let ((mut lmin, mut lmax), (mut rmin, mut rmax)) = self.players.score_minmax();
         if summarytype == 'A' {
             lmax = lmax.max(rmax);
             rmax = lmax;
