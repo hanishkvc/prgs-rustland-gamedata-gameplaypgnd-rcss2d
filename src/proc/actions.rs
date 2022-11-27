@@ -656,6 +656,29 @@ impl ActionsInfo {
         }
     }
 
+    fn handle_catch(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+        let score = curactd.action.scoring();
+        match prevactd.action {
+            AIAction::None => {
+                panic!("DBUG:{}:HandleAction:Catch:None{:?}->Catch{:?} shouldnt occur", MTAG, prevactd, curactd);
+            },
+            AIAction::Kick | AIAction::Tackle => {
+                if prevactd.side != curactd.side {
+                    let ppscore = score.0 * score.3;
+                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
+                    let cpscore = score.0 * score.4;
+                    self.players.score(curactd.side, curactd.playerid, cpscore);
+                }
+                return HAReturn::Done(true);
+            },
+            AIAction::Catch | AIAction::Goal => {
+                // Shouldnt occur (there should be a kick after these), however if it occurs, ignore for now
+                eprintln!("WARN:{}:HandleAction:Tackle:Catch/Goal{:?}->Catch{:?} shouldnt occur, ignoring...", MTAG, prevactd, curactd);
+                return HAReturn::Done(false);
+            },
+        }
+    }
+
     /// Handle the passed action.
     pub fn handle_action(&mut self, mut curactd: ActionData) {
         let mut bupdate_actions = false;
@@ -685,7 +708,12 @@ impl ActionsInfo {
                         break;
                     }
                 },
-                AIAction::Catch => (),
+                AIAction::Catch => {
+                    if let HAReturn::Done(save) = self.handle_catch(&mut curactd, &prevactd) {
+                        bupdate_actions = save;
+                        break;
+                    }
+                },
                 AIAction::Goal => {
                     bupdate_dist = false;
                     if let HAReturn::Done(save) = self.handle_goal(&mut curactd, &prevactd) {
