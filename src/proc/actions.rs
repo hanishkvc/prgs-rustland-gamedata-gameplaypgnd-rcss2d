@@ -540,7 +540,7 @@ pub enum HAReturn {
 
 impl ActionsInfo {
 
-    pub fn handle_kickx(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+    pub fn handle_kick(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
             AIAction::None => panic!("DBUG:{}:HandleKick:Unexpect None{:?}->Kick{:?}", MTAG, prevactd, curactd),
@@ -634,7 +634,7 @@ impl ActionsInfo {
                     break;
                 },
                 AIAction::Kick => {
-                    if let HAReturn::Done(save) = self.handle_kickx(&mut curactd, &prevactd) {
+                    if let HAReturn::Done(save) = self.handle_kick(&mut curactd, &prevactd) {
                         bupdate_actions = save;
                         break;
                     }
