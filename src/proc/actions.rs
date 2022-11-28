@@ -540,9 +540,10 @@ impl ActionsInfo {
                 }
                 if prevactd.side == curactd.side {
                     // A successful goal
-                    // Nearest player scores more compared to farther players
+                    // Nearest player scores more compared to farther players, wrt the chain of actions leading to the goal
                     let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
-                    self.players.score(curactd.side, curactd.playerid, pscore);
+                    let pid = if lookbackcnt <= 1 { curactd.playerid } else { prevactd.playerid };
+                    self.players.score(curactd.side, pid, pscore);
                     if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
                         return HAReturn::Done(true);
                     }
@@ -552,6 +553,7 @@ impl ActionsInfo {
                     if lookbackcnt <= 1 {
                         let mut pscore = score.0 * score.3;
                         curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
+                        eprintln!("WARN:{}:HandleGoal:{}:Player updated - SelfGoal; PrevAction {}", MTAG, curactd, prevactd);
                         if prevactd.action == AIAction::Catch {
                             pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
                         }
