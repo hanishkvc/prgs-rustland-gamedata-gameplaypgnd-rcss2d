@@ -3,7 +3,7 @@
 //! HanishKVC, 2022
 //!
 
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 
 type TPlayerId = i32;
@@ -13,6 +13,17 @@ pub enum Card {
     None,
     Red,
     Yellow,
+}
+
+impl Display for Card {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let svariant = match self {
+            Card::None => "None",
+            Card::Red => "Red",
+            Card::Yellow => "Yellow",
+        };
+        f.write_str(svariant)
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]

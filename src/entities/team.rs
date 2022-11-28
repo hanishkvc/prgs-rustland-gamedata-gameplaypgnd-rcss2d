@@ -3,6 +3,8 @@
 //! HanishKVC, 2022
 //!
 
+use std::collections::HashMap;
+
 use sdl2::pixels::Color;
 use sdl2::ttf::Font;
 
@@ -21,6 +23,7 @@ pub struct Team<'a> {
     name: String,
     color: Color,
     players: Vec<GEntity<'a>>,
+    cards: HashMap<String, Vec<usize>>,
     bshowstamina: bool,
     bshowactions: bool,
 }
@@ -32,6 +35,7 @@ impl<'a> Team<'a> {
             name: name.to_string(),
             color: color,
             players: Vec::new(),
+            cards: HashMap::new(),
             bshowstamina: true,
             bshowactions: true,
         };
@@ -42,6 +46,8 @@ impl<'a> Team<'a> {
             let fy = (rand::random::<u32>() % prgh) as f32;
             team.players.push(GEntity::new(i.to_string().as_str(), (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
         }
+        team.cards.insert(playdata::Card::Red.to_string(), Vec::new());
+        team.cards.insert(playdata::Card::Yellow.to_string(), Vec::new());
         ldebug!(&format!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team));
         team
     }
@@ -85,6 +91,13 @@ impl<'a> Team<'a> {
                     },
                     playdata::PlayerData::Card(card) => {
                         // Cards
+                        let penalised = self.cards.get_mut(&card.to_string());
+                        if penalised.is_some() {
+                            let penalised = penalised.unwrap();
+                            if !penalised.contains(&pi) {
+                                penalised.push(pi);
+                            }
+                        }
                         let mut card_color = sdlx::COLOR_INVISIBLE;
                         if let playdata::Card::Red = card {
                             card_color = Color::RED;
