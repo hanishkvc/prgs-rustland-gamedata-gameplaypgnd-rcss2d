@@ -42,8 +42,8 @@ const SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO: f32 = 0.3;
 #[derive(Debug)]
 /// Maintain the scoring related to a player
 struct Score {
-    /// The overall score
-    score: f32,
+    /// The overall actions related score
+    ascore: f32,
     /// The number of kicks
     kicks: usize,
     /// The number of tackles
@@ -58,9 +58,9 @@ struct Score {
 
 impl Score {
 
-    fn new(score: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
+    fn new(ascore: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
         Score {
-            score: score,
+            ascore: ascore,
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
@@ -73,13 +73,13 @@ impl Score {
         return Score::new(0.0, 0, 0, 0, 0.0, playdata::Card::None);
     }
 
-    fn full_score(&self) -> f32 {
+    fn score(&self) -> f32 {
         let cardscore = match self.card {
             playdata::Card::None => 0.0,
-            playdata::Card::Yellow => 1.5,
-            playdata::Card::Red => 3.0,
+            playdata::Card::Yellow => -1.5,
+            playdata::Card::Red => -3.0,
         };
-        return self.score + cardscore;
+        return self.ascore + cardscore;
     }
 
 }
@@ -125,7 +125,7 @@ impl Players {
     }
 
     /// Help update the actions related score of a specific player
-    fn score(&mut self, side: char, playerid: usize, score: f32) {
+    fn ascore(&mut self, side: char, playerid: usize, score: f32) {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
@@ -133,9 +133,9 @@ impl Players {
             eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, score);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].1.score += score;
+            self.lplayers[playerid].1.ascore += score;
         } else {
-            self.rplayers[playerid].1.score += score;
+            self.rplayers[playerid].1.ascore += score;
         }
     }
 
@@ -194,28 +194,28 @@ impl Players {
         player.2 = npos;
     }
 
-    /// Return the max player score for each of the teams
+    /// Return the min and max player score for each of the teams
     fn score_minmax(&self) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
         let mut lmin = f32::MAX;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if lmax < player.1.score {
-                lmax = player.1.score;
+            if lmax < player.1.score() {
+                lmax = player.1.score();
             }
-            if lmin > player.1.score {
-                lmin = player.1.score;
+            if lmin > player.1.score() {
+                lmin = player.1.score();
             }
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if rmax < player.1.score {
-                rmax = player.1.score;
+            if rmax < player.1.score() {
+                rmax = player.1.score();
             }
-            if rmin > player.1.score {
-                rmin = player.1.score;
+            if rmin > player.1.score() {
+                rmin = player.1.score();
             }
         }
         ((lmin,lmax), (rmin,rmax))
@@ -377,11 +377,11 @@ impl ActionsInfo {
     fn summary_simple(&self) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
-            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.0, player.1.score);
+            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.0, player.1.score());
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
-            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.0, player.1.score);
+            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.0, player.1.score());
         }
     }
 
@@ -389,7 +389,7 @@ impl ActionsInfo {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
             eprint!("DBUG:{}:L{:02}:", MTAG, player.0);
-            for _j in 0..player.1.score.round() as usize {
+            for _j in 0..player.1.score().round() as usize {
                 eprint!("#");
             }
             eprintln!();
@@ -397,7 +397,7 @@ impl ActionsInfo {
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
             eprint!("DBUG:{}:R{:02}:", MTAG, player.0);
-            for _j in 0..player.1.score.round() as usize {
+            for _j in 0..player.1.score().round() as usize {
                 eprint!("#");
             }
             eprintln!();
@@ -423,14 +423,14 @@ impl ActionsInfo {
             let player = &self.players.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            let lpscore = player.1.score - lmin;
+            let lpscore = player.1.score() - lmin;
             sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(lpscore/(lmax-lmin)), 0.04)
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            let rpscore = player.1.score - rmin;
+            let rpscore = player.1.score() - rmin;
             sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(rpscore/(rmax-rmin)), 0.04)
         }
     }
@@ -507,13 +507,13 @@ impl ActionsInfo {
                         ppscore *= SCORE_SELF_PASS_RATIO;
                         cpscore *= SCORE_SELF_PASS_RATIO;
                     }
-                    self.players.score(prevactd.side, prevactd.playerid, ppscore);
-                    self.players.score(curactd.side, curactd.playerid, cpscore);
+                    self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
+                    self.players.ascore(curactd.side, curactd.playerid, cpscore);
                 } else {
                     let pscore = score.0 * score.3;
-                    self.players.score(prevactd.side, prevactd.playerid, pscore);
+                    self.players.ascore(prevactd.side, prevactd.playerid, pscore);
                     let pscore = score.0 * score.4;
-                    self.players.score(curactd.side, curactd.playerid, pscore);
+                    self.players.ascore(curactd.side, curactd.playerid, pscore);
                 }
                 return HAReturn::Done(true);
             },
@@ -526,7 +526,7 @@ impl ActionsInfo {
                 } else {
                     // This is like a no effort kick potentially, ie after a goal, so low score
                     let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
-                    self.players.score(curactd.side, curactd.playerid, pscore);
+                    self.players.ascore(curactd.side, curactd.playerid, pscore);
                     return HAReturn::Done(true);
                 }
             },
@@ -574,7 +574,7 @@ impl ActionsInfo {
                     // Nearest player scores more compared to farther players, wrt the chain of actions leading to the goal
                     let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
                     let pid = if lookbackcnt <= 1 { curactd.playerid } else { prevactd.playerid };
-                    self.players.score(curactd.side, pid, pscore);
+                    self.players.ascore(curactd.side, pid, pscore);
                     if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
                         return HAReturn::Done(true);
                     }
@@ -588,11 +588,11 @@ impl ActionsInfo {
                         if prevactd.action == AIAction::Catch {
                             pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
                         }
-                        self.players.score(prevactd.side, prevactd.playerid, pscore);
+                        self.players.ascore(prevactd.side, prevactd.playerid, pscore);
                         return HAReturn::ContinueSearch;
                     }
                     pscore *= SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO;
-                    self.players.score(prevactd.side, prevactd.playerid, pscore);
+                    self.players.ascore(prevactd.side, prevactd.playerid, pscore);
                     HAReturn::Done(true)
                 }
             },
@@ -619,8 +619,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.score(prevactd.side, prevactd.playerid, ppscore);
-                self.players.score(curactd.side, curactd.playerid, cpscore);
+                self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
+                self.players.ascore(curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Tackle => {
@@ -640,8 +640,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.score(prevactd.side, prevactd.playerid, ppscore);
-                self.players.score(curactd.side, curactd.playerid, cpscore);
+                self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
+                self.players.ascore(curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -672,8 +672,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.score(prevactd.side, prevactd.playerid, ppscore);
-                self.players.score(curactd.side, curactd.playerid, cpscore);
+                self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
+                self.players.ascore(curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
