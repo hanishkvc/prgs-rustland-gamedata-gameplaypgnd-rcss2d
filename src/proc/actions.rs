@@ -671,9 +671,16 @@ impl ActionsInfo {
                     }
                 },
                 AIAction::Goal => {
+                    // Allow 1st lookback check to filter out this goal if required.
+                    // Else If one goes beyond 1st lookback, then the goal is always saved into actions.
                     bupdate_dist = false;
-                    bupdate_actions = true;
-                    if let HAReturn::Done(_save) = self.handle_goal(&mut curactd, &prevactd, lookbackcnt) {
+                    if lookbackcnt > 1 {
+                        bupdate_actions = true;
+                    }
+                    if let HAReturn::Done(save) = self.handle_goal(&mut curactd, &prevactd, lookbackcnt) {
+                        if lookbackcnt <= 1 {
+                            bupdate_actions = save;
+                        }
                         break;
                     }
                 },
