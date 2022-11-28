@@ -36,6 +36,8 @@ const SCORE_SELF_PASS_RATIO: f32 = 0.05;
 /// Let goalie get a lesser penalty wrt self goal due to missed/unsuccessful catch,
 /// bcas they have atleast tried to catch the goal related kick from other/own side.
 const SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO: f32 = 0.5;
+/// Scoring ratio for Otherside in a goal chain
+const SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO: f32 = 0.3;
 
 #[derive(Debug)]
 /// Maintain the scoring related to a player
@@ -562,6 +564,7 @@ impl ActionsInfo {
                         self.players.score(prevactd.side, prevactd.playerid, pscore);
                         return HAReturn::ContinueSearch;
                     }
+                    pscore *= SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO;
                     self.players.score(prevactd.side, prevactd.playerid, pscore);
                     HAReturn::Done(true)
                 }

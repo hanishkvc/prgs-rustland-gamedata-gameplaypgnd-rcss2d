@@ -22,8 +22,10 @@ can include
   penalty, cards, ...
 
   * try infer
+
     * good/bad passes (minimal logic for now),
-    * good (including chain of actions) / self goal,
+
+    * good / bad (self) goals (including chain of actions leading to it)
 
   * also performance scoring based on infered/otherwise game actions
 
@@ -253,6 +255,23 @@ tmp file.
 NOTE: The logic accounts for seeking in a crude way, currently, which should
 be ok to an extent.
 
+Goals
+=======
+
+Look at the chain of actions leading upto the goal and inturn reward players
+of the side which got the goal and penalise the otherside players in the chain
+a bit. The chain stops either when the specified time window before wrt goal
+is reached or a player (beyond a goalie triggered self goal) belonging to the
+otherside has intervened in the chain.
+
+As the players of the otherside could not defend their side and stop the goal,
+so penalise them a bit. Currently goalie is penalised only if they arent able
+to hold on to a ball catch, and beyond the goalie self goal, only 1 player
+from the otherside is penalised. Maybe I need to penalise beyond 1, if we are
+still within the specified time window wrt goal and equally reward players
+from the goal taking side, who moved ball to reach till the point where the
+other side player intervened.
+
 
 Changelog
 ###########
@@ -302,5 +321,6 @@ Use generic summary relative calc type identification chars T(eam) & A(ll)
 ===========
 
 Try identify the chain/sequence of actions leading to a goal, and inturn reward
-the involved players of the successful goal side.
+the involved players of the successful goal side. And penalise 1 or 2 players
+from the otherside who are in the goal chain nearer to the goal action.
 
