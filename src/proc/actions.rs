@@ -241,7 +241,7 @@ impl AIAction {
         match self {
             AIAction::None => (0.0, 0.0,0.0, 0.0,0.0),
             AIAction::Kick => (0.6, 0.5,0.5, -0.8,0.8),
-            AIAction::Tackle => (0.4, 0.5,0.5, -0.5,0.5),
+            AIAction::Tackle => (0.4, 0.5,0.5, -0.4,0.6),
             AIAction::Catch => (1.0, 0.4,0.4, 0.2,0.8), // Give some score to otherprev player bcas they tried to achieve a goal
             AIAction::Goal => (1.0, 1.0,0.0, -1.0,0.0),
         }
@@ -449,6 +449,9 @@ pub enum HAReturn {
 
 impl ActionsInfo {
 
+    /// Score wrt good and bad passes (ie btw members of same team or not)
+    /// Lower score wrt self pass (ie same player keeping the ball going)
+    /// Lower scoring for kick after a goal
     pub fn handle_kick(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
@@ -492,8 +495,8 @@ impl ActionsInfo {
         }
     }
 
-    /// Handle a Goal Action, by trying to find the kick or tackle
-    /// which might have lead to the goal.
+    /// Handle a Goal Action, by trying to find the kick or tackle which might have lead to the goal.
+    /// Allow for a catch action not succeeding in stopping a goal.
     ///
     /// TODO: Need to check if Tackle is related to a possible contact with Ball (by checking for ball to be very near),
     /// as tackle action data wrt rcss may also involve
@@ -531,6 +534,10 @@ impl ActionsInfo {
         }
     }
 
+    /// Score tackle involving same side and opposite (slightly higher scoring) side.
+    /// Filter same player adjacent (wrt time) tackle actions to a minimum number.
+    ///   Retain action only if still present over a long period of time, without
+    ///   any other player/actions in between.
     fn handle_tackle(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
@@ -580,6 +587,10 @@ impl ActionsInfo {
         }
     }
 
+    /// Score the players in the immidiate sequence leading to a catch.
+    ///   Even if a action leads to the catch in the next time step, still
+    ///   give that player some +ve score, bcas they tried to hit a goal.
+    ///   NOTE: This is managed based on the scoring assigned wrt catch seqs.
     fn handle_catch(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
