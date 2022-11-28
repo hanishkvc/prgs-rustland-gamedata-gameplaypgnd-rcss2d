@@ -21,8 +21,6 @@ pub struct Team<'a> {
     name: String,
     color: Color,
     players: Vec<GEntity<'a>>,
-    pmoves: Vec<(f32,f32)>,
-    pchgmovs: Vec<i32>,
     bshowstamina: bool,
     bshowactions: bool,
 }
@@ -34,8 +32,6 @@ impl<'a> Team<'a> {
             name: name.to_string(),
             color: color,
             players: Vec::new(),
-            pmoves: Vec::new(),
-            pchgmovs: Vec::new(),
             bshowstamina: true,
             bshowactions: true,
         };
@@ -45,12 +41,6 @@ impl<'a> Team<'a> {
             let fx = (rand::random::<u32>() % (prgw/4)) as f32;
             let fy = (rand::random::<u32>() % prgh) as f32;
             team.players.push(GEntity::new(i.to_string().as_str(), (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
-            team.pmoves.push((0.0,0.0));
-            let mut chgmov = fx.round() as i32;
-            if chgmov == 0 {
-                chgmov = 1;
-            }
-            team.pchgmovs.push(chgmov);
         }
         ldebug!(&format!("INFO:PGND:Team:Created:{}:{:#?}\n", team.name, team));
         team
