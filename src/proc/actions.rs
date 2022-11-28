@@ -21,8 +21,9 @@ const MTAG: &str = "PPGND:ProcActions";
 
 const REPEAT_TACKLE_MINTIME: isize = 10;
 const SELF_PASS_MINTIME: isize = 10;
+const GOAL_CHAIN_TIME: usize = 10;
+const HA_LOOKBACK_MAX: usize = 12;
 
-const HA_LOOKBACK_MAX: usize = 4;
 const SCORE_SELF_PASS_RATIO: f32 = 0.05;
 /// Let goalie get a lesser penalty wrt self goal due to missed/unsuccessful catch,
 /// bcas they have atleast tried to catch the goal related kick from other/own side.
@@ -496,30 +497,39 @@ impl ActionsInfo {
     }
 
     /// Handle a Goal Action, by trying to find the kick or tackle which might have lead to the goal.
+    ///   Inturn set the player responsible for the goal.
     /// Allow for a catch action not succeeding in stopping a goal.
     ///
     /// TODO: Need to check if Tackle is related to a possible contact with Ball (by checking for ball to be very near),
     /// as tackle action data wrt rcss may also involve
     /// contact btw oppositie side players and no ball in picture, potentially (need to check this bit more)
-    fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData) -> HAReturn {
+    fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData, lookbackcnt: usize) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
             AIAction::None | AIAction::Goal => {
                 panic!("DBUG:{}:HandleGoal:None/Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
             },
             AIAction::Kick | AIAction::Tackle | AIAction::Catch => {
-                if curactd.playerid >= entities::XPLAYERID_START {
-                    // Fill the player responsible for the goal bcas
-                    // One doesnt know whether a kick will become a goal or not
-                    // at the time of the kick, in general.
-                    curactd.playerid = prevactd.playerid;
-                } else {
-                    eprintln!("WARN:{}:HandleGoal:{}:Player already set; PrevAction Kick{}", MTAG, curactd, prevactd);
+                if lookbackcnt <= 1 {
+                    if curactd.playerid >= entities::XPLAYERID_START {
+                        // Fill the player responsible for the goal bcas
+                        // One doesnt know whether a kick will become a goal or not
+                        // at the time of the kick, in general.
+                        curactd.playerid = prevactd.playerid;
+                        eprintln!("INFO:{}:HandleGoal:{}:Player updated; PrevAction {}", MTAG, curactd, prevactd);
+                    } else {
+                        eprintln!("WARN:{}:HandleGoal:{}:Player already set; PrevAction {}", MTAG, curactd, prevactd);
+                    }
                 }
                 if prevactd.side == curactd.side {
                     // A successful goal
-                    let pscore = score.0 * score.1;
+                    // Nearest player scores more compared to farther players
+                    let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
                     self.players.score(curactd.side, curactd.playerid, pscore);
+                    if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
+                        return HAReturn::Done(true);
+                    }
+                    return HAReturn::ContinueSearch;
                 } else {
                     // a self goal !?!
                     let mut pscore = score.0 * score.3;
@@ -528,8 +538,8 @@ impl ActionsInfo {
                         pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
                     }
                     self.players.score(prevactd.side, prevactd.playerid, pscore);
+                    HAReturn::Done(true)
                 }
-                HAReturn::Done(true)
             },
         }
     }
@@ -619,7 +629,12 @@ impl ActionsInfo {
         }
     }
 
-    /// Handle the passed action.
+    /// Handle the passed action by
+    /// * looking at the sequence leading to it and scoring players accordingly.
+    ///   * normally 1 step back,
+    ///   * multi step wrt goal chaining.
+    /// * updating action related counters
+    /// * maintaing a list of raw and filtered list/vec of actions
     pub fn handle_action(&mut self, mut curactd: ActionData) {
         curactd.print(false);
         let mut bupdate_actions = false;
@@ -657,8 +672,8 @@ impl ActionsInfo {
                 },
                 AIAction::Goal => {
                     bupdate_dist = false;
-                    if let HAReturn::Done(save) = self.handle_goal(&mut curactd, &prevactd) {
-                        bupdate_actions = save;
+                    bupdate_actions = true;
+                    if let HAReturn::Done(_save) = self.handle_goal(&mut curactd, &prevactd, lookbackcnt) {
                         break;
                     }
                 },
