@@ -6,6 +6,7 @@
 //! * Track for halftime/etal and avoid providing -ve scoring
 //!   due to any of these shifting side that will kick
 //! * Allow -ve scoring to goalie, if they allow a goal to occur.
+//! * Account cards/penalty during scoring.
 //!
 
 use std::fmt::Display;
@@ -19,10 +20,17 @@ use crate::entities;
 
 const MTAG: &str = "PPGND:ProcActions";
 
+/// Repeat consecutive tackle action records wrt the same player
+/// is ignored for this duration intervals.
 const REPEAT_TACKLE_MINTIME: isize = 10;
+/// Dabling the ball around the field by the same player,
+/// is ignored for this duration based intervals.
 const SELF_PASS_MINTIME: isize = 10;
-const GOAL_CHAIN_TIME: usize = 10;
-const HA_LOOKBACK_MAX: usize = 12;
+/// How much back in time to swim to find players to reward wrt goal.
+const GOAL_CHAIN_TIME: usize = 30;
+/// How long back should handle_action go when looking into the sequence of actions.
+/// This needs to be same or larger than GAOL_CHAIN_TIME, ideally, in a simple sense.
+const HA_LOOKBACK_MAX: usize = 30;
 
 const SCORE_SELF_PASS_RATIO: f32 = 0.05;
 /// Let goalie get a lesser penalty wrt self goal due to missed/unsuccessful catch,
@@ -497,17 +505,26 @@ impl ActionsInfo {
     }
 
     /// Handle a Goal Action, by trying to find the kick or tackle which might have lead to the goal.
-    ///   Inturn set the player responsible for the goal.
+    /// * Inturn set the player responsible for the goal.
     /// Allow for a catch action not succeeding in stopping a goal.
+    /// Allow the chain of actions leading to the goal to be identified and the players scored to some extent.
+    /// * -ve scoring wrt other side players is restricted to the self goal situation of
+    ///   a immidiate prev action to the goal action.
     ///
     /// TODO: Need to check if Tackle is related to a possible contact with Ball (by checking for ball to be very near),
-    /// as tackle action data wrt rcss may also involve
-    /// contact btw oppositie side players and no ball in picture, potentially (need to check this bit more)
+    /// as tackle action data wrt rcss may also involve contact btw oppositie side players and no ball in picture,
+    /// potentially (need to check this bit more).
     fn handle_goal(&mut self, curactd: &mut ActionData, prevactd: &ActionData, lookbackcnt: usize) -> HAReturn {
         let score = curactd.action.scoring();
         match prevactd.action {
-            AIAction::None | AIAction::Goal => {
-                panic!("DBUG:{}:HandleGoal:None/Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
+            AIAction::None => {
+                panic!("DBUG:{}:HandleGoal:{}:None {} shouldnt be in actions list", MTAG, curactd, prevactd);
+            },
+            AIAction::Goal => {
+                if lookbackcnt <= 1 {
+                    panic!("DBUG:{}:HandleGoal:Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
+                }
+                return HAReturn::Done(true);
             },
             AIAction::Kick | AIAction::Tackle | AIAction::Catch => {
                 if lookbackcnt <= 1 {
@@ -532,12 +549,14 @@ impl ActionsInfo {
                     return HAReturn::ContinueSearch;
                 } else {
                     // a self goal !?!
-                    let mut pscore = score.0 * score.3;
-                    curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
-                    if prevactd.action == AIAction::Catch {
-                        pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
+                    if lookbackcnt <= 1 {
+                        let mut pscore = score.0 * score.3;
+                        curactd.playerid += entities::XPLAYERID_OOPS_OTHERSIDE_START;
+                        if prevactd.action == AIAction::Catch {
+                            pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
+                        }
+                        self.players.score(prevactd.side, prevactd.playerid, pscore);
                     }
-                    self.players.score(prevactd.side, prevactd.playerid, pscore);
                     HAReturn::Done(true)
                 }
             },

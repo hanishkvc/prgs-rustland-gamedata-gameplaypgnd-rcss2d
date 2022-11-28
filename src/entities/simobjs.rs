@@ -80,6 +80,8 @@ impl VirtBall {
     /// done when ever the ball (or rather playback) has just gone past a
     /// known game action time, wrt the next segment.
     ///
+    /// MAYBE: Add support for non linear interpolated movement later.
+    ///
     pub fn next_record(&mut self, ctime: usize) -> (f32, f32) {
         if ctime == self.lastgentime {
             return self.cpos;

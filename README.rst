@@ -21,8 +21,11 @@ can include
 * game actions captured like goal, kick/tackle/... and good/bad pass/...,
   penalty, cards, ...
 
-  * try infer good/bad passes (minimal logic for now), good/self goal,
-    also performance scoring based on infered/otherwise game actions
+  * try infer
+    * good/bad passes (minimal logic for now),
+    * good (including chain of actions) / self goal,
+
+  * also performance scoring based on infered/otherwise game actions
 
 * color coding ++ of
 
@@ -131,6 +134,13 @@ One can use the following keys to control the behaviour as noted below.
 
     * NOTE: Seeking back after reaching end, will bring back the source
       to be alive.
+
+  * NOTE: This does mess with action sequence cross-check/analysis logics
+    and can inturn lead to crashing of program currently, as seeking can
+    lead to illogical sequence of events to been seen in a simple minded
+    flow. Code may be updated in future to be more forgiving and thus
+    support seeking without crashing, but analysis results would be still
+    messed, unless even more effort is put in the logic.
 
 * FPS - frames per second
 
@@ -287,4 +297,10 @@ logic.
 Determine program window resolution dynamically at runtime based on screen res.
 
 Use generic summary relative calc type identification chars T(eam) & A(ll)
+
+20221128++
+===========
+
+Try identify the chain/sequence of actions leading to a goal, and inturn reward
+the involved players of the successful goal side.
 
