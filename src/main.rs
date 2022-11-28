@@ -351,7 +351,7 @@ fn main() {
                     }
                 },
                 keys::ProgramEvent::ToggleShowActions => gui.pgentities.toggle_bshowactions(),
-                keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bstamina(),
+                keys::ProgramEvent::ToggleShowStamina => gui.pgentities.toggle_bshowstamina(),
                 keys::ProgramEvent::SeekBackward => gui.seek(-50),
                 keys::ProgramEvent::SeekForward => gui.seek(50),
                 keys::ProgramEvent::AdjustFPS(ratio) => {

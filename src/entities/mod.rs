@@ -234,9 +234,9 @@ impl<'a> PGEntities<'a> {
         self.rteam.adjust_players(0x0e); //3
     }
 
-    pub fn toggle_bstamina(&mut self) {
-        let lshow = self.lteam.toggle_bstamina();
-        let rshow = self.rteam.toggle_bstamina();
+    pub fn toggle_bshowstamina(&mut self) {
+        let lshow = self.lteam.toggle_bshowstamina();
+        let rshow = self.rteam.toggle_bshowstamina();
         if lshow && rshow {
             self.timedmsg.update_direct("Stamina:Show");
         } else {

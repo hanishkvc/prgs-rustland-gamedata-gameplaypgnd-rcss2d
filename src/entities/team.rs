@@ -23,7 +23,7 @@ pub struct Team<'a> {
     players: Vec<GEntity<'a>>,
     pmoves: Vec<(f32,f32)>,
     pchgmovs: Vec<i32>,
-    bstamina: bool,
+    bshowstamina: bool,
     bshowactions: bool,
 }
 
@@ -36,7 +36,7 @@ impl<'a> Team<'a> {
             players: Vec::new(),
             pmoves: Vec::new(),
             pchgmovs: Vec::new(),
-            bstamina: true,
+            bshowstamina: true,
             bshowactions: true,
         };
         let (prgw, prgh) = sdlx::get_prg_resolution();
@@ -86,7 +86,7 @@ impl<'a> Team<'a> {
                             71..=100 => Color::GREEN,
                             _ => todo!(),
                         };
-                        if !self.bstamina {
+                        if !self.bshowstamina {
                             stamina_color = COLOR_INVISIBLE;
                         }
                         //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, stamina_color);
@@ -165,9 +165,9 @@ impl<'a> Team<'a> {
         }
     }
 
-    pub fn toggle_bstamina(&mut self) -> bool {
-        self.bstamina = !self.bstamina;
-        self.bstamina
+    pub fn toggle_bshowstamina(&mut self) -> bool {
+        self.bshowstamina = !self.bshowstamina;
+        self.bshowstamina
     }
 
     pub fn toggle_bshowactions(&mut self) -> bool {
