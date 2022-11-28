@@ -8,7 +8,7 @@ use std::{collections::HashMap, fmt::Display};
 
 type TPlayerId = i32;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Card {
     None,
     Red,

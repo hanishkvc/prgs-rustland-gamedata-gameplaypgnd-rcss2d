@@ -15,7 +15,7 @@ use loggerk::{ldebug, log_d};
 use sdl2::{pixels::Color, render::BlendMode};
 
 use crate::sdlx::SdlX;
-use crate::entities;
+use crate::{entities, playdata};
 
 
 const MTAG: &str = "PPGND:ProcActions";
@@ -52,22 +52,34 @@ struct Score {
     catchs: usize,
     /// The total distance traversed
     dist: f32,
+    /// Card issued if any
+    card: playdata::Card,
 }
 
 impl Score {
 
-    fn new(score: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32) -> Score {
+    fn new(score: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
         Score {
             score: score,
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
             dist: dist,
+            card: card,
         }
     }
 
     fn default() -> Score {
-        return Score::new(0.0, 0, 0, 0, 0.0);
+        return Score::new(0.0, 0, 0, 0, 0.0, playdata::Card::None);
+    }
+
+    fn full_score(&self) -> f32 {
+        let cardscore = match self.card {
+            playdata::Card::None => 0.0,
+            playdata::Card::Yellow => 1.5,
+            playdata::Card::Red => 3.0,
+        };
+        return self.score + cardscore;
     }
 
 }
@@ -98,6 +110,21 @@ impl Players {
     }
 
     /// Help update the score of a specific player
+    fn card(&mut self, side: char, playerid: usize, card: playdata::Card) {
+        if playerid >= entities::XPLAYERID_START {
+            ldebug!(&format!("WARN:{}:Players:Card:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
+            return;
+        } else {
+            eprintln!("DBUG:{}:Players:Card:{}{:02}:{}", MTAG, side, playerid, card);
+        }
+        if side == entities::SIDE_L {
+            self.lplayers[playerid].1.card = card;
+        } else {
+            self.rplayers[playerid].1.card = card;
+        }
+    }
+
+    /// Help update the actions related score of a specific player
     fn score(&mut self, side: char, playerid: usize, score: f32) {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
@@ -734,6 +761,14 @@ impl ActionsInfo {
             ldebug!(&format!("DBUG:{}:RawActions:{}", MTAG, curactd));
             self.rawactions.push(curactd);
         }
+    }
+
+}
+
+impl ActionsInfo {
+
+    pub fn handle_card(&mut self, side: char, playerid: usize, card: playdata::Card) {
+        self.players.card(side, playerid, card);
     }
 
 }
