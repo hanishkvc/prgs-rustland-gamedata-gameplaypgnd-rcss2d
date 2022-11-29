@@ -146,11 +146,20 @@ to control the behaviour as noted below.
       to be alive.
 
   * NOTE: This does mess with action sequence cross-check/analysis logics
-    and can inturn lead to crashing of program currently, as seeking can
-    lead to illogical sequence of events to been seen in a simple minded
-    flow. Code may be updated in future to be more forgiving and thus
-    support seeking without crashing, but analysis results would be still
-    messed, unless even more effort is put in the logic.
+    and can inturn lead to messed up scoring++ and or worst case crashing
+    of program currently, as seeking can lead to illogical sequence of
+    events to been seen in a simple minded flow. Code may be updated in
+    future to be more forgiving and thus support seeking without crashing,
+    but analysis results could/would be still messed, unless even more
+    effort is put in the logic.
+
+    * seeking back wont crash, but the anal/infering flows and inturn
+      scoring/graph etal will be messed up, bcas the logic wont take back
+      / undo what it has already given.
+
+    * seeking forward can crash in some cases currently. As for anal/infer
+      flows, it will be messed up, as we jump over rather than run through
+      the skipped records.
 
 * FPS - frames per second
 
@@ -342,4 +351,6 @@ the involved players of the successful goal side. And penalise 1 or 2 players
 from the otherside who are in the goal chain nearer to the goal action.
 
 Optionally include penalty cards (yellow,red) in performance scoring shown.
+
+Make seek back not crash wrt ActionsInfo.
 

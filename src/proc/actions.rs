@@ -796,6 +796,8 @@ impl ActionsInfo {
     /// Skip all action records with a time stamp, which is
     /// greater than or equal to specified timestamp/counter.
     fn skip_after_including(&mut self, timecounter: usize) {
+        let sacnt = self.actions.len();
+        let sracnt = self.rawactions.len();
         // Skip wrt actions
         for i in (0..self.actions.len()).rev() {
             let checkact = &self.actions[i];
@@ -812,6 +814,9 @@ impl ActionsInfo {
             }
             self.rawactions.pop();
         }
+        let eacnt = self.actions.len();
+        let eracnt = self.rawactions.len();
+        eprintln!("DBUG:{}:SkipAfterInc:A:{}->{}:RA:{}->{}", MTAG, sacnt, eacnt, sracnt, eracnt);
     }
 
     /// There need not be records in ActionsInfo for each time step in the game,

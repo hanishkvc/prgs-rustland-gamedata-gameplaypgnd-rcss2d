@@ -255,10 +255,9 @@ impl<'a> PGEntities<'a> {
     }
 
     pub fn seek(&mut self, seekdelta: isize) {
-        if self.virtballd.is_none() {
-            return;
+        if self.virtballd.is_some() {
+            self.virtballd.as_mut().unwrap().seek(seekdelta);
         }
-        self.virtballd.as_mut().unwrap().seek(seekdelta);
         self.actionsinfo.seek(seekdelta);
     }
 
