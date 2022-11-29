@@ -349,8 +349,10 @@ pub struct ActionsInfo {
     players: Players,
     /// Contains significant game actions
     actions: Vec<ActionData>,
-    /// Contains all game actions, even same actions which are too near in time.
+    /// Contains all game actions, even same type actions which are too near in time.
     pub rawactions: Vec<ActionData>,
+    /// Flag to indicate a seek was requested
+    handle_deferedseek: bool,
 }
 
 impl ActionsInfo {
@@ -360,6 +362,7 @@ impl ActionsInfo {
             players: Players::new(acnt, bcnt),
             actions: Vec::new(),
             rawactions: Vec::new(),
+            handle_deferedseek: false,
         }
     }
 
@@ -702,6 +705,10 @@ impl ActionsInfo {
     /// * updating action related counters
     /// * maintaing a list of raw and filtered list/vec of actions
     pub fn handle_action(&mut self, mut curactd: ActionData) {
+        if self.handle_deferedseek {
+            self.skip_after_including(curactd.time);
+            self.handle_deferedseek = false;
+        }
         curactd.print(false);
         let mut bupdate_actions = false;
         let mut bupdate_rawactions = true;
@@ -786,12 +793,39 @@ impl ActionsInfo {
 
 impl ActionsInfo {
 
+    /// Skip all action records with a time stamp, which is
+    /// greater than or equal to specified timestamp/counter.
+    fn skip_after_including(&mut self, timecounter: usize) {
+        // Skip wrt actions
+        for i in (0..self.actions.len()).rev() {
+            let checkact = &self.actions[i];
+            if checkact.time < timecounter {
+                break;
+            }
+            self.actions.pop();
+        }
+        // Skip wrt rawactions
+        for i in (0..self.rawactions.len()).rev() {
+            let checkact = &self.rawactions[i];
+            if checkact.time < timecounter {
+                break;
+            }
+            self.rawactions.pop();
+        }
+    }
+
     /// There need not be records in ActionsInfo for each time step in the game,
     /// So also it wont know what is the latest/current time step active, so going
     /// back relative to current time step is not directly possible currently.
     /// Also as it stands currently, it is not necessary that all entities in the
     /// program will seek in the same way. So need to use a indirect logic wrt this.
-    pub fn seek(&mut self, seekdelta: isize) {
+    ///
+    /// NOTE: If a playdata source returns multiple actions wrt a time step and
+    /// inturn if after a seek (especially backwards), if it returns from somewhere
+    /// in the middle of the set of actions associated with the seeked timestamp,
+    /// then the handle_deferedseek through skip_after_including may not help fully.
+    pub fn seek(&mut self, _seekdelta: isize) {
+        self.handle_deferedseek = true;
     }
 
 }
