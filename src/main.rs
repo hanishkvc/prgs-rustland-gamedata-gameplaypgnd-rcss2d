@@ -27,6 +27,9 @@ mod testlib;
 mod keys;
 mod proc;
 
+
+const MTAG: &str = "GPPGND:Main";
+
 struct Cfg {
     mode: String,
     src: String,
@@ -178,9 +181,9 @@ impl<'a> Gui<'a> {
             pgentities: pgentities,
             pdata: pdata,
             showaiscores: false,
-            aiscores_summarytype: 'T',
+            aiscores_summarytype: actions::SUMMARY_RELATIVE_TEAM,
             showaidistances: false,
-            aidistances_summarytype: 'T',
+            aidistances_summarytype: actions::SUMMARY_RELATIVE_TEAM,
             saved_virtball_csv: false,
             inc_cardscore: true,
         };
@@ -200,7 +203,7 @@ impl<'a> Gui<'a> {
         self.pgentities.fps_adjust(ratio);
         self.pdata.fps_changed(self.pgentities.fps());
         self.internal_fps_changed(self.pgentities.fps());
-        eprintln!("INFO:GPPGND:Main:Fps:{}", self.pgentities.fps());
+        eprintln!("INFO:{}:Fps:{}", MTAG, self.pgentities.fps());
     }
 
     /// Update internal state, wrt/related-to begining of a new frame
@@ -246,9 +249,9 @@ fn show_help(sx: &mut SdlX) {
     c0:     RCLive init hs\n\
     h:      hide/unhide help\n\
     \n\
-    gameplaypgnd --mode rclive [--src nwaddr]\n\
-    gameplaypgnd --mode rcg --src <path/file.rcg>\n\
-    ...                   Save Nature Save Earth";
+    gameplaypgnd-rcss2d --mode rclive [--src nwaddr]\n\
+    gameplaypgnd-rcss2d --mode rcg --src <path/file.rcg>\n\
+    ...                      Save Nature Save Earth";
 
     let vhelp: Vec<&str> = shelp.split('\n').collect();
     sx.n_msgbox((0.3,0.2, 0.4,0.6), vhelp, Color::BLUE);
@@ -262,11 +265,11 @@ fn test_me(font: &Font) {
 }
 
 fn identify() {
-    println!("GamePlay Playground");
+    println!("INFO:{}:GamePlay Playground", MTAG);
     if cfg!(feature = "inbetween_frames") {
-        println!("INFO:GPPGND:Mode: InBetween Frames");
+        println!("INFO:{}:Mode: InBetween Frames", MTAG);
     } else {
-        println!("INFO:GPPGND:Mode: OnlyProvided Frames");
+        println!("INFO:{}:Mode: OnlyProvided Frames", MTAG);
     }
 }
 
@@ -310,7 +313,7 @@ fn main() {
     let font = ttfx.load_font(sdlx::TTF_FONT, sdlx::TTF_FONT_SIZE);
     if font.is_err() {
         let err = font.err().unwrap();
-        eprintln!("ERRR:GPPGND:Loading font[{}], install it or update font in sdlx.rs:{}", sdlx::TTF_FONT, err);
+        eprintln!("ERRR:{}:Loading font[{}], install it or update font in sdlx.rs:{}", MTAG, sdlx::TTF_FONT, err);
         std::process::exit(10);
     }
     let font = font.unwrap();
@@ -362,7 +365,7 @@ fn main() {
                     gui.fps_adjust(ratio);
                 },
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
-                keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:GPPGND:Main:Entities:{:#?}", gui.pgentities),
+                keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:{}:Entities:{:#?}", MTAG, gui.pgentities),
                 keys::ProgramEvent::DumpAIScoresSummary(summarytype) => {
                     gui.pgentities.actionsinfo.summary(gui.inc_cardscore);
                     if gui.aiscores_summarytype == summarytype {
@@ -400,7 +403,7 @@ fn main() {
                 if cfg!(feature = "inbetween_frames") {
                     if gui.pdata.next_frame_is_record_ready() {
                         let pu = gui.pdata.next_record();
-                        ldebug!(&format!("DBUG:{:?}", pu));
+                        ldebug!(&format!("DBUG:{}:{:?}", MTAG, pu));
                         gui.pgentities.update(pu, false, gui.pdata.seconds_per_record() * gui.pgentities.fps());
                         //eprintln!("DBUG:GPPGND:Main:{}:Update called", _frame);
                     }
