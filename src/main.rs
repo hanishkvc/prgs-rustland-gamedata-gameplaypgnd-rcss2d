@@ -381,6 +381,11 @@ fn main() {
                         gui.pgentities.timedmsg.update_direct(&format!("DistBars:{}", summarytype));
                     }
                 },
+                keys::ProgramEvent::DumpIncCardScore => {
+                    gui.inc_cardscore = !gui.inc_cardscore;
+                    let smsg = if gui.inc_cardscore { "CardScore:Include" } else { "CardScore:Exclude" };
+                    gui.pgentities.timedmsg.update_direct(smsg);
+                },
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),
             }

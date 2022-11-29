@@ -19,7 +19,7 @@ info captured manually or automatically (during the game or later). This
 can include
 
 * game actions captured like goal, kick/tackle/... and good/bad pass/...,
-  penalty, cards, ...
+  penalty/cards, ...
 
   * try infer
 
@@ -187,6 +187,9 @@ One can use the following keys to control the behaviour as noted below.
   * D -> to show ActionsInfo relative distance traversed summary based on
     most distance traversed across both teams.
 
+  * c -> toggle whether to include penalty card based scoring in ActionsInfo
+    relative perf summary graphics.
+
   * any other key -> exit internal-debug-mode
 
 
@@ -323,4 +326,6 @@ Use generic summary relative calc type identification chars T(eam) & A(ll)
 Try identify the chain/sequence of actions leading to a goal, and inturn reward
 the involved players of the successful goal side. And penalise 1 or 2 players
 from the otherside who are in the goal chain nearer to the goal action.
+
+Optionally include penalty cards (yellow,red) in performance scoring shown.
 

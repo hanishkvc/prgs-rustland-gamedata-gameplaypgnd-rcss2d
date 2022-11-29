@@ -24,6 +24,7 @@ pub enum ProgramEvent {
     DumpPGEntities,
     DumpAIScoresSummary(char),
     DumpAIDistancesSummary(char),
+    DumpIncCardScore,
     Quit,
     NeedMore,
 }
@@ -79,6 +80,9 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
                 return ProgramEvent::DumpAIDistancesSummary('T');
             }
         },
+        Keycode::C => {
+            return ProgramEvent::DumpIncCardScore;
+        }
         Keycode::LShift | Keycode::RShift => return ProgramEvent::NeedMore,
         _ => ldebug!(&format!("DBUG:PPGND:Keys:DCmds:{}:{}", keycode, keymod)),
     }
