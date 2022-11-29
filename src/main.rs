@@ -130,6 +130,8 @@ struct Gui<'a> {
     aidistances_summarytype: char,
     /// Whether virtball.csv file is already created or not
     saved_virtball_csv: bool,
+    /// Include Penalty Card based scoring in PerfScore or not
+    inc_cardscore: bool,
 }
 
 impl<'a> Gui<'a> {
@@ -179,6 +181,7 @@ impl<'a> Gui<'a> {
             showaidistances: false,
             aidistances_summarytype: 'T',
             saved_virtball_csv: false,
+            inc_cardscore: true,
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -360,7 +363,7 @@ fn main() {
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
                 keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
                 keys::ProgramEvent::DumpAIScoresSummary(summarytype) => {
-                    gui.pgentities.actionsinfo.summary();
+                    gui.pgentities.actionsinfo.summary(gui.inc_cardscore);
                     if gui.aiscores_summarytype == summarytype {
                         gui.showaiscores = !gui.showaiscores;
                     }
@@ -417,7 +420,7 @@ fn main() {
 
         // Draw info
         if gui.showaiscores {
-            gui.pgentities.actionsinfo.summary_score_sdl(&mut sx, gui.aiscores_summarytype);
+            gui.pgentities.actionsinfo.summary_score_sdl(&mut sx, gui.aiscores_summarytype, gui.inc_cardscore);
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);

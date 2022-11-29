@@ -94,16 +94,14 @@ type Pos = (f32, f32);
 
 #[derive(Debug)]
 struct Players {
-    inc_cardscore: bool,
     lplayers: Vec<(usize, Score, Pos)>,
     rplayers: Vec<(usize, Score, Pos)>,
 }
 
 impl Players {
 
-    fn new(lcnt: usize, rcnt: usize, inc_cardscore: bool) -> Players {
+    fn new(lcnt: usize, rcnt: usize) -> Players {
         let mut players = Players {
-            inc_cardscore: inc_cardscore,
             lplayers: Vec::new(),
             rplayers: Vec::new(),
         };
@@ -202,27 +200,27 @@ impl Players {
     }
 
     /// Return the min and max player score for each of the teams
-    fn score_minmax(&self) -> ((f32,f32), (f32,f32)) {
+    fn score_minmax(&self, inc_cardscore: bool) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
         let mut lmin = f32::MAX;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if lmax < player.1.score(self.inc_cardscore) {
-                lmax = player.1.score(self.inc_cardscore);
+            if lmax < player.1.score(inc_cardscore) {
+                lmax = player.1.score(inc_cardscore);
             }
-            if lmin > player.1.score(self.inc_cardscore) {
-                lmin = player.1.score(self.inc_cardscore);
+            if lmin > player.1.score(inc_cardscore) {
+                lmin = player.1.score(inc_cardscore);
             }
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if rmax < player.1.score(self.inc_cardscore) {
-                rmax = player.1.score(self.inc_cardscore);
+            if rmax < player.1.score(inc_cardscore) {
+                rmax = player.1.score(inc_cardscore);
             }
-            if rmin > player.1.score(self.inc_cardscore) {
-                rmin = player.1.score(self.inc_cardscore);
+            if rmin > player.1.score(inc_cardscore) {
+                rmin = player.1.score(inc_cardscore);
             }
         }
         ((lmin,lmax), (rmin,rmax))
@@ -381,22 +379,22 @@ impl ActionsInfo {
         None
     }
 
-    fn summary_simple(&self) {
+    fn summary_simple(&self, inc_cardscore: bool) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
-            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.0, player.1.score());
+            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.0, player.1.score(inc_cardscore));
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
-            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.0, player.1.score());
+            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.0, player.1.score(inc_cardscore));
         }
     }
 
-    fn summary_asciiart(&self) {
+    fn summary_asciiart(&self, inc_cardscore: bool) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
             eprint!("DBUG:{}:L{:02}:", MTAG, player.0);
-            for _j in 0..player.1.score().round() as usize {
+            for _j in 0..player.1.score(inc_cardscore).round() as usize {
                 eprint!("#");
             }
             eprintln!();
@@ -404,7 +402,7 @@ impl ActionsInfo {
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
             eprint!("DBUG:{}:R{:02}:", MTAG, player.0);
-            for _j in 0..player.1.score().round() as usize {
+            for _j in 0..player.1.score(inc_cardscore).round() as usize {
                 eprint!("#");
             }
             eprintln!();
@@ -417,9 +415,9 @@ impl ActionsInfo {
     ///
     /// SummaryType if 'T' => Bar relative to max in each team
     /// SummaryType if 'A' => Bar relative to max across both teams
-    pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char) {
+    pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char, inc_cardscore: bool) {
         // let (amax, bmax) = (20.0, 20.0);
-        let ((mut lmin, mut lmax), (mut rmin, mut rmax)) = self.players.score_minmax();
+        let ((mut lmin, mut lmax), (mut rmin, mut rmax)) = self.players.score_minmax(inc_cardscore);
         if summarytype == 'A' {
             lmax = lmax.max(rmax);
             rmax = lmax;
@@ -430,14 +428,14 @@ impl ActionsInfo {
             let player = &self.players.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            let lpscore = player.1.score() - lmin;
+            let lpscore = player.1.score(inc_cardscore) - lmin;
             sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(lpscore/(lmax-lmin)), 0.04)
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            let rpscore = player.1.score() - rmin;
+            let rpscore = player.1.score(inc_cardscore) - rmin;
             sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(rpscore/(rmax-rmin)), 0.04)
         }
     }
@@ -474,9 +472,9 @@ impl ActionsInfo {
         }
     }
 
-    pub fn summary(&self) {
-        self.summary_asciiart();
-        self.summary_simple();
+    pub fn summary(&self, inc_cardscore: bool) {
+        self.summary_asciiart(inc_cardscore);
+        self.summary_simple(inc_cardscore);
     }
 
 }
