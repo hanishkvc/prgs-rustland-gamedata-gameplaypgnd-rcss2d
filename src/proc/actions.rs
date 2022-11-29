@@ -5,7 +5,8 @@
 //! TODO:
 //! * Track for halftime/etal and avoid providing -ve scoring
 //!   due to any of these shifting side that will kick
-//! * Allow -ve scoring to goalie, if they allow a goal to occur.
+//! * Allow -ve scoring to goalie, if they allow a goal to occur
+//!   ie beyond the failed catch situations.
 //! * Account penalties beyond cards during scoring.
 //!
 
@@ -779,6 +780,18 @@ impl ActionsInfo {
 
     pub fn handle_card(&mut self, side: char, playerid: usize, card: playdata::Card) {
         self.players.card(side, playerid, card);
+    }
+
+}
+
+impl ActionsInfo {
+
+    /// There need not be records in ActionsInfo for each time step in the game,
+    /// So also it wont know what is the latest/current time step active, so going
+    /// back relative to current time step is not directly possible currently.
+    /// Also as it stands currently, it is not necessary that all entities in the
+    /// program will seek in the same way. So need to use a indirect logic wrt this.
+    pub fn seek(&mut self, seekdelta: isize) {
     }
 
 }

@@ -259,6 +259,7 @@ impl<'a> PGEntities<'a> {
             return;
         }
         self.virtballd.as_mut().unwrap().seek(seekdelta);
+        self.actionsinfo.seek(seekdelta);
     }
 
     pub fn save_virtball_csv(&mut self) {
