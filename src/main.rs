@@ -200,7 +200,7 @@ impl<'a> Gui<'a> {
         self.pgentities.fps_adjust(ratio);
         self.pdata.fps_changed(self.pgentities.fps());
         self.internal_fps_changed(self.pgentities.fps());
-        eprintln!("INFO:PPGND:Main:Fps:{}", self.pgentities.fps());
+        eprintln!("INFO:GPPGND:Main:Fps:{}", self.pgentities.fps());
     }
 
     /// Update internal state, wrt/related-to begining of a new frame
@@ -246,8 +246,8 @@ fn show_help(sx: &mut SdlX) {
     c0:     RCLive init hs\n\
     h:      hide/unhide help\n\
     \n\
-    playbackpgnd --mode rclive [--src nwaddr]\n\
-    playbackpgnd --mode rcg --src <path/file.rcg>\n\
+    gameplaypgnd --mode rclive [--src nwaddr]\n\
+    gameplaypgnd --mode rcg --src <path/file.rcg>\n\
     ...                   Save Nature Save Earth";
 
     let vhelp: Vec<&str> = shelp.split('\n').collect();
@@ -262,11 +262,11 @@ fn test_me(font: &Font) {
 }
 
 fn identify() {
-    println!("Playback Playground");
+    println!("GamePlay Playground");
     if cfg!(feature = "inbetween_frames") {
-        println!("INFO:PPGND:Mode: InBetween Frames");
+        println!("INFO:GPPGND:Mode: InBetween Frames");
     } else {
-        println!("INFO:PPGND:Mode: OnlyProvided Frames");
+        println!("INFO:GPPGND:Mode: OnlyProvided Frames");
     }
 }
 
@@ -310,11 +310,11 @@ fn main() {
     let font = ttfx.load_font(sdlx::TTF_FONT, sdlx::TTF_FONT_SIZE);
     if font.is_err() {
         let err = font.err().unwrap();
-        eprintln!("ERRR:PPGND:Loading font[{}], install it or update font in sdlx.rs:{}", sdlx::TTF_FONT, err);
+        eprintln!("ERRR:GPPGND:Loading font[{}], install it or update font in sdlx.rs:{}", sdlx::TTF_FONT, err);
         std::process::exit(10);
     }
     let font = font.unwrap();
-    let mut sx = sdlx::SdlX::init_plus("PlaybackPGND", entities::BASE_SCREEN_WIDTH, entities::BASE_SCREEN_HEIGHT, false);
+    let mut sx = sdlx::SdlX::init_plus("GamePlayPGND", entities::BASE_SCREEN_WIDTH, entities::BASE_SCREEN_HEIGHT, false);
     let (prgw, prgh) = sdlx::get_prg_resolution();
 
     let cfg = Cfg::load();
@@ -362,7 +362,7 @@ fn main() {
                     gui.fps_adjust(ratio);
                 },
                 keys::ProgramEvent::SendRecordCoded(code) => gui.pdata.send_record_coded(code),
-                keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:PPGND:Main:Entities:{:#?}", gui.pgentities),
+                keys::ProgramEvent::DumpPGEntities => eprintln!("DBUG:GPPGND:Main:Entities:{:#?}", gui.pgentities),
                 keys::ProgramEvent::DumpAIScoresSummary(summarytype) => {
                     gui.pgentities.actionsinfo.summary(gui.inc_cardscore);
                     if gui.aiscores_summarytype == summarytype {
@@ -402,12 +402,12 @@ fn main() {
                         let pu = gui.pdata.next_record();
                         ldebug!(&format!("DBUG:{:?}", pu));
                         gui.pgentities.update(pu, false, gui.pdata.seconds_per_record() * gui.pgentities.fps());
-                        //eprintln!("DBUG:PPGND:Main:{}:Update called", _frame);
+                        //eprintln!("DBUG:GPPGND:Main:{}:Update called", _frame);
                     }
                     // TODO: Need to let this run for Fps frames ideally, even after bdone is set
                     // Or Rcg needs to be udpated to set bdone after a second of ending or so ...
                     gui.pgentities.next_frame();
-                    //eprintln!("DBUG:PPGND:Main:{}:NextFrame called", _frame);
+                    //eprintln!("DBUG:GPPGND:Main:{}:NextFrame called", _frame);
                 } else {
                     let pu = gui.pdata.next_record();
                     gui.pgentities.update(pu, true, 0.0);
@@ -440,7 +440,7 @@ fn main() {
         // Save raw screen data
         if (cfg.save_interval > 0) && ((gui.frame % cfg.save_interval) == 0) {
             let imgdata = sx.wc.read_pixels(Some(Rect::new(0,0,prgw,prgh)), sdl2::pixels::PixelFormatEnum::RGB24).unwrap();
-            std::fs::write(&format!("/tmp/ppgnd{:04}.rgb", gui.frame), imgdata).unwrap();
+            std::fs::write(&format!("/tmp/gppgnd{:04}.rgb", gui.frame), imgdata).unwrap();
         }
 
         // consume any remaining frame time

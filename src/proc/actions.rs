@@ -18,7 +18,7 @@ use crate::sdlx::SdlX;
 use crate::{entities, playdata};
 
 
-const MTAG: &str = "PPGND:ProcActions";
+const MTAG: &str = "GPPGND:ProcActions";
 
 /// Repeat consecutive tackle action records wrt the same player
 /// is ignored for this duration intervals.

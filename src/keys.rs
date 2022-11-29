@@ -84,7 +84,7 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
             return ProgramEvent::DumpIncCardScore;
         }
         Keycode::LShift | Keycode::RShift => return ProgramEvent::NeedMore,
-        _ => ldebug!(&format!("DBUG:PPGND:Keys:DCmds:{}:{}", keycode, keymod)),
+        _ => ldebug!(&format!("DBUG:GPPGND:Keys:DCmds:{}:{}", keycode, keymod)),
     }
     return ProgramEvent::None;
 }
