@@ -5,6 +5,7 @@
 
 use std::time;
 
+use proc::actions;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::ttf::Font;
@@ -368,8 +369,9 @@ fn main() {
                         gui.showaiscores = !gui.showaiscores;
                     }
                     gui.aiscores_summarytype = summarytype;
+                    let st = if summarytype == actions::SUMMARY_RELATIVE_ALL { "All" } else { "Team" };
                     if gui.showaiscores {
-                        gui.pgentities.timedmsg.update_direct(&format!("PerfBars:{}", summarytype));
+                        gui.pgentities.timedmsg.update_direct(&format!("PerfBars:{}", st));
                     }
                 },
                 keys::ProgramEvent::DumpAIDistancesSummary(summarytype) => {
@@ -377,8 +379,9 @@ fn main() {
                         gui.showaidistances = !gui.showaidistances;
                     }
                     gui.aidistances_summarytype = summarytype;
+                    let st = if summarytype == actions::SUMMARY_RELATIVE_TEAM { "Team" } else { "All" };
                     if gui.showaidistances {
-                        gui.pgentities.timedmsg.update_direct(&format!("DistBars:{}", summarytype));
+                        gui.pgentities.timedmsg.update_direct(&format!("DistBars:{}", st));
                     }
                 },
                 keys::ProgramEvent::DumpIncCardScore => {

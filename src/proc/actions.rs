@@ -39,6 +39,11 @@ const SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO: f32 = 0.5;
 /// Scoring ratio for Otherside in a goal chain
 const SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO: f32 = 0.3;
 
+/// Relative summary graphs wrt Best in respective Team
+pub const SUMMARY_RELATIVE_TEAM: char = 'T';
+/// Relative summary graphs wrt Best across both teams
+pub const SUMMARY_RELATIVE_ALL: char = 'A';
+
 #[derive(Debug)]
 /// Maintain the scoring related to a player
 struct Score {
@@ -418,7 +423,7 @@ impl ActionsInfo {
     pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char, inc_cardscore: bool) {
         // let (amax, bmax) = (20.0, 20.0);
         let ((mut lmin, mut lmax), (mut rmin, mut rmax)) = self.players.score_minmax(inc_cardscore);
-        if summarytype == 'A' {
+        if summarytype == SUMMARY_RELATIVE_ALL {
             lmax = lmax.max(rmax);
             rmax = lmax;
             lmin = lmin.min(rmin);
@@ -444,7 +449,7 @@ impl ActionsInfo {
     /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_dist_sdl(&self, sx: &mut SdlX, summarytype: char) {
         let (mut lmax, mut rmax) = self.players.dist_max();
-        if summarytype == 'A' {
+        if summarytype == SUMMARY_RELATIVE_ALL {
             lmax = lmax.max(rmax);
             rmax = lmax;
         }

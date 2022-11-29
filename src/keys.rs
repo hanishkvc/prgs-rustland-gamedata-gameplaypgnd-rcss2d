@@ -7,7 +7,7 @@ use sdl2::keyboard::{Keycode, Mod};
 
 use loggerk::{ldebug, log_d};
 
-use crate::sdlx::SdlX;
+use crate::{sdlx::SdlX, proc::actions};
 
 pub enum ProgramEvent {
     None,
@@ -68,16 +68,16 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
         },
         Keycode::A => {
             if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
-                return ProgramEvent::DumpAIScoresSummary('A');
+                return ProgramEvent::DumpAIScoresSummary(actions::SUMMARY_RELATIVE_ALL);
             } else {
-                return ProgramEvent::DumpAIScoresSummary('T');
+                return ProgramEvent::DumpAIScoresSummary(actions::SUMMARY_RELATIVE_TEAM);
             }
         },
         Keycode::D => {
             if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
-                return ProgramEvent::DumpAIDistancesSummary('A');
+                return ProgramEvent::DumpAIDistancesSummary(actions::SUMMARY_RELATIVE_ALL);
             } else {
-                return ProgramEvent::DumpAIDistancesSummary('T');
+                return ProgramEvent::DumpAIDistancesSummary(actions::SUMMARY_RELATIVE_TEAM);
             }
         },
         Keycode::C => {
