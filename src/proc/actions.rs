@@ -73,12 +73,17 @@ impl Score {
         return Score::new(0.0, 0, 0, 0, 0.0, playdata::Card::None);
     }
 
-    fn score(&self) -> f32 {
-        let cardscore = match self.card {
-            playdata::Card::None => 0.0,
-            playdata::Card::Yellow => -1.5,
-            playdata::Card::Red => -3.0,
-        };
+    fn score(&self, inc_cardscore: bool) -> f32 {
+        let cardscore;
+        if inc_cardscore {
+            cardscore = match self.card {
+                playdata::Card::None => 0.0,
+                playdata::Card::Yellow => -1.5,
+                playdata::Card::Red => -3.0,
+            };
+        } else {
+            cardscore = 0.0;
+        }
         return self.ascore + cardscore;
     }
 
@@ -89,14 +94,16 @@ type Pos = (f32, f32);
 
 #[derive(Debug)]
 struct Players {
+    inc_cardscore: bool,
     lplayers: Vec<(usize, Score, Pos)>,
     rplayers: Vec<(usize, Score, Pos)>,
 }
 
 impl Players {
 
-    fn new(lcnt: usize, rcnt: usize) -> Players {
+    fn new(lcnt: usize, rcnt: usize, inc_cardscore: bool) -> Players {
         let mut players = Players {
+            inc_cardscore: inc_cardscore,
             lplayers: Vec::new(),
             rplayers: Vec::new(),
         };
@@ -200,22 +207,22 @@ impl Players {
         let mut lmin = f32::MAX;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if lmax < player.1.score() {
-                lmax = player.1.score();
+            if lmax < player.1.score(self.inc_cardscore) {
+                lmax = player.1.score(self.inc_cardscore);
             }
-            if lmin > player.1.score() {
-                lmin = player.1.score();
+            if lmin > player.1.score(self.inc_cardscore) {
+                lmin = player.1.score(self.inc_cardscore);
             }
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if rmax < player.1.score() {
-                rmax = player.1.score();
+            if rmax < player.1.score(self.inc_cardscore) {
+                rmax = player.1.score(self.inc_cardscore);
             }
-            if rmin > player.1.score() {
-                rmin = player.1.score();
+            if rmin > player.1.score(self.inc_cardscore) {
+                rmin = player.1.score(self.inc_cardscore);
             }
         }
         ((lmin,lmax), (rmin,rmax))
