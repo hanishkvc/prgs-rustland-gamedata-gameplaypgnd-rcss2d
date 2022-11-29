@@ -17,6 +17,8 @@ use crate::playdata::VPlayerData;
 use crate::sdlx::XSpaces;
 
 
+const MTAG: &str = "GPPGND:PlayDataRcg";
+
 pub struct Rcg {
     _fname: String,
     _file: File,
@@ -65,7 +67,7 @@ impl Rcg {
         let fx = self.r2d.d2ox(fxin);
         let fy = self.r2d.d2oy(fyin);
         if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
-            eprintln!("DBUG:Rcg:Ball:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+            eprintln!("DBUG:{}:Ball:BeyondBoundry:{},{}:{},{}", MTAG, fxin, fyin, fx, fy);
         }
         pu.ball = (fx, fy);
     }
@@ -87,7 +89,7 @@ impl Rcg {
         let state: u32 = u32::from_str_radix(sstate, 16).unwrap();
         let (action, card) = rcss::handle_state(state);
         if (action == playdata::Action::None) && (card == playdata::Card::None) {
-            ldebug!(&format!("DBUG:PPGND:RCLive:{}-{}:{}",steam, iplayer, state));
+            ldebug!(&format!("DBUG:{}:Player:{}-{}:{}", MTAG, steam, iplayer, state));
         }
         pd.push(PlayerData::Card(card));
         pd.push(PlayerData::Action(action));
@@ -97,7 +99,7 @@ impl Rcg {
         let fx = self.r2d.d2ox(fxin);
         let fy = self.r2d.d2oy(fyin);
         if (fx < 0.0) || (fx > 1.0) || (fy < 0.0) || (fy > 1.0) {
-            eprintln!("DBUG:Rcg:Player:BeyondBoundry:{},{}:{},{}", fxin, fyin, fx, fy);
+            eprintln!("DBUG:{}:Player:BeyondBoundry:{},{}:{},{}", MTAG, fxin, fyin, fx, fy);
         }
         pd.push(PlayerData::Pos(fx, fy));
         // Handle stamina
@@ -144,12 +146,13 @@ impl PlayData for Rcg {
     }
 
     fn next_record(&mut self) -> PlayUpdate {
+        let fmtag: String = format!("{}:NextRecord", MTAG);
         let bcontinue = true;
         let mut pu = PlayUpdate::new();
         while bcontinue {
             self.iline += 1;
             if self.iline >= self.lines.len() as isize {
-                print!("WARN:PGND:Rcg:No more data\n");
+                print!("WARN:{}:No more data\n", fmtag);
                 self.bdone = true;
                 break;
             }
@@ -165,7 +168,7 @@ impl PlayData for Rcg {
             }
             tstr.peel_bracket('(').unwrap();
             let toks = tstr.tokens_vec(' ', true, true).unwrap();
-            ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Top:Full:{:?}", toks));
+            ldebug!(&format!("DBUG:{}:Toks:Top:Full:{:?}", fmtag, toks));
             pu.msgs.insert("stime".to_string(), toks[1].to_string());
             if toks[0].starts_with("show") {
                 pu.timecounter = toks[1].parse().unwrap();
@@ -176,7 +179,7 @@ impl PlayData for Rcg {
                     let mut tstr = TStr::from_str(&tok, true);
                     tstr.peel_bracket('(').unwrap();
                     let vdata = tstr.tokens_vec(' ', true, true).unwrap();
-                    ldebug!(&format!("DBUG:PPGND:Rcg:Toks:Full:{:?}", vdata));
+                    ldebug!(&format!("DBUG:{}:Toks:Full:{:?}", fmtag, vdata));
                     if vdata[0].starts_with("(b") {
                         self.handle_ball(&vdata, &mut pu);
                     } else {
@@ -197,7 +200,7 @@ impl PlayData for Rcg {
                 pu.msgs.insert("score".to_string(), self.lines[self.iline as usize].clone());
             } else {
                 pu.msgs.insert("unknown".to_string(), self.lines[self.iline as usize].clone());
-                print!("DBUG:PGND:Rcg:Skipping:{:?}\n", toks);
+                print!("DBUG:{}:Skipping:{:?}\n", fmtag, toks);
             }
         }
         return pu;
@@ -224,7 +227,7 @@ impl PlayData for Rcg {
     }
 
     fn send_record_coded(&mut self, code: isize) {
-        eprintln!("WARN:PPGND:PlayDataRcg:ignoring request for send record coded [{}]", code);
+        eprintln!("WARN:{}:SendRecordCoded:ignoring request for send record coded [{}]", MTAG, code);
     }
 
 }

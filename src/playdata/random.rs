@@ -222,7 +222,7 @@ impl PlayData for RandomData {
     }
 
     fn send_record_coded(&mut self, code: isize) {
-        eprintln!("WARN:PPGND:PlayDataRandom:ignoring request for send record coded [{}]", code);
+        eprintln!("WARN:GPPGND:PlayDataRandom:ignoring request for send record coded [{}]", code);
     }
 
 }

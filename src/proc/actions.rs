@@ -6,7 +6,7 @@
 //! * Track for halftime/etal and avoid providing -ve scoring
 //!   due to any of these shifting side that will kick
 //! * Allow -ve scoring to goalie, if they allow a goal to occur.
-//! * Account cards/penalty during scoring.
+//! * Account penalties beyond cards during scoring.
 //!
 
 use std::fmt::Display;
