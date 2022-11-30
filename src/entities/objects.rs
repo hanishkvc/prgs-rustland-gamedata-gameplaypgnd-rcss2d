@@ -61,7 +61,7 @@ impl<'a> Ball<'a> {
         self.bge.next_frame();
     }
 
-    pub fn draw(&self, sx: &mut SdlX) {
+    pub fn draw(&mut self, sx: &mut SdlX) {
         self.bge.draw(sx);
     }
 

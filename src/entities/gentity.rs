@@ -52,11 +52,23 @@ pub struct GEntity<'a> {
     arc_nradius: f32,
     /// XArc angle in normalised space of 0.0-1.0 (ie wrt 0-360)
     arc_nangle: f32,
+    /// Color of the arc
     arc_color: Color,
+    /// Color of the top outer line
+    /// Dont show line if invisible color
     tl_color: Color,
+    /// Color of the bottom outer line
+    /// Dont show line if invisible color
     bl_color: Color,
+    /// Color of the left outer line
+    /// Dont show line if invisible color
     ll_color: Color,
+    /// Color of the right outer line
+    /// Dont show line if invisible color
     rl_color: Color,
+    /// Vector of extra graphics
+    gextras: Vec<GEDrawPrimitive>,
+
 }
 
 impl<'a> GEntity<'a> {
@@ -84,6 +96,7 @@ impl<'a> GEntity<'a> {
             bl_color: COLOR_INVISIBLE,
             ll_color: COLOR_INVISIBLE,
             rl_color: COLOR_INVISIBLE,
+            gextras: Vec::new(),
         }
     }
 
@@ -192,7 +205,7 @@ impl<'a> GEntity<'a> {
     /// * the fill color (which can be partly modified using fcolor)
     /// * a arc (wrt/including its radius, angle and color)
     /// * a set of outer lines and their colors
-    pub fn draw(&self, sx: &mut SdlX) {
+    pub fn draw(&mut self, sx: &mut SdlX) {
         let color;
         if self.fcolor < 0.0 {
             color = self.color;
@@ -216,6 +229,7 @@ impl<'a> GEntity<'a> {
         }
         drop(tx);
         self.draw_outerlines(sx);
+        self.draw_gextras(sx);
     }
 
 }
@@ -287,6 +301,63 @@ impl<'a> GEntity<'a> {
 
     pub fn set_rl_color(&mut self, color: Color) {
         self.rl_color = color;
+    }
+
+}
+
+
+/// A Enum with supported additional graphical primitives that are
+/// allowed to be drawn wrt the GEntity
+enum GEDrawPrimitive {
+    /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
+    NSArc(usize, f32, (i16,i16), Color),
+    #[allow(dead_code)]
+    /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePosition, Color
+    NLine(usize, char, f32, Color),
+}
+
+impl GEDrawPrimitive {
+
+    /// Decrement the remaining frame count wrt this GEDrawPrimitive.
+    /// Inturn if it reaches 0, indicate same to the caller.
+    fn life_decrement_need_removal(&mut self) -> bool {
+        let mut bremove = false;
+        match self {
+            GEDrawPrimitive::NSArc(remfc, _, _, _) => {
+                *remfc -= 1;
+                if *remfc == 0 {
+                    bremove = true;
+                }
+            },
+            GEDrawPrimitive::NLine(remfc, _, _, _) => {
+                *remfc -= 1;
+                if *remfc == 0 {
+                    bremove = true;
+                }
+            },
+        }
+        return bremove;
+    }
+
+}
+
+impl<'a> GEntity<'a> {
+
+    fn draw_gextras(&mut self, sx: &mut SdlX) {
+        for i in (0..self.gextras.len()).rev() {
+            let ge = &mut self.gextras[i];
+            match ge {
+                GEDrawPrimitive::NSArc(_remfc, radratio, (sa,ea), color) => {
+                    let (nx,ny) = self.npos;
+                    let srad = (self.radius  as f32 * *radratio) as i16;
+                    sx.ns_arc(nx, ny, srad, *sa, *ea, 3, *color);
+                },
+                GEDrawPrimitive::NLine(_, _, _, _) => todo!(),
+            }
+            if ge.life_decrement_need_removal() {
+                self.gextras.remove(i);
+            }
+        }
     }
 
 }

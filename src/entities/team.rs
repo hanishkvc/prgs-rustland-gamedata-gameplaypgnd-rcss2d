@@ -153,7 +153,7 @@ impl<'a> Team<'a> {
         }
     }
 
-    pub fn draw(&self, sx: &mut SdlX) {
+    pub fn draw(&mut self, sx: &mut SdlX) {
         for i in 0..self.players.len() {
             self.players[i].draw(sx);
         }

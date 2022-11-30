@@ -400,3 +400,27 @@ pub fn ncolor_gyr(ncolor: f32) -> Color {
     let g = g.round().min(255.0) as u8;
     Color::RGB(r, g, 0)
 }
+
+
+/// Represent some of the drawing primitives as variants of a enum
+pub enum DrawPrimitive {
+    /// NNThickLine((nx1,ny1),(nx2,ny2), nwidth, color)
+    NNThickLine((f32,f32), (f32,f32), f32, Color),
+    /// NArc((nx,ny), nrad, (nstartangle,nendangle), width, color)
+    NArc((f32, f32), f32, (f32, f32), isize, Color),
+}
+
+impl DrawPrimitive {
+
+    pub fn draw(&self, sx: &mut SdlX) {
+        match self {
+            DrawPrimitive::NNThickLine((nx1,ny1), (nx2,ny2), nw, color) => {
+                sx.nn_thick_line(*nx1, *ny1, *nx2, *ny2, *nw, *color);
+            },
+            DrawPrimitive::NArc((nx,ny), nrad, (nsangle,neangle), nwidth, color) => {
+                sx.n_arc(*nx, *ny, *nrad, *nsangle, *neangle, *nwidth, *color);
+            },
+        }
+    }
+
+}
