@@ -308,7 +308,7 @@ impl<'a> GEntity<'a> {
 
 /// A Enum with supported additional graphical primitives that are
 /// allowed to be drawn wrt the GEntity
-enum GEDrawPrimitive {
+pub enum GEDrawPrimitive {
     /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
     NSArc(usize, f32, (i16,i16), Color),
     #[allow(dead_code)]
@@ -342,6 +342,12 @@ impl GEDrawPrimitive {
 }
 
 impl<'a> GEntity<'a> {
+
+    /// Add a supported graphics primitive wrt gentity
+    /// to modify its graphical appearance.
+    pub fn gextras_add(&mut self, ge: GEDrawPrimitive) {
+        self.gextras.push(ge);
+    }
 
     fn draw_gextras(&mut self, sx: &mut SdlX) {
         for i in (0..self.gextras.len()).rev() {

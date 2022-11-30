@@ -51,9 +51,11 @@ pub fn handle_state(state: u32) -> (Action, Card) {
         action = Action::Tackle(false);
         statecnt += 1;
     } else if state & STATE_BALL2PLAYER == STATE_BALL2PLAYER {
+        action = Action::Others(STATE_BALL2PLAYER as usize);
         statecnt += 1;
         eprintln!("DBUG:RCSS:Ball2Player");
     } else if state & STATE_PLAYER2BALL == STATE_PLAYER2BALL {
+        action = Action::Others(STATE_PLAYER2BALL as usize);
         statecnt += 1;
         eprintln!("DBUG:RCSS:Player2Ball");
     }

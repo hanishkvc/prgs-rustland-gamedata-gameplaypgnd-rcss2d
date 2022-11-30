@@ -11,7 +11,7 @@ use sdl2::ttf::Font;
 use loggerk::{ldebug, log_d};
 
 use crate::entities::{ENTITY_WIDTH, ENTITY_HEIGHT};
-use crate::entities::gentity::GEntity;
+use crate::entities::gentity::{GEntity, GEDrawPrimitive};
 use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
 use crate::playdata::{PlayerCodedData, self};
@@ -133,6 +133,10 @@ impl<'a> Team<'a> {
                                 } else {
                                     Color::GRAY
                                 }
+                            },
+                            playdata::Action::Others(_other_action) => {
+                                self.players[pi].gextras_add(GEDrawPrimitive::NSArc(10, 1.4, (20,340), Color::BLACK));
+                                COLOR_INVISIBLE
                             },
                             playdata::Action::None => COLOR_INVISIBLE,
                         };

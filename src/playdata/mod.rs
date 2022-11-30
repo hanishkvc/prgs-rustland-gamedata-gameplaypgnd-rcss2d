@@ -32,6 +32,7 @@ pub enum Action {
     Kick(bool),
     Catch(bool),
     Tackle(bool),
+    Others(usize),
 }
 
 #[derive(Debug)]
