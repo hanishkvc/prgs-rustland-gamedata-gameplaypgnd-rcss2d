@@ -14,7 +14,7 @@ use crate::entities::{ENTITY_WIDTH, ENTITY_HEIGHT};
 use crate::entities::gentity::{GEntity, GEDrawPrimitive};
 use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 use crate::sdlx::{SdlX, self, COLOR_INVISIBLE};
-use crate::playdata::{PlayerCodedData, self};
+use crate::playdata::{PlayerCodedData, self, rcss};
 
 
 
@@ -134,8 +134,15 @@ impl<'a> Team<'a> {
                                     Color::GRAY
                                 }
                             },
-                            playdata::Action::Others(_other_action) => {
-                                self.players[pi].gextras_add(GEDrawPrimitive::NSArc(10, 1.4, (20,340), Color::BLACK));
+                            playdata::Action::Others(other_action) => {
+                                let arcangles = if other_action == rcss::STATE_BALL2PLAYER as usize {
+                                    (20,340)
+                                } else if other_action == rcss::STATE_PLAYER2BALL as usize {
+                                    (200,160)
+                                } else {
+                                    (340,20)
+                                };
+                                self.players[pi].gextras_add(GEDrawPrimitive::NSArc(10, 1.4, arcangles, Color::BLACK));
                                 COLOR_INVISIBLE
                             },
                             playdata::Action::None => COLOR_INVISIBLE,

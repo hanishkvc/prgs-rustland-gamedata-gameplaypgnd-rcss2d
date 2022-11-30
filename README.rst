@@ -245,6 +245,8 @@ to map to different player performance and or other characteristics
 * color and arc length of the arc around the player
   Currently it is mapped to actions like kick, tackle, catch
 
+* one can optionally add individually timed additional supported graphic
+  primitives wrt each gentity (including players).
 
 One can also super impose translucent graphs ++ on top of the playground.
 Which is currently used to show player relative performance scoring and
@@ -353,4 +355,8 @@ from the otherside who are in the goal chain nearer to the goal action.
 Optionally include penalty cards (yellow,red) in performance scoring shown.
 
 Make seek back not crash wrt ActionsInfo.
+
+Allow additional graphical primitives to be decorated/tacked on to the gentities,
+in a flexible way. Use same to show RCSS Ball2Player and Player2Ball states wrt
+players.
 
