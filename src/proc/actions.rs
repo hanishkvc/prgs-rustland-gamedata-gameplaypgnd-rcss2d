@@ -51,7 +51,9 @@ struct Score {
     /// The overall actions related score
     ascore: f32,
     /// Vector of time,ascoredelta
-    vtimeascore: Vec<(usize, f32)>,
+    vtimeascore_indiv: Vec<(usize, f32)>,
+    /// Vector of time vs ascore cumulative
+    vtimeascore_cumul: Vec<(usize,f32)>,
     /// The number of kicks
     kicks: usize,
     /// The number of tackles
@@ -69,7 +71,8 @@ impl Score {
     fn new(ascore: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
         Score {
             ascore: ascore,
-            vtimeascore: Vec::new(),
+            vtimeascore_indiv: Vec::new(),
+            vtimeascore_cumul: Vec::new(),
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
@@ -85,7 +88,8 @@ impl Score {
 
     fn ascore_update(&mut self, time: usize, ascoredelta: f32) {
         self.ascore += ascoredelta;
-        self.vtimeascore.push((time, ascoredelta));
+        self.vtimeascore_indiv.push((time, ascoredelta));
+        self.vtimeascore_cumul.push((time, self.ascore));
     }
 
     fn score(&self, inc_cardscore: bool) -> f32 {
@@ -876,12 +880,23 @@ impl ActionsInfo {
 
 }
 
+#[derive(Debug, PartialEq)]
+pub enum SummaryPlayerType {
+    Individual,
+    Cumulative,
+}
+
 impl ActionsInfo {
 
-    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize) {
+    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, sptype: SummaryPlayerType) {
         use crate::sdlx::PlotType;
         let player = self.players.get_player(side, playerid);
-        let vts = &player.score.vtimeascore;
+        let vts;
+        if sptype == SummaryPlayerType::Individual {
+            vts = &player.score.vtimeascore_indiv;
+        } else {
+            vts = &player.score.vtimeascore_cumul;
+        }
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
         sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, -2.0, 5.0, PlotType::Lines);
     }
