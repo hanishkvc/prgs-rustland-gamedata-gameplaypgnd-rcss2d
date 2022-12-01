@@ -431,7 +431,7 @@ impl DrawPrimitive {
 impl SdlX {
 
     /// Plot a given set of data along y axis
-    /// nx,ny starting location of the plot window
+    /// nx,ny starting location of the plot window at left,bottom
     /// nw,nh size of the plot window
     /// vdata the vector of data
     /// ymin,ymax the valid data range
@@ -492,7 +492,7 @@ impl SdlX {
             if (yd < 0.0) || (yd > dh) { // Skip y data beyond ymin-ymax
                 continue;
             }
-            let y = sy + (yd * spdh).round() as i16;
+            let y = sy - (yd * spdh).round() as i16;
             self.wc.circle(sx+x as i16, y, 1, Color::WHITE).unwrap();
         }
     }
