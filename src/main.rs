@@ -262,6 +262,7 @@ fn show_help(sx: &mut SdlX) {
 fn test_me(font: &Font) {
     testlib::test_ncolor();
     testlib::test_gentity(font);
+    testlib::sdlx_plots();
 }
 
 fn identify() {
@@ -436,6 +437,7 @@ fn main() {
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
+            gui.pgentities.actionsinfo.summary_player(&mut sx, entities::SIDE_L, 10);
         }
 
         // Present screen update to user

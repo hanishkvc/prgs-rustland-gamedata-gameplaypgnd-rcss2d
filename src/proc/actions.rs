@@ -146,6 +146,21 @@ impl Players {
         return players;
     }
 
+    /// Get the specified player
+    fn get_player<'a>(&'a self, side: char, playerid: usize) -> &'a Player {
+        let player = if side == entities::SIDE_L { &self.lplayers[playerid] } else { &self.rplayers[playerid] };
+        return player;
+    }
+
+    /*
+    #[allow(dead_code)]
+    /// Get the specified player's score struct
+    fn get_player_score_set<'a>(&'a self, side: char, playerid: usize) -> &'a Score {
+        let player = self.get_player(side, playerid);
+        return &player.score;
+    }
+    */
+
     /// Help update the score of a specific player
     fn card(&mut self, side: char, playerid: usize, card: playdata::Card) {
         if playerid >= entities::XPLAYERID_START {
@@ -857,6 +872,16 @@ impl ActionsInfo {
     /// then the handle_deferedseek through skip_after_including may not help fully.
     pub fn seek(&mut self, _seekdelta: isize) {
         self.handle_deferedseek = true;
+    }
+
+}
+
+impl ActionsInfo {
+
+    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize) {
+        let player = self.players.get_player(side, playerid);
+        let vts = &player.score.vtimeascore;
+        sx.n_plot_uf(0.1, 0.9, 0.8, 0.2, vts, 0.0, vts.len() as f32, -2.0, 5.0);
     }
 
 }

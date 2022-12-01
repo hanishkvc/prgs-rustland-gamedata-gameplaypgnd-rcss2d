@@ -149,3 +149,26 @@ fn test_sdlx_xspaces_srinmid() {
         eprintln!("Test:Sdlx:XSpaces:SrInMid:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
     }
 }
+
+pub fn sdlx_plots() {
+    use sdl2::event::Event;
+    let mut sx = sdlx::SdlX::init_plus("Test SdlX", 640, 480, false);
+    'mainloop: loop {
+        for ev in sx.ep.poll_iter() {
+            match ev {
+                Event::Quit { timestamp: _ } => {
+                    break 'mainloop;
+                },
+                _ => (),
+            }
+        }
+        sx.n_plot_f(0.1, 0.4, 0.8, 0.3, vec![2.0, 3.0, 4.0, 3.0, 2.0, 1.0], 0.0, 5.0);
+        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, &vec![(2,2.0), (4,4.0), (6,2.0)], 0.0, 3.0, -1.0, 6.0);
+        sx.wc.present();
+    }
+}
+
+#[test]
+fn test_sdlx_plots() {
+    sdlx_plots();
+}
