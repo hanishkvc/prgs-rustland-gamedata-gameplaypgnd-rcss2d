@@ -99,9 +99,26 @@ impl Score {
 type Pos = (f32, f32);
 
 #[derive(Debug)]
+struct Player {
+    id: usize,
+    score: Score,
+    pos: Pos,
+}
+
+impl Player {
+    fn new(playerid: usize, score: Score, pos: Pos) -> Player {
+        Player {
+            id: playerid,
+            score: score,
+            pos: pos,
+        }
+    }
+}
+
+#[derive(Debug)]
 struct Players {
-    lplayers: Vec<(usize, Score, Pos)>,
-    rplayers: Vec<(usize, Score, Pos)>,
+    lplayers: Vec<Player>,
+    rplayers: Vec<Player>,
 }
 
 impl Players {
@@ -112,10 +129,10 @@ impl Players {
             rplayers: Vec::new(),
         };
         for i in 0..lcnt {
-            players.lplayers.push((i, Score::default(), (99.0,99.0)));
+            players.lplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
         }
         for i in 0..rcnt {
-            players.rplayers.push((i, Score::default(), (99.0,99.0)));
+            players.rplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
         }
         return players;
     }
@@ -129,9 +146,9 @@ impl Players {
             eprintln!("DBUG:{}:Players:Card:{}{:02}:{}", MTAG, side, playerid, card);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].1.card = card;
+            self.lplayers[playerid].score.card = card;
         } else {
-            self.rplayers[playerid].1.card = card;
+            self.rplayers[playerid].score.card = card;
         }
     }
 
@@ -144,9 +161,9 @@ impl Players {
             eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, score);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].1.ascore += score;
+            self.lplayers[playerid].score.ascore += score;
         } else {
-            self.rplayers[playerid].1.ascore += score;
+            self.rplayers[playerid].score.ascore += score;
         }
     }
 
@@ -167,15 +184,15 @@ impl Players {
             AIAction::None => stype = "None",
             AIAction::Kick => {
                 stype = "Kick";
-                player.1.kicks += 1;
+                player.score.kicks += 1;
             },
             AIAction::Catch => {
                 stype = "Catch";
-                player.1.catchs += 1;
+                player.score.catchs += 1;
             },
             AIAction::Tackle => {
                 stype = "Tackle";
-                player.1.tackles += 1;
+                player.score.tackles += 1;
             },
             AIAction::Goal => stype = "Goal",
         }
@@ -193,16 +210,16 @@ impl Players {
         } else {
             player = &mut self.rplayers[playerid];
         }
-        let opos = player.2;
+        let opos = player.pos;
         if opos.0 == 99.0 && opos.1 == 99.0 {
-            player.2 = npos;
+            player.pos = npos;
             return;
         }
         let dx = npos.0-opos.0;
         let dy = npos.1-opos.1;
         let d = dx*dx + dy*dy;
-        player.1.dist += d.sqrt();
-        player.2 = npos;
+        player.score.dist += d.sqrt();
+        player.pos = npos;
     }
 
     /// Return the min and max player score for each of the teams
@@ -211,22 +228,22 @@ impl Players {
         let mut lmin = f32::MAX;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if lmax < player.1.score(inc_cardscore) {
-                lmax = player.1.score(inc_cardscore);
+            if lmax < player.score.score(inc_cardscore) {
+                lmax = player.score.score(inc_cardscore);
             }
-            if lmin > player.1.score(inc_cardscore) {
-                lmin = player.1.score(inc_cardscore);
+            if lmin > player.score.score(inc_cardscore) {
+                lmin = player.score.score(inc_cardscore);
             }
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if rmax < player.1.score(inc_cardscore) {
-                rmax = player.1.score(inc_cardscore);
+            if rmax < player.score.score(inc_cardscore) {
+                rmax = player.score.score(inc_cardscore);
             }
-            if rmin > player.1.score(inc_cardscore) {
-                rmin = player.1.score(inc_cardscore);
+            if rmin > player.score.score(inc_cardscore) {
+                rmin = player.score.score(inc_cardscore);
             }
         }
         ((lmin,lmax), (rmin,rmax))
@@ -237,15 +254,15 @@ impl Players {
         let mut lmax = f32::MIN;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if lmax < player.1.dist {
-                lmax = player.1.dist;
+            if lmax < player.score.dist {
+                lmax = player.score.dist;
             }
         }
         let mut rmax = f32::MIN;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if rmax < player.1.dist {
-                rmax = player.1.dist;
+            if rmax < player.score.dist {
+                rmax = player.score.dist;
             }
         }
         (lmax, rmax)
@@ -391,27 +408,27 @@ impl ActionsInfo {
     fn summary_simple(&self, inc_cardscore: bool) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
-            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.0, player.1.score(inc_cardscore));
+            eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.id, player.score.score(inc_cardscore));
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
-            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.0, player.1.score(inc_cardscore));
+            eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.id, player.score.score(inc_cardscore));
         }
     }
 
     fn summary_asciiart(&self, inc_cardscore: bool) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
-            eprint!("DBUG:{}:L{:02}:", MTAG, player.0);
-            for _j in 0..player.1.score(inc_cardscore).round() as usize {
+            eprint!("DBUG:{}:L{:02}:", MTAG, player.id);
+            for _j in 0..player.score.score(inc_cardscore).round() as usize {
                 eprint!("#");
             }
             eprintln!();
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
-            eprint!("DBUG:{}:R{:02}:", MTAG, player.0);
-            for _j in 0..player.1.score(inc_cardscore).round() as usize {
+            eprint!("DBUG:{}:R{:02}:", MTAG, player.id);
+            for _j in 0..player.score.score(inc_cardscore).round() as usize {
                 eprint!("#");
             }
             eprintln!();
@@ -437,14 +454,14 @@ impl ActionsInfo {
             let player = &self.players.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            let lpscore = player.1.score(inc_cardscore) - lmin;
+            let lpscore = player.score.score(inc_cardscore) - lmin;
             sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(lpscore/(lmax-lmin)), 0.04)
         }
         for i in 0..self.players.rplayers.len() {
             let player = &self.players.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
-            let rpscore = player.1.score(inc_cardscore) - rmin;
+            let rpscore = player.score.score(inc_cardscore) - rmin;
             sx.nn_fill_rect(0.55, 0.05*(i as f32 + 4.0), 0.4*(rpscore/(rmax-rmin)), 0.04)
         }
     }
@@ -467,7 +484,7 @@ impl ActionsInfo {
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let x = xs + (i as f32 * xu);
-            let yh = yh*(player.1.dist/lmax);
+            let yh = yh*(player.score.dist/lmax);
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
         let xs = 0.55;
@@ -476,7 +493,7 @@ impl ActionsInfo {
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let x = xs + (i as f32 * xu);
-            let yh = yh*(player.1.dist/rmax);
+            let yh = yh*(player.score.dist/rmax);
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
     }
