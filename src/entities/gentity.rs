@@ -28,6 +28,8 @@ pub struct GEntity<'a> {
     npos: (f32, f32),
     /// width, height in screen space dimensions
     width_height: (u32, u32),
+    nw: f32,
+    nh: f32,
     /// Radius in screen space dimensions
     radius: i16,
     /// Color of the object
@@ -45,8 +47,14 @@ pub struct GEntity<'a> {
     mov: (f32, f32),
     /// Internal member - half width
     hw: i32,
+    nhw: f32,
     /// Internal member - half height
     hh: i32,
+    nhh: f32,
+    /// Internal member - horizontal line width in normalised space
+    nhlw: f32,
+    /// Internal member - vertical line width in normalised space
+    nvlw: f32,
     /// Extras - XArc
     /// XArc radius relative to GEntity size
     arc_nradius: f32,
@@ -89,6 +97,12 @@ impl<'a> GEntity<'a> {
             mov: (0.0, 0.0),
             hw: (width_height.0/2) as i32,
             hh: (width_height.1/2) as i32,
+            nw: 0.05,
+            nh: 0.05,
+            nhw: 0.025,
+            nhh: 0.025,
+            nhlw: 0.005,
+            nvlw: 0.005,
             arc_nradius: -1.0,
             arc_nangle: -1.0,
             arc_color: Color::WHITE,
@@ -162,38 +176,41 @@ impl<'a> GEntity<'a> {
         self.pos_set_rel(self.mov.0, self.mov.1);
     }
 
+    fn update_base_graphicelements(&mut self, sx: &mut SdlX) {
+        self.nw = sx.n2s.o2dx(self.width_height.0 as f32);
+        self.nh = sx.n2s.o2dy(self.width_height.1 as f32);
+        self.nhw = self.nw/2.0;
+        self.nhh = self.nh/2.0;
+        self.nhlw = self.nh*0.2;
+        self.nvlw = self.nhlw*(self.nh/self.nw); // nw*0.2;
+    }
+
     /// Draw the outer lines provided their colors is not invisible
     fn draw_outerlines(&self, sx: &mut SdlX) {
-        let nw = sx.n2s.o2dx(self.width_height.0 as f32);
-        let nh = sx.n2s.o2dy(self.width_height.1 as f32);
-        let nhw = nw/2.0;
-        let nhh = nh/2.0;
-        let hlw = nh*0.2;
-        let vlw = hlw*(nh/nw); // nw*0.2;
         //eprintln!("DBUG:PPGND:GEntity:DrawOuterLines:{}=>{},{}=>{},{}-{}",self.width_height.0, nw, self.width_height.1, nh, vlw, hlw);
         // Top line
         if self.tl_color != COLOR_INVISIBLE {
-            let tx1 = self.npos.0 - nhw;
-            let ty1 = self.npos.1 - nhh - nh*0.2;
-            sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.tl_color);
+            let tx1 = self.npos.0 - self.nhw;
+            let ty1 = self.npos.1 - self.nhh - self.nh*0.2;
+            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, self.tl_color);
         }
         // Bottom line
         if self.bl_color != COLOR_INVISIBLE {
-            let tx1 = self.npos.0 - nhw;
-            let ty1 = self.npos.1 + nhh + nh*0.2;
-            sx.nn_thick_line(tx1, ty1, tx1+nw, ty1, hlw, self.bl_color);
+            let tx1 = self.npos.0 - self.nhw;
+            let ty1 = self.npos.1 + self.nhh + self.nh*0.2;
+            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, self.bl_color);
         }
         // left line
         if self.ll_color != COLOR_INVISIBLE {
-            let lx1 = self.npos.0 - nhw - nw*0.2;
-            let ly1 = self.npos.1 - nhh;
-            sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.ll_color);
+            let lx1 = self.npos.0 - self.nhw - self.nw*0.2;
+            let ly1 = self.npos.1 - self.nhh;
+            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, self.ll_color);
         }
         // Right line
         if self.rl_color != COLOR_INVISIBLE {
-            let lx1 = self.npos.0 + nhw + nw*0.2;
-            let ly1 = self.npos.1 - nhh;
-            sx.nn_thick_line(lx1, ly1, lx1, ly1+nh, vlw, self.rl_color);
+            let lx1 = self.npos.0 + self.nhw + self.nw*0.2;
+            let ly1 = self.npos.1 - self.nhh;
+            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, self.rl_color);
         }
     }
 
@@ -205,7 +222,9 @@ impl<'a> GEntity<'a> {
     /// * the fill color (which can be partly modified using fcolor)
     /// * a arc (wrt/including its radius, angle and color)
     /// * a set of outer lines and their colors
+    /// * gextras (GEDrawPrimitive based graphics)
     pub fn draw(&mut self, sx: &mut SdlX) {
+        self.update_base_graphicelements(sx);
         let color;
         if self.fcolor < 0.0 {
             color = self.color;
