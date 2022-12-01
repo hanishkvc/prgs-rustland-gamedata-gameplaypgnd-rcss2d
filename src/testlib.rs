@@ -39,10 +39,27 @@ fn test_sdlx_drawprims(sx: &mut SdlX) {
 }
 
 #[test]
-fn test_sdlx_xspaces_q4_q4() {
+fn test_sdlx_xspaces_dtoq1() {
     let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(1.0,1.0)));
     let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
+    let vo = vec![(0.0,0.0), (0.0,1.0), (1.0,1.0), (1.0,0.0), (0.5,0.5)];
     for d in vd {
-        eprintln!("Test:Sdlx:XSpaces:Q4Q4:{:?}:{:?}", d, s2n.d2o(d));
+        eprintln!("Test:Sdlx:XSpaces:DtoQ1:D2O:{:?}:{:?}", d, s2n.d2o(d));
+    }
+    for o in vo {
+        eprintln!("Test:Sdlx:XSpaces:DtoQ1:O2D:{:?}:{:?}", o, s2n.o2d(o));
+    }
+}
+
+#[test]
+fn test_sdlx_xspaces_dtoq2() {
+    let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(-1.0,1.0)));
+    let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
+    let vo = vec![(0.0,0.0), (0.0,1.0), (-1.0,1.0), (-1.0,0.0), (-0.5,0.5)];
+    for d in vd {
+        eprintln!("Test:Sdlx:XSpaces:DtoQ2:{:?}:{:?}", d, s2n.d2o(d));
+    }
+    for o in vo {
+        eprintln!("Test:Sdlx:XSpaces:DtoQ2:O2D:{:?}:{:?}", o, s2n.o2d(o));
     }
 }
