@@ -428,6 +428,12 @@ impl DrawPrimitive {
 
 }
 
+#[derive(Debug, PartialEq)]
+pub enum PlotType {
+    Points,
+    Lines,
+}
+
 impl SdlX {
 
     /// Plot a given set of data along y axis
@@ -501,7 +507,7 @@ impl SdlX {
     /// * usize takes x-axis, f32 takes y-axis
     /// * nx,ny gives the left,bottom position of the plot window
     /// * nw,nh gives the width and height of the plot window
-    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32) {
+    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, plottype: PlotType) {
         let sx = self.n2s.d2ox(nx).round();
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
@@ -509,13 +515,22 @@ impl SdlX {
         let drect = ((xmin,ymin), (xmax,ymax));
         let orect = ((sx,sy),(sx+sw,sy-sh));
         let d2s = XSpaces::new(drect, orect);
-
+        let mut px = i16::MIN;
+        let mut py = i16::MIN;
         for d in vdata {
             let dx = d.0;
             let dy = d.1;
             let sx = d2s.d2ox(dx as f32).round() as i16;
             let sy = d2s.d2oy(dy).round() as i16;
-            self.wc.circle(sx, sy, 1, Color::WHITE).unwrap();
+            if plottype == PlotType::Points {
+                self.wc.circle(sx, sy, 1, Color::WHITE).unwrap();
+            } else {
+                if (px != i16::MIN) && (py != i16::MIN) {
+                    self.wc.line(px, py, sx, sy, Color::WHITE).unwrap();
+                }
+            }
+            px = sx;
+            py = sy;
         }
     }
 

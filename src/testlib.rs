@@ -152,6 +152,7 @@ fn test_sdlx_xspaces_srinmid() {
 
 pub fn sdlx_plots() {
     use sdl2::event::Event;
+    use sdlx::PlotType;
     let mut sx = sdlx::SdlX::init_plus("Test SdlX", 640, 480, false);
     'mainloop: loop {
         for ev in sx.ep.poll_iter() {
@@ -163,7 +164,7 @@ pub fn sdlx_plots() {
             }
         }
         sx.n_plot_f(0.1, 0.4, 0.8, 0.3, vec![2.0, 3.0, 4.0, 3.0, 2.0, 1.0], 0.0, 5.0);
-        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, &vec![(2,2.0), (4,4.0), (6,2.0)], 0.0, 8.0, -1.0, 6.0);
+        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, &vec![(2,2.0), (4,4.0), (6,2.0)], 0.0, 8.0, -1.0, 6.0, PlotType::Lines);
         sx.wc.present();
     }
 }
