@@ -476,6 +476,9 @@ impl SdlX {
                 } else {
                     let mut y = cd*rem;
                     i += 1;
+                    if i >= vdata.len() {
+                        break;
+                    }
                     let cd = vdata[i];
                     rem = 1.0-rem;
                     y += cd*rem;
@@ -484,7 +487,7 @@ impl SdlX {
                 }
             }
         }
-        for x in 0..sw.round() as usize {
+        for x in 0..(sw.round()-1.0) as usize {
             let yd = vnew[x]-ymin;
             if (yd < 0.0) || (yd > dh) { // Skip y data beyond ymin-ymax
                 continue;
