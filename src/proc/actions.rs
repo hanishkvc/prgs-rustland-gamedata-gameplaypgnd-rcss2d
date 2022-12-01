@@ -50,6 +50,8 @@ pub const SUMMARY_RELATIVE_ALL: char = 'A';
 struct Score {
     /// The overall actions related score
     ascore: f32,
+    /// Vector of time,ascoredelta
+    vtimeascore: Vec<(usize, f32)>,
     /// The number of kicks
     kicks: usize,
     /// The number of tackles
@@ -67,6 +69,7 @@ impl Score {
     fn new(ascore: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
         Score {
             ascore: ascore,
+            vtimeascore: Vec::new(),
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
@@ -77,6 +80,12 @@ impl Score {
 
     fn default() -> Score {
         return Score::new(0.0, 0, 0, 0, 0.0, playdata::Card::None);
+    }
+
+
+    fn ascore_update(&mut self, time: usize, ascoredelta: f32) {
+        self.ascore += ascoredelta;
+        self.vtimeascore.push((time, ascoredelta));
     }
 
     fn score(&self, inc_cardscore: bool) -> f32 {
@@ -153,17 +162,17 @@ impl Players {
     }
 
     /// Help update the actions related score of a specific player
-    fn ascore(&mut self, side: char, playerid: usize, score: f32) {
+    fn ascore_update(&mut self, time: usize, side: char, playerid: usize, ascore: f32) {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         } else {
-            eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, score);
+            eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, ascore);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].score.ascore += score;
+            self.lplayers[playerid].score.ascore_update(time, ascore);
         } else {
-            self.rplayers[playerid].score.ascore += score;
+            self.rplayers[playerid].score.ascore_update(time, ascore);
         }
     }
 
@@ -538,13 +547,13 @@ impl ActionsInfo {
                         ppscore *= SCORE_SELF_PASS_RATIO;
                         cpscore *= SCORE_SELF_PASS_RATIO;
                     }
-                    self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
-                    self.players.ascore(curactd.side, curactd.playerid, cpscore);
+                    self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                    self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 } else {
                     let pscore = score.0 * score.3;
-                    self.players.ascore(prevactd.side, prevactd.playerid, pscore);
+                    self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                     let pscore = score.0 * score.4;
-                    self.players.ascore(curactd.side, curactd.playerid, pscore);
+                    self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, pscore);
                 }
                 return HAReturn::Done(true);
             },
@@ -557,7 +566,7 @@ impl ActionsInfo {
                 } else {
                     // This is like a no effort kick potentially, ie after a goal, so low score
                     let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
-                    self.players.ascore(curactd.side, curactd.playerid, pscore);
+                    self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, pscore);
                     return HAReturn::Done(true);
                 }
             },
@@ -605,7 +614,7 @@ impl ActionsInfo {
                     // Nearest player scores more compared to farther players, wrt the chain of actions leading to the goal
                     let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
                     let pid = if lookbackcnt <= 1 { curactd.playerid } else { prevactd.playerid };
-                    self.players.ascore(curactd.side, pid, pscore);
+                    self.players.ascore_update(curactd.time, curactd.side, pid, pscore);
                     if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
                         return HAReturn::Done(true);
                     }
@@ -619,11 +628,11 @@ impl ActionsInfo {
                         if prevactd.action == AIAction::Catch {
                             pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
                         }
-                        self.players.ascore(prevactd.side, prevactd.playerid, pscore);
+                        self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                         return HAReturn::ContinueSearch;
                     }
                     pscore *= SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO;
-                    self.players.ascore(prevactd.side, prevactd.playerid, pscore);
+                    self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                     HAReturn::Done(true)
                 }
             },
@@ -650,8 +659,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
-                self.players.ascore(curactd.side, curactd.playerid, cpscore);
+                self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Tackle => {
@@ -671,8 +680,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
-                self.players.ascore(curactd.side, curactd.playerid, cpscore);
+                self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -703,8 +712,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.ascore(prevactd.side, prevactd.playerid, ppscore);
-                self.players.ascore(curactd.side, curactd.playerid, cpscore);
+                self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
