@@ -427,10 +427,17 @@ impl DrawPrimitive {
 
 impl SdlX {
 
-    pub fn n_plot_uf(&self, _nx: f32, _ny: f32, nw: f32, nh: f32, vdata: Vec<(usize, f32)>, xmin: usize, xmax: usize, ymin: f32, ymax: f32) {
+    /// Plot a given set of data along y axis
+    /// nx,ny starting location of the plot window
+    /// nw,nh size of the plot window
+    /// vdata the vector of data
+    /// ymin,ymax the valid data range
+    pub fn n_plot_f(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: Vec<f32>, ymin: f32, ymax: f32) {
+        let sx = self.n2s.d2ox(nx).round() as i16;
+        let sy = self.n2s.d2oy(ny).round() as i16;
         let sw = self.n2s.d2ox(nw);
         let sh = self.n2s.d2oy(nh);
-        let dw = xmax - xmin;
+        let dw = vdata.len();
         let dh = ymax - ymin;
         let _spdw = sw/dw as f32;
         let dpsw = dw as f32/sw;
@@ -443,14 +450,14 @@ impl SdlX {
             while i < vdata.len() {
                 let cd = vdata[i];
                 if rem > 1.0 {
-                    y += cd.1;
+                    y += cd;
                     rem -= 1.0;
                     i += 1;
                 } else {
-                    y += cd.1*rem;
+                    y += cd*rem;
                     vnew.push(y/dpsw);
                     rem = 1.0-rem;
-                    y = cd.1*rem;
+                    y = cd*rem;
                     rem = dpsw - rem;
                     i += 1;
                 }
@@ -459,9 +466,12 @@ impl SdlX {
             todo!()
         }
         for x in 0..sw.round() as usize {
-            let yd = vnew[x];
-            let y = yd * spdh;
-            self.wc.circle(x as i16, y.round() as i16, 1, Color::WHITE).unwrap();
+            let yd = vnew[x]-ymin;
+            if (yd < 0.0) || (yd > dh) { // Skip y data beyond ymin-ymax
+                continue;
+            }
+            let y = sy + (yd * spdh).round() as i16;
+            self.wc.circle(sx+x as i16, y, 1, Color::WHITE).unwrap();
         }
     }
 
