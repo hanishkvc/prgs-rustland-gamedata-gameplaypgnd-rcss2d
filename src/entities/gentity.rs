@@ -306,14 +306,18 @@ impl<'a> GEntity<'a> {
 }
 
 
-/// A Enum with supported additional graphical primitives that are
-/// allowed to be drawn wrt the GEntity
+/// A Enum with a set of supported graphical primitives that one can use
+/// to draw or enhance the visual representation wrt the GEntity.
+///
+/// remfc: life of the corresponding graphics
+/// * if -ve, the graphics lives for ever
+/// * if +ve, it specifies for how many draw calls this graphics will be shown
 pub enum GEDrawPrimitive {
     /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
-    NSArc{ remfc: usize, radratio: f32, arcangles: (i16,i16), color: Color },
+    NSArc{ remfc: isize, radratio: f32, arcangles: (i16,i16), color: Color },
     #[allow(dead_code)]
     /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionFromCenter, Color
-    NLine{ remfc: usize, linetype: char, radratio: f32, color: Color },
+    NLine{ remfc: isize, linetype: char, radratio: f32, color: Color },
 }
 
 impl GEDrawPrimitive {
@@ -324,9 +328,11 @@ impl GEDrawPrimitive {
         let mut bremove = false;
         match self {
             GEDrawPrimitive::NSArc{ remfc, radratio: _, arcangles: _, color: _ } => {
-                *remfc -= 1;
-                if *remfc == 0 {
-                    bremove = true;
+                if *remfc > 0 {
+                    *remfc -= 1;
+                    if *remfc == 0 {
+                        bremove = true;
+                    }
                 }
             },
             GEDrawPrimitive::NLine{ remfc, linetype: _, radratio: _, color: _ } => {
