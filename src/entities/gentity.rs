@@ -187,26 +187,31 @@ impl<'a> GEntity<'a> {
 
     /// Draw a top/bottom/left/right line, relative to the boundry of the gentity
     /// provided its color is not invisible
-    fn draw_geline(&self, sx: &mut SdlX, linetype: char, posratio: f32, color: Color) {
+    fn draw_geline(&self, sx: &mut SdlX, linetype: GELineType, posratio: f32, color: Color) {
         if color == COLOR_INVISIBLE {
             return;
         }
-        if linetype == 't' {                // Top line
-            let tx1 = self.npos.0 - self.nhw;
-            let ty1 = self.npos.1 - self.nhh*posratio;
-            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, color);
-        } else if linetype == 'b' {         // Bottom line
-            let tx1 = self.npos.0 - self.nhw;
-            let ty1 = self.npos.1 + self.nhh*posratio;
-            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, color);
-        } else if linetype == 'l' {         // left line
-            let lx1 = self.npos.0 - self.nhw*posratio;
-            let ly1 = self.npos.1 - self.nhh;
-            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, color);
-        } else if linetype == 'r' {         // Right line
-            let lx1 = self.npos.0 + self.nhw*posratio;
-            let ly1 = self.npos.1 - self.nhh;
-            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, color);
+        match linetype {
+            GELineType::Top => {
+                let tx1 = self.npos.0 - self.nhw;
+                let ty1 = self.npos.1 - self.nhh*posratio;
+                sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, color);
+            },
+            GELineType::Bottom => {
+                let tx1 = self.npos.0 - self.nhw;
+                let ty1 = self.npos.1 + self.nhh*posratio;
+                sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, color);
+            },
+            GELineType::Left => {
+                let lx1 = self.npos.0 - self.nhw*posratio;
+                let ly1 = self.npos.1 - self.nhh;
+                sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, color);
+            },
+            GELineType::Right => {
+                let lx1 = self.npos.0 + self.nhw*posratio;
+                let ly1 = self.npos.1 - self.nhh;
+                sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, color);
+            },
         }
     }
 
@@ -215,19 +220,19 @@ impl<'a> GEntity<'a> {
         //eprintln!("DBUG:PPGND:GEntity:DrawOuterLines:{}=>{},{}=>{},{}-{}",self.width_height.0, nw, self.width_height.1, nh, vlw, hlw);
         // Top line
         if self.tl_color != COLOR_INVISIBLE {
-            self.draw_geline(sx, 't', 1.4, self.tl_color);
+            self.draw_geline(sx, GELineType::Top, 1.4, self.tl_color);
         }
         // Bottom line
         if self.bl_color != COLOR_INVISIBLE {
-            self.draw_geline(sx, 'b', 1.4, self.bl_color);
+            self.draw_geline(sx, GELineType::Bottom, 1.4, self.bl_color);
         }
         // left line
         if self.ll_color != COLOR_INVISIBLE {
-            self.draw_geline(sx, 'l', 1.4, self.ll_color);
+            self.draw_geline(sx, GELineType::Left, 1.4, self.ll_color);
         }
         // Right line
         if self.rl_color != COLOR_INVISIBLE {
-            self.draw_geline(sx, 'r', 1.4, self.rl_color);
+            self.draw_geline(sx, GELineType::Right, 1.4, self.rl_color);
         }
     }
 
@@ -342,6 +347,15 @@ impl<'a> GEntity<'a> {
 }
 
 
+#[derive(Debug, Clone)]
+/// Support GEntity DrawPrimitive Line types
+pub enum GELineType {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
 /// A Enum with a set of supported graphical primitives that one can use
 /// to draw or enhance the visual representation wrt the GEntity.
 ///
@@ -353,7 +367,7 @@ pub enum GEDrawPrimitive {
     NSArc{ remfc: isize, radratio: f32, arcangles: (i16,i16), color: Color },
     #[allow(dead_code)]
     /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionWrtCorrespondingBoundry, Color
-    NLine{ remfc: isize, linetype: char, radratio: f32, color: Color },
+    NLine{ remfc: isize, linetype: GELineType, radratio: f32, color: Color },
 }
 
 impl GEDrawPrimitive {
@@ -406,7 +420,7 @@ impl<'a> GEntity<'a> {
                     sx.ns_arc(nx, ny, srad, arcangles.0, arcangles.1, 3, *color);
                 },
                 GEDrawPrimitive::NLine { remfc: _, linetype, radratio, color } => {
-                    self.draw_geline(sx, *linetype, *radratio, *color);
+                    self.draw_geline(sx, linetype.clone(), *radratio, *color);
                 },
             }
             let ge = &mut self.gextras[i];
