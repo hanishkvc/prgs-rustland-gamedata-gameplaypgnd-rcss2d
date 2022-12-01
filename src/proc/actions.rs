@@ -15,7 +15,7 @@ use std::fmt::Display;
 use loggerk::{ldebug, log_d};
 use sdl2::{pixels::Color, render::BlendMode};
 
-use crate::sdlx::SdlX;
+use crate::sdlx::{SdlX, XRect};
 use crate::{entities, playdata};
 
 
@@ -888,13 +888,16 @@ pub enum SummaryPlayerType {
 
 impl ActionsInfo {
 
-    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, sptype: SummaryPlayerType) {
+    /// Plot time vs ascore wrt specified side+playerid.
+    /// It could either be based on individual ascores over time or cumulated ascores over time.
+    /// Specify the position of the plot window ((x,y),(w,h))
+    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
         use crate::sdlx::PlotType;
         let player = self.players.get_player(side, playerid);
         let vts;
         let mut ymin = -2.0;
         let mut ymax = 5.0;
-        if sptype == SummaryPlayerType::Individual {
+        if *sptype == SummaryPlayerType::Individual {
             vts = &player.score.vtimeascore_indiv;
         } else {
             vts = &player.score.vtimeascore_cumul;
@@ -906,7 +909,18 @@ impl ActionsInfo {
         }
         let stag = format!("{}{:02}", side, playerid);
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
-        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, ymin, ymax, &stag, PlotType::Lines);
+        sx.n_plot_uf(win.0.0, win.0.1, win.1.0, win.1.1, vts, 0.0, maxtime as f32, ymin, ymax, &stag, PlotType::Lines);
+    }
+
+    pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
+        let ((wx,wy), (ww,wh)) = win;
+        let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
+        let ph = wh/players.len() as f32;
+        for pi in 0..players.len() {
+            let x = wx;
+            let y = wy - (pi as f32*ph);
+            self.summary_player(sx, side, pi, maxtime, &sptype, ((x,y),(ww,ph)));
+        }
     }
 
 }
