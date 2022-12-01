@@ -478,48 +478,26 @@ impl SdlX {
         }
     }
 
-    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: Vec<(usize, f32)>, xmin: usize, xmax: usize, ymin: f32, ymax: f32) {
+    /// Plot the give Vector(usize,f32)
+    /// * usize takes x-axis, f32 takes y-axis
+    /// * nx,ny gives the left,bottom position of the plot window
+    /// * nw,nh gives the width and height of the plot window
+    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32) {
         let sx = self.n2s.d2ox(nx).round();
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
         let sh = self.n2s.d2oy(nh).round();
+        let drect = ((xmin,ymin), (xmax,ymax));
+        let orect = ((sx,sy),(sx+sw,sy-sh));
+        let d2s = XSpaces::new(drect, orect);
 
-        let sw = self.n2s.d2ox(nw);
-        let sh = self.n2s.d2oy(nh);
-        let dw = xmax - xmin;
-        let dh = ymax - ymin;
-        let _spdw = sw/dw as f32;
-        let dpsw = dw as f32/sw;
-        let spdh = sh/dh;
-        let mut vnew = Vec::new();
-        if dpsw > 1.0 {
-            let mut rem = dpsw;
-            let mut i = 0;
-            let mut y = 0.0;
-            while i < vdata.len() {
-                let cd = vdata[i];
-                if rem > 1.0 {
-                    y += cd.1;
-                    rem -= 1.0;
-                    i += 1;
-                } else {
-                    y += cd.1*rem;
-                    vnew.push(y/dpsw);
-                    rem = 1.0-rem;
-                    y = cd.1*rem;
-                    rem = dpsw - rem;
-                    i += 1;
-                }
-            }
-        } else {
-            todo!()
-        }
-        for x in 0..sw.round() as usize {
-            let yd = vnew[x];
-            let y = yd * spdh;
-            self.wc.circle(x as i16, y.round() as i16, 1, Color::WHITE).unwrap();
+        for d in vdata {
+            let dx = d.0;
+            let dy = d.1;
+            let sx = d2s.d2ox(dx as f32).round() as i16;
+            let sy = d2s.d2oy(dy).round() as i16;
+            self.wc.circle(sx, sy, 1, Color::WHITE).unwrap();
         }
     }
-
 
 }
