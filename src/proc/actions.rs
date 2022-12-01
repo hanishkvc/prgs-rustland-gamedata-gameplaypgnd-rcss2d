@@ -892,13 +892,20 @@ impl ActionsInfo {
         use crate::sdlx::PlotType;
         let player = self.players.get_player(side, playerid);
         let vts;
+        let mut ymin = -2.0;
+        let mut ymax = 5.0;
         if sptype == SummaryPlayerType::Individual {
             vts = &player.score.vtimeascore_indiv;
         } else {
             vts = &player.score.vtimeascore_cumul;
+            if player.score.ascore > ymax {
+                ymax = player.score.ascore;
+            } else if ymin > player.score.ascore {
+                ymin = player.score.ascore;
+            }
         }
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
-        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, -2.0, 5.0, PlotType::Lines);
+        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, ymin, ymax, PlotType::Lines);
     }
 
 }
