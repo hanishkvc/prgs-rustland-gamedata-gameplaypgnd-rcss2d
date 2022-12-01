@@ -37,3 +37,12 @@ fn test_sdlx_drawprims(sx: &mut SdlX) {
     dp1.draw(sx);
     dp2.draw(sx);
 }
+
+#[test]
+fn test_sdlx_xspaces_q4_q4() {
+    let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(1.0,1.0)));
+    let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
+    for d in vd {
+        eprintln!("Test:Sdlx:XSpaces:Q4Q4:{:?}:{:?}", d, s2n.d2o(d));
+    }
+}
