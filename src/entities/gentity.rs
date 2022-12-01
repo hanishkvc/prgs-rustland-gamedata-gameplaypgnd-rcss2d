@@ -185,32 +185,49 @@ impl<'a> GEntity<'a> {
         self.nvlw = self.nhlw*(self.nh/self.nw); // nw*0.2;
     }
 
+    /// Draw a top/bottom/left/right line, relative to the boundry of the gentity
+    /// provided its color is not invisible
+    fn draw_geline(&self, sx: &mut SdlX, linetype: char, posratio: f32, color: Color) {
+        if color == COLOR_INVISIBLE {
+            return;
+        }
+        if linetype == 't' {                // Top line
+            let tx1 = self.npos.0 - self.nhw;
+            let ty1 = self.npos.1 - self.nhh*posratio;
+            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, color);
+        } else if linetype == 'b' {         // Bottom line
+            let tx1 = self.npos.0 - self.nhw;
+            let ty1 = self.npos.1 + self.nhh*posratio;
+            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, color);
+        } else if linetype == 'l' {         // left line
+            let lx1 = self.npos.0 - self.nhw*posratio;
+            let ly1 = self.npos.1 - self.nhh;
+            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, color);
+        } else if linetype == 'r' {         // Right line
+            let lx1 = self.npos.0 + self.nhw*posratio;
+            let ly1 = self.npos.1 - self.nhh;
+            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, color);
+        }
+    }
+
     /// Draw the outer lines provided their colors is not invisible
     fn draw_outerlines(&self, sx: &mut SdlX) {
         //eprintln!("DBUG:PPGND:GEntity:DrawOuterLines:{}=>{},{}=>{},{}-{}",self.width_height.0, nw, self.width_height.1, nh, vlw, hlw);
         // Top line
         if self.tl_color != COLOR_INVISIBLE {
-            let tx1 = self.npos.0 - self.nhw;
-            let ty1 = self.npos.1 - self.nhh - self.nh*0.2;
-            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, self.tl_color);
+            self.draw_geline(sx, 't', 1.4, self.tl_color);
         }
         // Bottom line
         if self.bl_color != COLOR_INVISIBLE {
-            let tx1 = self.npos.0 - self.nhw;
-            let ty1 = self.npos.1 + self.nhh + self.nh*0.2;
-            sx.nn_thick_line(tx1, ty1, tx1+self.nw, ty1, self.nhlw, self.bl_color);
+            self.draw_geline(sx, 'b', 1.4, self.bl_color);
         }
         // left line
         if self.ll_color != COLOR_INVISIBLE {
-            let lx1 = self.npos.0 - self.nhw - self.nw*0.2;
-            let ly1 = self.npos.1 - self.nhh;
-            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, self.ll_color);
+            self.draw_geline(sx, 'l', 1.4, self.ll_color);
         }
         // Right line
         if self.rl_color != COLOR_INVISIBLE {
-            let lx1 = self.npos.0 + self.nhw + self.nw*0.2;
-            let ly1 = self.npos.1 - self.nhh;
-            sx.nn_thick_line(lx1, ly1, lx1, ly1+self.nh, self.nvlw, self.rl_color);
+            self.draw_geline(sx, 'r', 1.4, self.rl_color);
         }
     }
 
@@ -335,7 +352,7 @@ pub enum GEDrawPrimitive {
     /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
     NSArc{ remfc: isize, radratio: f32, arcangles: (i16,i16), color: Color },
     #[allow(dead_code)]
-    /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionFromCenter, Color
+    /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionWrtCorrespondingBoundry, Color
     NLine{ remfc: isize, linetype: char, radratio: f32, color: Color },
 }
 
@@ -381,15 +398,18 @@ impl<'a> GEntity<'a> {
     /// not worrying about index into the list getting affected, for remaining elements.
     fn draw_gextras(&mut self, sx: &mut SdlX) {
         for i in (0..self.gextras.len()).rev() {
-            let ge = &mut self.gextras[i];
+            let ge = &self.gextras[i];
             match ge {
                 GEDrawPrimitive::NSArc{remfc: _, radratio, arcangles, color } => {
                     let (nx,ny) = self.npos;
                     let srad = (self.radius  as f32 * *radratio) as i16;
                     sx.ns_arc(nx, ny, srad, arcangles.0, arcangles.1, 3, *color);
                 },
-                GEDrawPrimitive::NLine { remfc: _, linetype: _, radratio: _, color: _ } => todo!(),
+                GEDrawPrimitive::NLine { remfc: _, linetype, radratio, color } => {
+                    self.draw_geline(sx, *linetype, *radratio, *color);
+                },
             }
+            let ge = &mut self.gextras[i];
             if ge.life_decrement_need_removal() {
                 self.gextras.remove(i);
             }
