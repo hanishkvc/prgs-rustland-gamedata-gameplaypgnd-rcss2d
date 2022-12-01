@@ -933,8 +933,19 @@ impl ActionsInfo {
 
     pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
         let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
+        let mut ymin = f32::MAX;
+        let mut ymax = f32::MIN;
         for pi in 0..players.len() {
-            self.summary_player(sx, side, pi, maxtime, None, &sptype, win);
+            let player = self.players.get_player(side, pi);
+            if player.score.ascore > ymax {
+                ymax = player.score.ascore;
+            }
+            if player.score.ascore < ymin {
+                ymin = player.score.ascore;
+            }
+        }
+        for pi in 0..players.len() {
+            self.summary_player(sx, side, pi, maxtime, Some((ymin, ymax)), &sptype, win);
         }
     }
 
