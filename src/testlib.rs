@@ -43,11 +43,10 @@ fn test_sdlx_xspaces_dtoq1() {
     let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(1.0,1.0)));
     let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
     let vo = vec![(0.0,0.0), (0.0,1.0), (1.0,1.0), (1.0,0.0), (0.5,0.5)];
-    for d in vd {
-        eprintln!("Test:Sdlx:XSpaces:DtoQ1:D2O:{:?}:{:?}", d, s2n.d2o(d));
-    }
-    for o in vo {
-        eprintln!("Test:Sdlx:XSpaces:DtoQ1:O2D:{:?}:{:?}", o, s2n.o2d(o));
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:DtoQ1:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:DtoQ1:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
     }
 }
 
@@ -56,10 +55,33 @@ fn test_sdlx_xspaces_dtoq2() {
     let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(-1.0,1.0)));
     let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
     let vo = vec![(0.0,0.0), (0.0,1.0), (-1.0,1.0), (-1.0,0.0), (-0.5,0.5)];
-    for d in vd {
-        eprintln!("Test:Sdlx:XSpaces:DtoQ2:{:?}:{:?}", d, s2n.d2o(d));
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:DtoQ2:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:DtoQ2:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
     }
-    for o in vo {
-        eprintln!("Test:Sdlx:XSpaces:DtoQ2:O2D:{:?}:{:?}", o, s2n.o2d(o));
+}
+
+#[test]
+fn test_sdlx_xspaces_dtoq3() {
+    let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(-1.0,-1.0)));
+    let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
+    let vo = vec![(0.0,0.0), (0.0,-1.0), (-1.0,-1.0), (-1.0,0.0), (-0.5,-0.5)];
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:DtoQ3:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:DtoQ3:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
+    }
+}
+
+#[test]
+fn test_sdlx_xspaces_dtoq4() {
+    let s2n = sdlx::XSpaces::new(((0.0,0.0),(640.0,480.0)), ((0.0,0.0),(1.0,-1.0)));
+    let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
+    let vo = vec![(0.0,0.0), (0.0,-1.0), (1.0,-1.0), (1.0,0.0), (0.5,-0.5)];
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:DtoQ4:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:DtoQ4:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
     }
 }
