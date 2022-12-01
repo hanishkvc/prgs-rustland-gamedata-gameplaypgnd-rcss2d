@@ -147,6 +147,9 @@ impl<'a> PGEntities<'a> {
     ///   to the given position.
     ///   * inframes - specifies as to in how many frames the object should
     ///     be moved to the new location being specified.
+    ///
+    /// Handle Game State info (Currently Goal)
+    ///
     pub fn update(&mut self, pu: PlayUpdate, babsolute: bool, inframes: f32) {
         for fpmsg in &mut self.vfpmsgs {
             fpmsg.update(&pu.msgs);

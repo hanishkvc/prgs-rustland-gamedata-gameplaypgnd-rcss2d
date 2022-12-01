@@ -328,6 +328,7 @@ fn main() {
     // The main loop of the program starts now
     let mut dcolor = 20;
     let mut skey = String::new();
+    let mut timecounter = 0;
     'mainloop: loop {
         gui.next_frame();
         // Clear the background
@@ -406,6 +407,7 @@ fn main() {
                     if gui.pdata.next_frame_is_record_ready() {
                         let pu = gui.pdata.next_record();
                         ldebug!(&format!("DBUG:{}:{:?}", MTAG, pu));
+                        timecounter = pu.timecounter;
                         gui.pgentities.update(pu, false, gui.pdata.seconds_per_record() * gui.pgentities.fps());
                         //eprintln!("DBUG:GPPGND:Main:{}:Update called", _frame);
                     }
@@ -415,6 +417,7 @@ fn main() {
                     //eprintln!("DBUG:GPPGND:Main:{}:NextFrame called", _frame);
                 } else {
                     let pu = gui.pdata.next_record();
+                    timecounter = pu.timecounter;
                     gui.pgentities.update(pu, true, 0.0);
                 }
             } else {
@@ -437,7 +440,7 @@ fn main() {
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
-            gui.pgentities.actionsinfo.summary_player(&mut sx, entities::SIDE_L, 10, gui.frame);
+            gui.pgentities.actionsinfo.summary_player(&mut sx, entities::SIDE_L, 10, timecounter);
         }
 
         // Present screen update to user

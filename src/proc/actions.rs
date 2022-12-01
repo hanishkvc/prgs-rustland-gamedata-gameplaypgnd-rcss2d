@@ -881,7 +881,7 @@ impl ActionsInfo {
     pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize) {
         let player = self.players.get_player(side, playerid);
         let vts = &player.score.vtimeascore;
-        eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
+        //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
         sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, -2.0, 5.0);
     }
 
