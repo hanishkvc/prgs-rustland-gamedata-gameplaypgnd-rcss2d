@@ -137,7 +137,10 @@ pub type XPoint = (f32,f32);
 pub type XRect = (XPoint,XPoint);
 
 
-/// Allow conversion between two different 2d spaces
+/// Allow conversion between two different 2d spaces.
+/// To help differentiate between the two spaces
+/// * 1st 2d space is called d(ata) space
+/// * 2nd 2d space is called o(ther) space
 pub struct XSpaces {
     /// The 1st/Data 2d space ((dx1,dy1), (dx2,dy2))
     drect: XRect,
@@ -474,5 +477,49 @@ impl SdlX {
             self.wc.circle(sx+x as i16, y, 1, Color::WHITE).unwrap();
         }
     }
+
+    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: Vec<(usize, f32)>, xmin: usize, xmax: usize, ymin: f32, ymax: f32) {
+        let sx = self.n2s.d2ox(nx).round();
+        let sy = self.n2s.d2oy(ny).round();
+        let sw = self.n2s.d2ox(nw).round();
+        let sh = self.n2s.d2oy(nh).round();
+
+        let sw = self.n2s.d2ox(nw);
+        let sh = self.n2s.d2oy(nh);
+        let dw = xmax - xmin;
+        let dh = ymax - ymin;
+        let _spdw = sw/dw as f32;
+        let dpsw = dw as f32/sw;
+        let spdh = sh/dh;
+        let mut vnew = Vec::new();
+        if dpsw > 1.0 {
+            let mut rem = dpsw;
+            let mut i = 0;
+            let mut y = 0.0;
+            while i < vdata.len() {
+                let cd = vdata[i];
+                if rem > 1.0 {
+                    y += cd.1;
+                    rem -= 1.0;
+                    i += 1;
+                } else {
+                    y += cd.1*rem;
+                    vnew.push(y/dpsw);
+                    rem = 1.0-rem;
+                    y = cd.1*rem;
+                    rem = dpsw - rem;
+                    i += 1;
+                }
+            }
+        } else {
+            todo!()
+        }
+        for x in 0..sw.round() as usize {
+            let yd = vnew[x];
+            let y = yd * spdh;
+            self.wc.circle(x as i16, y.round() as i16, 1, Color::WHITE).unwrap();
+        }
+    }
+
 
 }
