@@ -142,7 +142,7 @@ impl<'a> Team<'a> {
                                 } else {
                                     (340,20)
                                 };
-                                self.players[pi].gextras_add(GEDrawPrimitive::NSArc(10, 1.4, arcangles, Color::BLACK));
+                                self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, color: Color::BLACK});
                                 COLOR_INVISIBLE
                             },
                             playdata::Action::None => COLOR_INVISIBLE,

@@ -310,10 +310,10 @@ impl<'a> GEntity<'a> {
 /// allowed to be drawn wrt the GEntity
 pub enum GEDrawPrimitive {
     /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
-    NSArc(usize, f32, (i16,i16), Color),
+    NSArc{ remfc: usize, radratio: f32, arcangles: (i16,i16), color: Color },
     #[allow(dead_code)]
-    /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePosition, Color
-    NLine(usize, char, f32, Color),
+    /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionFromCenter, Color
+    NLine{ remfc: usize, linetype: char, radratio: f32, color: Color },
 }
 
 impl GEDrawPrimitive {
@@ -323,13 +323,13 @@ impl GEDrawPrimitive {
     fn life_decrement_need_removal(&mut self) -> bool {
         let mut bremove = false;
         match self {
-            GEDrawPrimitive::NSArc(remfc, _, _, _) => {
+            GEDrawPrimitive::NSArc{ remfc, radratio: _, arcangles: _, color: _ } => {
                 *remfc -= 1;
                 if *remfc == 0 {
                     bremove = true;
                 }
             },
-            GEDrawPrimitive::NLine(remfc, _, _, _) => {
+            GEDrawPrimitive::NLine{ remfc, linetype: _, radratio: _, color: _ } => {
                 *remfc -= 1;
                 if *remfc == 0 {
                     bremove = true;
@@ -349,16 +349,21 @@ impl<'a> GEntity<'a> {
         self.gextras.push(ge);
     }
 
+    /// Draws starting from the end of the list (ie from the last/latest
+    /// added entry towards the oldest).
+    ///
+    /// NOTE: This also helps manipulate (remove from) the list, while still
+    /// not worrying about index into the list getting affected, for remaining elements.
     fn draw_gextras(&mut self, sx: &mut SdlX) {
         for i in (0..self.gextras.len()).rev() {
             let ge = &mut self.gextras[i];
             match ge {
-                GEDrawPrimitive::NSArc(_remfc, radratio, (sa,ea), color) => {
+                GEDrawPrimitive::NSArc{remfc: _, radratio, arcangles, color } => {
                     let (nx,ny) = self.npos;
                     let srad = (self.radius  as f32 * *radratio) as i16;
-                    sx.ns_arc(nx, ny, srad, *sa, *ea, 3, *color);
+                    sx.ns_arc(nx, ny, srad, arcangles.0, arcangles.1, 3, *color);
                 },
-                GEDrawPrimitive::NLine(_, _, _, _) => todo!(),
+                GEDrawPrimitive::NLine { remfc: _, linetype: _, radratio: _, color: _ } => todo!(),
             }
             if ge.life_decrement_need_removal() {
                 self.gextras.remove(i);

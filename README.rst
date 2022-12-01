@@ -360,3 +360,6 @@ Allow additional graphical primitives to be decorated/tacked on to the gentities
 in a flexible way. Use same to show RCSS Ball2Player and Player2Ball states wrt
 players.
 
+Remove old branches used for exploring and crystalising different ideas and
+inturn replace with tags to the tips of these old branches.
+
