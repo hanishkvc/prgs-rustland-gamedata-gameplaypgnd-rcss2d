@@ -437,7 +437,7 @@ fn main() {
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
-            gui.pgentities.actionsinfo.summary_player(&mut sx, entities::SIDE_L, 10);
+            gui.pgentities.actionsinfo.summary_player(&mut sx, entities::SIDE_L, 10, gui.frame);
         }
 
         // Present screen update to user
