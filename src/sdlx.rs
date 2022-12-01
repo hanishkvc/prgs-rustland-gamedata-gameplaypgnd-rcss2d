@@ -466,7 +466,23 @@ impl SdlX {
                 }
             }
         } else {
-            todo!()
+            let mut rem = 1.0/dpsw;
+            let mut i = 0;
+            while i < vdata.len() {
+                let cd = vdata[i];
+                if rem > 1.0 {
+                    vnew.push(cd);
+                    rem -= 1.0;
+                } else {
+                    let mut y = cd*rem;
+                    i += 1;
+                    let cd = vdata[i];
+                    rem = 1.0-rem;
+                    y += cd*rem;
+                    rem = (1.0/dpsw) - rem;
+                    vnew.push(y);
+                }
+            }
         }
         for x in 0..sw.round() as usize {
             let yd = vnew[x]-ymin;
