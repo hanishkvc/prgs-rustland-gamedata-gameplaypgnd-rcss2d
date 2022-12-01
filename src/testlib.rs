@@ -111,3 +111,41 @@ fn test_sdlx_xspaces_slbinq3() {
         eprintln!("Test:Sdlx:XSpaces:SlbInQ3:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
     }
 }
+
+#[test]
+fn test_sdlx_xspaces_drtoq1() {
+    let s2n = sdlx::XSpaces::new(((640.0,480.0),(0.0,0.0)), ((0.0,0.0),(1.0,1.0)));
+    let vd = vec![(0.0,0.0), (0.0,480.0), (640.0,480.0), (640.0,0.0), (320.0,240.0)];
+    let vo = vec![(1.0,1.0), (1.0,0.0), (0.0,0.0), (0.0,1.0), (0.5,0.5)];
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:DrtoQ1:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:DrtoQ1:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
+    }
+}
+
+#[test]
+/// Screen 0,0 in mid
+fn test_sdlx_xspaces_sinmid() {
+    let s2n = sdlx::XSpaces::new(((-320.0,240.0),(320.0,-240.0)), ((-0.5,0.5),(0.5,-0.5)));
+    let vd = vec![(-320.0,240.0), (-320.0,-240.0), (320.0,-240.0), (320.0,240.0), (0.0,0.0)];
+    let vo = vec![(-0.5,0.5),     (-0.5,-0.5),     (0.5,-0.5),     (0.5,0.5),     (0.0,0.0)];
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:SInMid:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:SInMid:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
+    }
+}
+
+#[test]
+/// ScreenR 0,0 in mid
+fn test_sdlx_xspaces_srinmid() {
+    let s2n = sdlx::XSpaces::new(((-320.0,240.0),(320.0,-240.0)), ((0.5,-0.5),(-0.5,0.5)));
+    let vd = vec![(-320.0,240.0), (-320.0,-240.0), (320.0,-240.0), (320.0,240.0), (0.0,0.0)];
+    let vo = vec![(0.5,-0.5),     (0.5,0.5),       (-0.5,0.5),     (-0.5,-0.5),   (0.0,0.0)];
+    for i in 0..vd.len() {
+        eprintln!();
+        eprintln!("Test:Sdlx:XSpaces:SrInMid:D2O:{:?}:{:?}", vd[i], s2n.d2o(vd[i]));
+        eprintln!("Test:Sdlx:XSpaces:SrInMid:O2D:{:?}:{:?}", vo[i], s2n.o2d(vo[i]));
+    }
+}
