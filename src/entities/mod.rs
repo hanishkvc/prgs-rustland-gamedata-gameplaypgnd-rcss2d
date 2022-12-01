@@ -254,6 +254,16 @@ impl<'a> PGEntities<'a> {
         }
     }
 
+    pub fn toggle_bshowcards(&mut self) {
+        let lshow = self.lteam.toggle_bshowcards();
+        let rshow = self.rteam.toggle_bshowcards();
+        if lshow && rshow {
+            self.timedmsg.update_direct("Cards:Show");
+        } else {
+            self.timedmsg.update_direct("Cards:Hide");
+        }
+    }
+
     pub fn seek(&mut self, seekdelta: isize) {
         if self.virtballd.is_some() {
             self.virtballd.as_mut().unwrap().seek(seekdelta);

@@ -26,6 +26,7 @@ pub struct Team<'a> {
     cards: HashMap<String, Vec<usize>>,
     bshowstamina: bool,
     bshowactions: bool,
+    bshowcards: bool,
 }
 
 impl<'a> Team<'a> {
@@ -38,6 +39,7 @@ impl<'a> Team<'a> {
             cards: HashMap::new(),
             bshowstamina: true,
             bshowactions: true,
+            bshowcards: true,
         };
         let (prgw, prgh) = sdlx::get_prg_resolution();
         let bx = (rand::random::<u32>() % prgw) as f32;
@@ -104,6 +106,9 @@ impl<'a> Team<'a> {
                             card_color = Color::RED;
                         } else if let playdata::Card::Yellow = card {
                             card_color = Color::YELLOW;
+                        }
+                        if !self.bshowcards {
+                            card_color = sdlx::COLOR_INVISIBLE;
                         }
                         self.players[pi].set_tl_color(card_color);
                         self.players[pi].set_bl_color(card_color);
@@ -188,6 +193,11 @@ impl<'a> Team<'a> {
     pub fn toggle_bshowactions(&mut self) -> bool {
         self.bshowactions = !self.bshowactions;
         self.bshowactions
+    }
+
+    pub fn toggle_bshowcards(&mut self) -> bool {
+        self.bshowcards = !self.bshowcards;
+        self.bshowcards
     }
 
 }
