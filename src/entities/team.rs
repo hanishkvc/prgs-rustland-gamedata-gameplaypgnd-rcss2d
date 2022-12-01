@@ -27,6 +27,7 @@ pub struct Team<'a> {
     bshowstamina: bool,
     bshowactions: bool,
     bshowcards: bool,
+    bshowotheractions: bool,
 }
 
 impl<'a> Team<'a> {
@@ -40,6 +41,7 @@ impl<'a> Team<'a> {
             bshowstamina: true,
             bshowactions: true,
             bshowcards: true,
+            bshowotheractions: false,
         };
         let (prgw, prgh) = sdlx::get_prg_resolution();
         let bx = (rand::random::<u32>() % prgw) as f32;
@@ -147,7 +149,9 @@ impl<'a> Team<'a> {
                                 } else {
                                     (340,20)
                                 };
-                                self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, color: Color::BLACK});
+                                if self.bshowotheractions {
+                                    self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, color: Color::BLACK});
+                                }
                                 COLOR_INVISIBLE
                             },
                             playdata::Action::None => COLOR_INVISIBLE,
