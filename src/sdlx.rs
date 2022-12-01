@@ -424,3 +424,45 @@ impl DrawPrimitive {
     }
 
 }
+
+impl SdlX {
+
+    pub fn n_plot_uf(&self, _nx: f32, _ny: f32, nw: f32, nh: f32, vdata: Vec<(usize, f32)>, xmin: usize, xmax: usize, ymin: f32, ymax: f32) {
+        let sw = self.n2s.d2ox(nw);
+        let sh = self.n2s.d2oy(nh);
+        let dw = xmax - xmin;
+        let dh = ymax - ymin;
+        let _spdw = sw/dw as f32;
+        let dpsw = dw as f32/sw;
+        let spdh = sh/dh;
+        let mut vnew = Vec::new();
+        if dpsw > 1.0 {
+            let mut rem = dpsw;
+            let mut i = 0;
+            let mut y = 0.0;
+            while i < vdata.len() {
+                let cd = vdata[i];
+                if rem > 1.0 {
+                    y += cd.1;
+                    rem -= 1.0;
+                    i += 1;
+                } else {
+                    y += cd.1*rem;
+                    vnew.push(y/dpsw);
+                    rem = 1.0-rem;
+                    y = cd.1*rem;
+                    rem = dpsw - rem;
+                    i += 1;
+                }
+            }
+        } else {
+            todo!()
+        }
+        for x in 0..sw.round() as usize {
+            let yd = vnew[x];
+            let y = yd * spdh;
+            self.wc.circle(x as i16, y.round() as i16, 1, Color::WHITE).unwrap();
+        }
+    }
+
+}
