@@ -891,20 +891,27 @@ impl ActionsInfo {
     /// Plot time vs ascore wrt specified side+playerid.
     /// It could either be based on individual ascores over time or cumulated ascores over time.
     /// Specify the position of the plot window ((x,y),(w,h))
-    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
+    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         use crate::sdlx::PlotType;
         let player = self.players.get_player(side, playerid);
         let vts;
         let mut ymin = -2.0;
         let mut ymax = 5.0;
+        if yminmax.is_some() {
+            let yminmax = yminmax.unwrap();
+            ymin = yminmax.0;
+            ymax = yminmax.1;
+        }
         if *sptype == SummaryPlayerType::Individual {
             vts = &player.score.vtimeascore_indiv;
         } else {
             vts = &player.score.vtimeascore_cumul;
-            if player.score.ascore > ymax {
-                ymax = player.score.ascore;
-            } else if ymin > player.score.ascore {
-                ymin = player.score.ascore;
+            if yminmax.is_none() {
+                if player.score.ascore > ymax {
+                    ymax = player.score.ascore;
+                } else if ymin > player.score.ascore {
+                    ymin = player.score.ascore;
+                }
             }
         }
         let stag = format!("{}{:02}", side, playerid);
@@ -912,14 +919,22 @@ impl ActionsInfo {
         sx.n_plot_uf(win.0.0, win.0.1, win.1.0, win.1.1, vts, 0.0, maxtime as f32, ymin, ymax, &stag, PlotType::Lines);
     }
 
-    pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
+    #[allow(dead_code)]
+    pub fn summary_players_seperate(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
         let ((wx,wy), (ww,wh)) = win;
         let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
         let ph = wh/players.len() as f32;
         for pi in 0..players.len() {
             let x = wx;
             let y = wy - (pi as f32*ph);
-            self.summary_player(sx, side, pi, maxtime, &sptype, ((x,y),(ww,ph)));
+            self.summary_player(sx, side, pi, maxtime, None, &sptype, ((x,y),(ww,ph)));
+        }
+    }
+
+    pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
+        let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
+        for pi in 0..players.len() {
+            self.summary_player(sx, side, pi, maxtime, None, &sptype, win);
         }
     }
 
