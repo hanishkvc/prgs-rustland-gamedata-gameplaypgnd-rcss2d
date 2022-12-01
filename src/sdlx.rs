@@ -507,7 +507,7 @@ impl SdlX {
     /// * usize takes x-axis, f32 takes y-axis
     /// * nx,ny gives the left,bottom position of the plot window
     /// * nw,nh gives the width and height of the plot window
-    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, plottype: PlotType) {
+    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, stag: &str, plottype: PlotType) {
         let sx = self.n2s.d2ox(nx).round();
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
@@ -532,6 +532,7 @@ impl SdlX {
             px = sx;
             py = sy;
         }
+        self.wc.string(px, py, stag, Color::WHITE).unwrap();
     }
 
 }

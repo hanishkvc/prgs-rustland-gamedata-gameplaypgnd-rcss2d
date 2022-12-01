@@ -904,8 +904,9 @@ impl ActionsInfo {
                 ymin = player.score.ascore;
             }
         }
+        let stag = format!("{}{:02}", side, playerid);
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
-        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, ymin, ymax, PlotType::Lines);
+        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, vts, 0.0, maxtime as f32, ymin, ymax, &stag, PlotType::Lines);
     }
 
 }
