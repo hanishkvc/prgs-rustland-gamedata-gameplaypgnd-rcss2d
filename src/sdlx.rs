@@ -503,24 +503,28 @@ impl SdlX {
         }
     }
 
-    fn dsp_uf_f_lowpass(vdata: &Vec<(usize, f32)>) -> Vec<(usize, f32)> {
+    fn dsp_uf_f_lowpass(vdata: &Vec<(usize, f32)>, fw: usize) -> Vec<(usize, f32)> {
+        let fwh = (fw/2) as isize;
+        let weight = 1.0/(fw as f32);
         let mut vnew = Vec::new();
         let mut vbtw = Vec::new();
         for i in 0..vdata.len() {
-            vbtw.push(vdata[i].1*0.2);
+            vbtw.push(vdata[i].1*weight);
         }
-        vnew.push(vdata[0]);
-        vnew.push(vdata[1]);
-        for i in 2..vbtw.len()-2 {
+        for i in 0..fwh {
+            vnew.push(vdata[i as usize]);
+        }
+        for i in fw..vbtw.len()-fw {
             let mut d = 0.0;
-            for j in -2..3 {
+            for j in -fwh..(fwh+1) {
                 let fi = (i as isize + j) as usize;
                 d += vbtw[fi];
             }
             vnew.push((vdata[i].0, d));
         }
-        vnew.push(vdata[vdata.len()-2]);
-        vnew.push(vdata[vdata.len()-1]);
+        for i in (1..=fwh as usize).rev() {
+            vnew.push(vdata[vdata.len()-i]);
+        }
         vnew
     }
 
@@ -540,8 +544,9 @@ impl SdlX {
         let mut py = i16::MIN;
         let vdata;
         let vnew;
-        if vindata.len() > 5 {
-            vnew = Self::dsp_uf_f_lowpass(vindata);
+        let filterwindow = 10;
+        if vindata.len() > filterwindow {
+            vnew = Self::dsp_uf_f_lowpass(vindata, filterwindow);
             vdata = &vnew;
         } else {
             vdata = vindata;
