@@ -136,6 +136,10 @@ struct Gui<'a> {
     saved_virtball_csv: bool,
     /// Include Penalty Card based scoring in PerfScore or not
     inc_cardscore: bool,
+    /// ActionsInfo TimeVsScore summary show
+    showaitimevsscore: bool,
+    /// ActionsInfo TimeVsScore summary type
+    aitimevsscore_summarytype: char,
 }
 
 impl<'a> Gui<'a> {
@@ -186,6 +190,8 @@ impl<'a> Gui<'a> {
             aidistances_summarytype: actions::SUMMARY_RELATIVE_TEAM,
             saved_virtball_csv: false,
             inc_cardscore: true,
+            showaitimevsscore: false,
+            aitimevsscore_summarytype: actions::SUMMARY_RELATIVE_TEAM,
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -395,6 +401,16 @@ fn main() {
                     let smsg = if gui.inc_cardscore { "CardScore:Include" } else { "CardScore:Exclude" };
                     gui.pgentities.timedmsg.update_direct(smsg);
                 },
+                keys::ProgramEvent::DumpAITimeVsScoreSummary(summarytype) => {
+                    if gui.aitimevsscore_summarytype == summarytype {
+                        gui.showaitimevsscore = !gui.showaitimevsscore;
+                    }
+                    gui.aitimevsscore_summarytype = summarytype;
+                    let st = if summarytype == actions::SUMMARY_RELATIVE_TEAM { "Team" } else { "Team" }; // TODO: Add support for All later
+                    if gui.showaitimevsscore {
+                        gui.pgentities.timedmsg.update_direct(&format!("TimeVsPerf:{}", st));
+                    }
+                },
                 keys::ProgramEvent::Quit => break 'mainloop,
                 keys::ProgramEvent::NeedMore => (),
             }
@@ -440,6 +456,8 @@ fn main() {
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
+        }
+        if gui.showaitimevsscore {
             gui.pgentities.actionsinfo.summary_tvs(&mut sx, timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)));
         }
 

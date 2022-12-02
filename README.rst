@@ -207,6 +207,9 @@ to control the behaviour as noted below.
   * c -> toggle whether to include penalty card based scoring in ActionsInfo
     relative perf summary graphics.
 
+  * t -> to show ActionsInfo time vs perf plot wrt all players, scaled
+    relative to best and worst player perf score in the team.
+
   * any other key -> exit internal-debug_explore-mode
 
 

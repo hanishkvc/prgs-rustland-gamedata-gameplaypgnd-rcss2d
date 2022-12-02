@@ -26,6 +26,7 @@ pub enum ProgramEvent {
     DumpAIScoresSummary(char),
     DumpAIDistancesSummary(char),
     DumpIncCardScore,
+    DumpAITimeVsScoreSummary(char),
     Quit,
     NeedMore,
 }
@@ -87,6 +88,13 @@ fn handle_d_cmds(keycode: Keycode, keymod: Mod) -> ProgramEvent {
         Keycode::C => {
             return ProgramEvent::DumpIncCardScore;
         }
+        Keycode::T => {
+            if keymod.contains(Mod::RSHIFTMOD) || keymod.contains(Mod::LSHIFTMOD) {
+                return ProgramEvent::DumpAITimeVsScoreSummary(actions::SUMMARY_RELATIVE_ALL);
+            } else {
+                return ProgramEvent::DumpAITimeVsScoreSummary(actions::SUMMARY_RELATIVE_TEAM);
+            }
+        },
         Keycode::LShift | Keycode::RShift => return ProgramEvent::NeedMore,
         _ => ldebug!(&format!("DBUG:GPPGND:Keys:DCmds:{}:{}", keycode, keymod)),
     }
