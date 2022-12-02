@@ -544,7 +544,7 @@ impl SdlX {
         let mut py = i16::MIN;
         let vdata;
         let vnew;
-        let filterwindow = 10;
+        let filterwindow = 5;
         if vindata.len() > filterwindow {
             vnew = Self::dsp_uf_f_lowpass(vindata, filterwindow);
             vdata = &vnew;

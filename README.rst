@@ -378,3 +378,5 @@ Plotting of Time vs Player Perf AScore (IndividualScoreChanges/Cumulative,
 Points/Lines) wrt individual player / full team / both teams, with controllable
 positioning.
 
+* low pass filtered plotting of time vs player perf graphs
+
