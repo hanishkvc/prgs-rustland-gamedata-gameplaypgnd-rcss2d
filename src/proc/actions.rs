@@ -48,16 +48,16 @@ pub const SUMMARY_RELATIVE_ALL: char = 'A';
 #[derive(Debug)]
 /// Maintain the scoring related to a player
 struct Score {
-    /// The overall actions related score
-    ascore: f32,
-    /// Vector of time,ascoredeltas
-    vtimeascore_deltas: Vec<(usize, f32)>,
-    /// Vector of time vs ascore cumulative
-    vtimeascore_cumul: Vec<(usize,f32)>,
-    /// Historic cumulative min score
-    hist_cumul_minscore: f32,
-    /// Historic cumulative max score
-    hist_cumul_maxscore: f32,
+    /// The overall performance related score
+    pscore: f32,
+    /// Vector of time,pscoredeltas
+    vtimepscore_deltas: Vec<(usize, f32)>,
+    /// Vector of time vs pscore cumulative
+    vtimepscore_cumul: Vec<(usize,f32)>,
+    /// Historic cumulative min pscore
+    hist_cumul_minpscore: f32,
+    /// Historic cumulative max pscore
+    hist_cumul_maxpscore: f32,
     /// The number of kicks
     kicks: usize,
     /// The number of tackles
@@ -72,13 +72,13 @@ struct Score {
 
 impl Score {
 
-    fn new(ascore: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
+    fn new(pscore: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
         Score {
-            ascore: ascore,
-            vtimeascore_deltas: Vec::new(),
-            vtimeascore_cumul: Vec::new(),
-            hist_cumul_maxscore: f32::MIN,
-            hist_cumul_minscore: f32::MAX,
+            pscore,
+            vtimepscore_deltas: Vec::new(),
+            vtimepscore_cumul: Vec::new(),
+            hist_cumul_maxpscore: f32::MIN,
+            hist_cumul_minpscore: f32::MAX,
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
@@ -91,15 +91,15 @@ impl Score {
         return Score::new(0.0, 0, 0, 0, 0.0, playdata::Card::None);
     }
 
-    fn ascore_update(&mut self, time: usize, ascoredelta: f32) {
-        self.ascore += ascoredelta;
-        if self.ascore > self.hist_cumul_maxscore {
-            self.hist_cumul_maxscore = self.ascore;
-        } else if self.ascore < self.hist_cumul_minscore {
-            self.hist_cumul_minscore = self.ascore;
+    fn pscore_update(&mut self, time: usize, pscoredelta: f32) {
+        self.pscore += pscoredelta;
+        if self.pscore > self.hist_cumul_maxpscore {
+            self.hist_cumul_maxpscore = self.pscore;
+        } else if self.pscore < self.hist_cumul_minpscore {
+            self.hist_cumul_minpscore = self.pscore;
         }
-        self.vtimeascore_deltas.push((time, ascoredelta));
-        self.vtimeascore_cumul.push((time, self.ascore));
+        self.vtimepscore_deltas.push((time, pscoredelta));
+        self.vtimepscore_cumul.push((time, self.pscore));
     }
 
     fn card_score_value(card: playdata::Card) -> f32 {
@@ -112,9 +112,15 @@ impl Score {
 
     fn card_issued(&mut self, time: usize, card: playdata::Card) {
         self.card = card.clone();
-        self.ascore_update(time, Self::card_score_value(card));
+        self.pscore_update(time, Self::card_score_value(card));
     }
 
+    /// Returns the performance score as is, or after substracting latest
+    /// card penalty.
+    ///
+    /// NOTE: It will only avoid the last / latest card penalty. If multiple
+    /// card penalties were issued, then the previous ones wont be adjusted
+    /// for.
     fn score(&self, inc_cardscore: bool) -> f32 {
         let adjustcardscore;
         if inc_cardscore {
@@ -122,7 +128,7 @@ impl Score {
         } else {
             adjustcardscore = Self::card_score_value(self.card.clone());
         }
-        return self.ascore - adjustcardscore;
+        return self.pscore - adjustcardscore;
     }
 
 }
@@ -175,15 +181,6 @@ impl Players {
         return player;
     }
 
-    /*
-    #[allow(dead_code)]
-    /// Get the specified player's score struct
-    fn get_player_score_set<'a>(&'a self, side: char, playerid: usize) -> &'a Score {
-        let player = self.get_player(side, playerid);
-        return &player.score;
-    }
-    */
-
     /// Help update the score of a specific player, based on card issued if any
     fn card_issued(&mut self, time: usize, side: char, playerid: usize, card: playdata::Card) {
         if playerid >= entities::XPLAYERID_START {
@@ -199,18 +196,19 @@ impl Players {
         }
     }
 
-    /// Help update the actions related score of a specific player
-    fn ascore_update(&mut self, time: usize, side: char, playerid: usize, ascore: f32) {
+    /// Help update the performance related score of a specific player
+    /// Could be used for actions based scoring or so...
+    fn pscore_update(&mut self, time: usize, side: char, playerid: usize, pscoredelta: f32) {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Score:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         } else {
-            eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, ascore);
+            eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, pscoredelta);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].score.ascore_update(time, ascore);
+            self.lplayers[playerid].score.pscore_update(time, pscoredelta);
         } else {
-            self.rplayers[playerid].score.ascore_update(time, ascore);
+            self.rplayers[playerid].score.pscore_update(time, pscoredelta);
         }
     }
 
@@ -271,27 +269,30 @@ impl Players {
 
     /// Return the min and max player score for each of the teams, based
     /// on the historic values seen wrt player performance scoring.
+    ///
+    /// NOTE: This always includes the actions based scoring as well as
+    /// card based scoring.
     fn score_hist_cumul_minmax(&self) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
         let mut lmin = f32::MAX;
         for i in 0..self.lplayers.len() {
             let player = &self.lplayers[i];
-            if lmax < player.score.hist_cumul_maxscore {
-                lmax = player.score.hist_cumul_maxscore;
+            if lmax < player.score.hist_cumul_maxpscore {
+                lmax = player.score.hist_cumul_maxpscore;
             }
-            if lmin > player.score.hist_cumul_minscore {
-                lmin = player.score.hist_cumul_minscore;
+            if lmin > player.score.hist_cumul_minpscore {
+                lmin = player.score.hist_cumul_minpscore;
             }
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
         for i in 0..self.rplayers.len() {
             let player = &self.rplayers[i];
-            if rmax < player.score.hist_cumul_maxscore {
-                rmax = player.score.hist_cumul_maxscore;
+            if rmax < player.score.hist_cumul_maxpscore {
+                rmax = player.score.hist_cumul_maxpscore;
             }
-            if rmin > player.score.hist_cumul_minscore {
-                rmin = player.score.hist_cumul_minscore;
+            if rmin > player.score.hist_cumul_minpscore {
+                rmin = player.score.hist_cumul_minpscore;
             }
         }
         ((lmin,lmax), (rmin,rmax))
@@ -585,7 +586,6 @@ impl ActionsInfo {
 /// Helps tell what should one do after the handle helper returns
 pub enum HAReturn {
     /// Continue searching/checking the history further back, cas not yet done
-    #[allow(dead_code)]
     ContinueSearch,
     /// Stop checking the history at this point, ie be done with it.
     /// Inturn indicate whether to save the current action or not
@@ -614,13 +614,13 @@ impl ActionsInfo {
                         ppscore *= SCORE_SELF_PASS_RATIO;
                         cpscore *= SCORE_SELF_PASS_RATIO;
                     }
-                    self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                    self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                    self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                    self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 } else {
                     let pscore = score.0 * score.3;
-                    self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
+                    self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                     let pscore = score.0 * score.4;
-                    self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, pscore);
+                    self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, pscore);
                 }
                 return HAReturn::Done(true);
             },
@@ -633,7 +633,7 @@ impl ActionsInfo {
                 } else {
                     // This is like a no effort kick potentially, ie after a goal, so low score
                     let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
-                    self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, pscore);
+                    self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, pscore);
                     return HAReturn::Done(true);
                 }
             },
@@ -681,7 +681,7 @@ impl ActionsInfo {
                     // Nearest player scores more compared to farther players, wrt the chain of actions leading to the goal
                     let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
                     let pid = if lookbackcnt <= 1 { curactd.playerid } else { prevactd.playerid };
-                    self.players.ascore_update(curactd.time, curactd.side, pid, pscore);
+                    self.players.pscore_update(curactd.time, curactd.side, pid, pscore);
                     if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
                         return HAReturn::Done(true);
                     }
@@ -695,11 +695,11 @@ impl ActionsInfo {
                         if prevactd.action == AIAction::Catch {
                             pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
                         }
-                        self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
+                        self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                         return HAReturn::ContinueSearch;
                     }
                     pscore *= SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO;
-                    self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
+                    self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                     HAReturn::Done(true)
                 }
             },
@@ -726,8 +726,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Tackle => {
@@ -747,8 +747,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -779,8 +779,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.ascore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.players.ascore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -936,8 +936,8 @@ pub enum SummaryPlayerType {
 
 impl ActionsInfo {
 
-    /// Plot time vs ascore wrt specified side+playerid.
-    /// It could either be based on individual ascores deltas/changes over time or cumulated ascores over time.
+    /// Plot time vs pscore wrt specified side+playerid.
+    /// It could either be based on individual pscores deltas/changes over time or cumulated pscores over time.
     /// Specify the position of the plot window ((x,y),(w,h))
     ///
     /// If yminmax is not specified, then a standard min max is used and inturn adjusted based on player's score.
@@ -953,14 +953,14 @@ impl ActionsInfo {
             ymax = yminmax.1;
         }
         if *sptype == SummaryPlayerType::ScoreDeltas {
-            vts = &player.score.vtimeascore_deltas;
+            vts = &player.score.vtimepscore_deltas;
         } else {
-            vts = &player.score.vtimeascore_cumul;
+            vts = &player.score.vtimepscore_cumul;
             if yminmax.is_none() {
-                if player.score.ascore > ymax {
-                    ymax = player.score.ascore;
-                } else if ymin > player.score.ascore {
-                    ymin = player.score.ascore;
+                if player.score.pscore > ymax {
+                    ymax = player.score.pscore;
+                } else if ymin > player.score.pscore {
+                    ymin = player.score.pscore;
                 }
             }
         }
