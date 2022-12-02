@@ -92,6 +92,10 @@ impl Score {
         self.vtimeascore_cumul.push((time, self.ascore));
     }
 
+    fn card_issued(&mut self, card: playdata::Card) {
+        self.card = card;
+    }
+
     fn score(&self, inc_cardscore: bool) -> f32 {
         let cardscore;
         if inc_cardscore {
@@ -174,9 +178,9 @@ impl Players {
             eprintln!("DBUG:{}:Players:Card:{}{:02}:{}", MTAG, side, playerid, card);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].score.card = card;
+            self.lplayers[playerid].score.card_issued(card);
         } else {
-            self.rplayers[playerid].score.card = card;
+            self.rplayers[playerid].score.card_issued(card);
         }
     }
 
