@@ -990,8 +990,14 @@ impl ActionsInfo {
     }
 
     /// Display time vs score wrt players of both side
-    pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
-        let ((lmin,lmax), (rmin,rmax)) = self.players.score_hist_cumul_minmax();
+    pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect, summarytype: char) {
+        let ((mut lmin,mut lmax), (mut rmin,mut rmax)) = self.players.score_hist_cumul_minmax();
+        if summarytype == SUMMARY_RELATIVE_ALL {
+            lmin = lmin.min(rmin);
+            lmax = lmax.max(rmax);
+            rmin = lmin;
+            rmax = lmax;
+        }
         let winxy = win.0;
         let winwh = win.1;
         let winwby2 = winwh.0/2.0;

@@ -210,6 +210,9 @@ to control the behaviour as noted below.
   * t -> to show ActionsInfo time vs perf plot wrt all players, scaled
     relative to best and worst player perf score in the team.
 
+  * T -> to show ActionsInfo time vs perf plot wrt all players, scaled
+    relative to best and worst player perf score across both the teams.
+
   * any other key -> exit internal-debug_explore-mode
 
 

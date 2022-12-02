@@ -414,7 +414,7 @@ fn main() {
                         gui.showaitimevsscore = !gui.showaitimevsscore;
                     }
                     gui.aitimevsscore_summarytype = summarytype;
-                    let st = if summarytype == actions::SUMMARY_RELATIVE_TEAM { "Team" } else { "Team" }; // TODO: Add support for All later
+                    let st = if summarytype == actions::SUMMARY_RELATIVE_TEAM { "Team" } else { "All" };
                     if gui.showaitimevsscore {
                         gui.pgentities.timedmsg.update_direct(&format!("TimeVsPerf:{}", st));
                     }
@@ -466,7 +466,7 @@ fn main() {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
         }
         if gui.showaitimevsscore {
-            gui.pgentities.actionsinfo.summary_tvs(&mut sx, gui.timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)));
+            gui.pgentities.actionsinfo.summary_tvs(&mut sx, gui.timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)), gui.aitimevsscore_summarytype);
         }
 
         // Present screen update to user
