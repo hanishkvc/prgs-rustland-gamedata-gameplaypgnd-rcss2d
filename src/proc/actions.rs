@@ -891,6 +891,8 @@ impl ActionsInfo {
     /// Plot time vs ascore wrt specified side+playerid.
     /// It could either be based on individual ascores over time or cumulated ascores over time.
     /// Specify the position of the plot window ((x,y),(w,h))
+    ///
+    /// If yminmax is not specified, then a standard min max is used and inturn adjusted based on player's score.
     pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         use crate::sdlx::PlotType;
         let player = self.players.get_player(side, playerid);
@@ -931,21 +933,10 @@ impl ActionsInfo {
         }
     }
 
-    pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
+    pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: SummaryPlayerType, win: XRect) {
         let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
-        let mut ymin = f32::MAX;
-        let mut ymax = f32::MIN;
         for pi in 0..players.len() {
-            let player = self.players.get_player(side, pi);
-            if player.score.ascore > ymax {
-                ymax = player.score.ascore;
-            }
-            if player.score.ascore < ymin {
-                ymin = player.score.ascore;
-            }
-        }
-        for pi in 0..players.len() {
-            self.summary_player(sx, side, pi, maxtime, Some((ymin, ymax)), &sptype, win);
+            self.summary_player(sx, side, pi, maxtime, yminmax, &sptype, win);
         }
     }
 
