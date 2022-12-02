@@ -893,7 +893,7 @@ impl ActionsInfo {
     /// Specify the position of the plot window ((x,y),(w,h))
     ///
     /// If yminmax is not specified, then a standard min max is used and inturn adjusted based on player's score.
-    pub fn summary_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
+    pub fn summary_tvs_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         use crate::sdlx::PlotType;
         let player = self.players.get_player(side, playerid);
         let vts;
@@ -922,22 +922,33 @@ impl ActionsInfo {
     }
 
     #[allow(dead_code)]
-    pub fn summary_players_seperate(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: SummaryPlayerType, win: XRect) {
+    pub fn summary_tvs_givenside_independent(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
         let ((wx,wy), (ww,wh)) = win;
         let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
         let ph = wh/players.len() as f32;
         for pi in 0..players.len() {
             let x = wx;
             let y = wy - (pi as f32*ph);
-            self.summary_player(sx, side, pi, maxtime, None, &sptype, ((x,y),(ww,ph)));
+            self.summary_tvs_player(sx, side, pi, maxtime, None, &sptype, ((x,y),(ww,ph)));
         }
     }
 
-    pub fn summary_players(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: SummaryPlayerType, win: XRect) {
+    pub fn summary_tvs_givenside_shared(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
         for pi in 0..players.len() {
-            self.summary_player(sx, side, pi, maxtime, yminmax, &sptype, win);
+            self.summary_tvs_player(sx, side, pi, maxtime, yminmax, &sptype, win);
         }
+    }
+
+    pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
+        let ((lmin,lmax), (rmin,rmax)) = self.players.score_minmax(false);
+        let winxy = win.0;
+        let winwh = win.1;
+        let winwby2 = winwh.0/2.0;
+        let lwin = (winxy,(winwby2,winwh.1));
+        self.summary_tvs_givenside_shared(sx, entities::SIDE_L, maxtime, Some((lmin,lmax)), sptype, lwin);
+        let rwin = ((winxy.0+winwby2, winxy.1),(winwby2, winwh.1));
+        self.summary_tvs_givenside_shared(sx, entities::SIDE_R, maxtime, Some((rmin,rmax)), sptype, rwin);
     }
 
 }
