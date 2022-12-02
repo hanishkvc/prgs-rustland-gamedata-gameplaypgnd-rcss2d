@@ -503,11 +503,32 @@ impl SdlX {
         }
     }
 
+    fn dsp_uf_f_lowpass(vdata: &Vec<(usize, f32)>) -> Vec<(usize, f32)> {
+        let mut vnew = Vec::new();
+        let mut vbtw = Vec::new();
+        for i in 0..vdata.len() {
+            vbtw.push(vdata[i].1*0.2);
+        }
+        vnew.push(vdata[0]);
+        vnew.push(vdata[1]);
+        for i in 2..vbtw.len()-2 {
+            let mut d = 0.0;
+            for j in -2..3 {
+                let fi = (i as isize + j) as usize;
+                d += vbtw[fi];
+            }
+            vnew.push((vdata[i].0, d));
+        }
+        vnew.push(vdata[vdata.len()-2]);
+        vnew.push(vdata[vdata.len()-1]);
+        vnew
+    }
+
     /// Plot the give Vector(usize,f32)
     /// * usize takes x-axis, f32 takes y-axis
     /// * nx,ny gives the left,bottom position of the plot window
     /// * nw,nh gives the width and height of the plot window
-    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vdata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, stag: &str, plottype: PlotType) {
+    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vindata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, stag: &str, plottype: PlotType) {
         let sx = self.n2s.d2ox(nx).round();
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
@@ -517,6 +538,14 @@ impl SdlX {
         let d2s = XSpaces::new(drect, orect);
         let mut px = i16::MIN;
         let mut py = i16::MIN;
+        let vdata;
+        let vnew;
+        if vindata.len() > 5 {
+            vnew = Self::dsp_uf_f_lowpass(vindata);
+            vdata = &vnew;
+        } else {
+            vdata = vindata;
+        }
         for d in vdata {
             let dx = d.0;
             let dy = d.1;
