@@ -253,7 +253,7 @@ Which is currently used to show
 
 * player relative performance scoring and distance traversed as bar graphs.
 
-* players (of given team) performance wrt/vs time, as overlapping cumulative
+* players (of both sides) performance wrt/vs time, as overlapping cumulative
   line graphs, to help identify performance of individual players wrt game
   phases/time.
 
@@ -368,7 +368,7 @@ players.
 Remove old branches used for exploring and crystalising different ideas and
 inturn replace with tags to the tips of these old branches.
 
-Plotting of Time vs Player AScore (Individual/Cumulative, Points/Lines) wrt
-individual player / full team.
-
+Plotting of Time vs Player Perf AScore (IndividualScoreChanges/Cumulative,
+Points/Lines) wrt individual player / full team / both teams, with controllable
+positioning.
 

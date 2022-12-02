@@ -166,7 +166,7 @@ impl Players {
     */
 
     /// Help update the score of a specific player
-    fn card(&mut self, side: char, playerid: usize, card: playdata::Card) {
+    fn card_issued(&mut self, side: char, playerid: usize, card: playdata::Card) {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Card:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
@@ -433,7 +433,7 @@ impl ActionsInfo {
         None
     }
 
-    fn summary_simple(&self, inc_cardscore: bool) {
+    fn summary_score_simple(&self, inc_cardscore: bool) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
             eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.id, player.score.score(inc_cardscore));
@@ -444,7 +444,7 @@ impl ActionsInfo {
         }
     }
 
-    fn summary_asciiart(&self, inc_cardscore: bool) {
+    fn summary_score_asciiart(&self, inc_cardscore: bool) {
         for i in 0..self.players.lplayers.len() {
             let player = &self.players.lplayers[i];
             eprint!("DBUG:{}:L{:02}:", MTAG, player.id);
@@ -527,8 +527,8 @@ impl ActionsInfo {
     }
 
     pub fn summary(&self, inc_cardscore: bool) {
-        self.summary_asciiart(inc_cardscore);
-        self.summary_simple(inc_cardscore);
+        self.summary_score_asciiart(inc_cardscore);
+        self.summary_score_simple(inc_cardscore);
     }
 
 }
@@ -831,7 +831,7 @@ impl ActionsInfo {
 impl ActionsInfo {
 
     pub fn handle_card(&mut self, side: char, playerid: usize, card: playdata::Card) {
-        self.players.card(side, playerid, card);
+        self.players.card_issued(side, playerid, card);
     }
 
 }
@@ -933,6 +933,7 @@ impl ActionsInfo {
         }
     }
 
+    /// Display time vs score wrt players of the specified side
     pub fn summary_tvs_givenside_shared(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
         for pi in 0..players.len() {
@@ -940,6 +941,7 @@ impl ActionsInfo {
         }
     }
 
+    /// Display time vs score wrt players of both side
     pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
         let ((lmin,lmax), (rmin,rmax)) = self.players.score_minmax(false);
         let winxy = win.0;
