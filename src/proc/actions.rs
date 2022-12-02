@@ -54,6 +54,10 @@ struct Score {
     vtimeascore_indiv: Vec<(usize, f32)>,
     /// Vector of time vs ascore cumulative
     vtimeascore_cumul: Vec<(usize,f32)>,
+    /// Historic cumulative min score
+    hist_cumul_minscore: f32,
+    /// Historic cumulative max score
+    hist_cumul_maxscore: f32,
     /// The number of kicks
     kicks: usize,
     /// The number of tackles
@@ -73,6 +77,8 @@ impl Score {
             ascore: ascore,
             vtimeascore_indiv: Vec::new(),
             vtimeascore_cumul: Vec::new(),
+            hist_cumul_maxscore: f32::MIN,
+            hist_cumul_minscore: f32::MAX,
             kicks: kicks,
             tackles: tackles,
             catchs: catchs,
@@ -85,9 +91,13 @@ impl Score {
         return Score::new(0.0, 0, 0, 0, 0.0, playdata::Card::None);
     }
 
-
     fn ascore_update(&mut self, time: usize, ascoredelta: f32) {
         self.ascore += ascoredelta;
+        if self.ascore > self.hist_cumul_maxscore {
+            self.hist_cumul_maxscore = self.ascore;
+        } else if self.ascore < self.hist_cumul_minscore {
+            self.hist_cumul_minscore = self.ascore;
+        }
         self.vtimeascore_indiv.push((time, ascoredelta));
         self.vtimeascore_cumul.push((time, self.ascore));
     }
@@ -254,7 +264,36 @@ impl Players {
         player.pos = npos;
     }
 
-    /// Return the min and max player score for each of the teams
+    /// Return the min and max player score for each of the teams, based
+    /// on the historic values seen wrt player performance scoring.
+    fn score_hist_cumul_minmax(&self) -> ((f32,f32), (f32,f32)) {
+        let mut lmax = f32::MIN;
+        let mut lmin = f32::MAX;
+        for i in 0..self.lplayers.len() {
+            let player = &self.lplayers[i];
+            if lmax < player.score.hist_cumul_maxscore {
+                lmax = player.score.hist_cumul_maxscore;
+            }
+            if lmin > player.score.hist_cumul_minscore {
+                lmin = player.score.hist_cumul_minscore;
+            }
+        }
+        let mut rmax = f32::MIN;
+        let mut rmin = f32::MAX;
+        for i in 0..self.rplayers.len() {
+            let player = &self.rplayers[i];
+            if rmax < player.score.hist_cumul_maxscore {
+                rmax = player.score.hist_cumul_maxscore;
+            }
+            if rmin > player.score.hist_cumul_minscore {
+                rmin = player.score.hist_cumul_minscore;
+            }
+        }
+        ((lmin,lmax), (rmin,rmax))
+    }
+
+    /// Return the min and max player score for each of the teams, based on
+    /// the current perf scoring wrt each player.
     fn score_minmax(&self, inc_cardscore: bool) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
         let mut lmin = f32::MAX;
@@ -947,7 +986,7 @@ impl ActionsInfo {
 
     /// Display time vs score wrt players of both side
     pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
-        let ((lmin,lmax), (rmin,rmax)) = self.players.score_minmax(false);
+        let ((lmin,lmax), (rmin,rmax)) = self.players.score_hist_cumul_minmax();
         let winxy = win.0;
         let winwh = win.1;
         let winwby2 = winwh.0/2.0;
