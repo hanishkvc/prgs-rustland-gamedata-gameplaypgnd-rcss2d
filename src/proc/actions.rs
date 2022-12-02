@@ -95,7 +95,8 @@ impl Score {
         self.pscore += pscoredelta;
         if self.pscore > self.hist_cumul_maxpscore {
             self.hist_cumul_maxpscore = self.pscore;
-        } else if self.pscore < self.hist_cumul_minpscore {
+        }
+        if self.pscore < self.hist_cumul_minpscore {
             self.hist_cumul_minpscore = self.pscore;
         }
         self.vtimepscore_deltas.push((time, pscoredelta));
@@ -990,8 +991,13 @@ impl ActionsInfo {
     }
 
     /// Display time vs score wrt players of both side
+    ///
+    /// TODO: Currently the minmax is calculated/got wrt the historic cumulative data set and not historic deltas data set
+    /// So if in future, we want to plot wrt score deltas rather than cumulative score, then one needs to get the minmax
+    /// wrt score deltas.
     pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect, summarytype: char) {
         let ((mut lmin,mut lmax), (mut rmin,mut rmax)) = self.players.score_hist_cumul_minmax();
+        //eprintln!("DBUG:{}:SummaryTVS:MinMax:{},{}:{},{}", MTAG, lmin, lmax, rmin, rmax);
         if summarytype == SUMMARY_RELATIVE_ALL {
             lmin = lmin.min(rmin);
             lmax = lmax.max(rmax);
