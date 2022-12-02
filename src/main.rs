@@ -140,6 +140,8 @@ struct Gui<'a> {
     showaitimevsscore: bool,
     /// ActionsInfo TimeVsScore summary type
     aitimevsscore_summarytype: char,
+    /// Game time counter
+    timecounter: usize,
 }
 
 impl<'a> Gui<'a> {
@@ -192,6 +194,7 @@ impl<'a> Gui<'a> {
             inc_cardscore: true,
             showaitimevsscore: false,
             aitimevsscore_summarytype: actions::SUMMARY_RELATIVE_TEAM,
+            timecounter: 0,
         };
         // sync up fps to spr
         gui.sync_up_fps_to_spr();
@@ -237,6 +240,12 @@ impl<'a> Gui<'a> {
     fn seek(&mut self, seekdelta: isize) {
         self.pdata.seek(seekdelta);
         self.pgentities.seek(seekdelta);
+    }
+
+    fn update_timecounter(&mut self, timecounter: usize) {
+        if timecounter > 0 {
+            self.timecounter = timecounter;
+        }
     }
 
 }
@@ -334,7 +343,6 @@ fn main() {
     // The main loop of the program starts now
     let mut dcolor = 20;
     let mut skey = String::new();
-    let mut timecounter = 0;
     'mainloop: loop {
         gui.next_frame();
         // Clear the background
@@ -423,7 +431,7 @@ fn main() {
                     if gui.pdata.next_frame_is_record_ready() {
                         let pu = gui.pdata.next_record();
                         ldebug!(&format!("DBUG:{}:{:?}", MTAG, pu));
-                        timecounter = pu.timecounter;
+                        gui.update_timecounter(pu.timecounter);
                         gui.pgentities.update(pu, false, gui.pdata.seconds_per_record() * gui.pgentities.fps());
                         //eprintln!("DBUG:GPPGND:Main:{}:Update called", _frame);
                     }
@@ -433,7 +441,7 @@ fn main() {
                     //eprintln!("DBUG:GPPGND:Main:{}:NextFrame called", _frame);
                 } else {
                     let pu = gui.pdata.next_record();
-                    timecounter = pu.timecounter;
+                    gui.update_timecounter(pu.timecounter);
                     gui.pgentities.update(pu, true, 0.0);
                 }
             } else {
@@ -458,7 +466,7 @@ fn main() {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
         }
         if gui.showaitimevsscore {
-            gui.pgentities.actionsinfo.summary_tvs(&mut sx, timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)));
+            gui.pgentities.actionsinfo.summary_tvs(&mut sx, gui.timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)));
         }
 
         // Present screen update to user
