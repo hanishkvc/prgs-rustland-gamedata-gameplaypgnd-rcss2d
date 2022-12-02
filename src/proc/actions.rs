@@ -50,8 +50,8 @@ pub const SUMMARY_RELATIVE_ALL: char = 'A';
 struct Score {
     /// The overall actions related score
     ascore: f32,
-    /// Vector of time,ascoredelta
-    vtimeascore_indiv: Vec<(usize, f32)>,
+    /// Vector of time,ascoredeltas
+    vtimeascore_deltas: Vec<(usize, f32)>,
     /// Vector of time vs ascore cumulative
     vtimeascore_cumul: Vec<(usize,f32)>,
     /// Historic cumulative min score
@@ -75,7 +75,7 @@ impl Score {
     fn new(ascore: f32, kicks: usize, tackles: usize, catchs: usize, dist: f32, card: playdata::Card) -> Score {
         Score {
             ascore: ascore,
-            vtimeascore_indiv: Vec::new(),
+            vtimeascore_deltas: Vec::new(),
             vtimeascore_cumul: Vec::new(),
             hist_cumul_maxscore: f32::MIN,
             hist_cumul_minscore: f32::MAX,
@@ -98,7 +98,7 @@ impl Score {
         } else if self.ascore < self.hist_cumul_minscore {
             self.hist_cumul_minscore = self.ascore;
         }
-        self.vtimeascore_indiv.push((time, ascoredelta));
+        self.vtimeascore_deltas.push((time, ascoredelta));
         self.vtimeascore_cumul.push((time, self.ascore));
     }
 
@@ -925,14 +925,14 @@ impl ActionsInfo {
 
 #[derive(Debug, PartialEq)]
 pub enum SummaryPlayerType {
-    Individual,
-    Cumulative,
+    ScoreDeltas,
+    ScoreCumulative,
 }
 
 impl ActionsInfo {
 
     /// Plot time vs ascore wrt specified side+playerid.
-    /// It could either be based on individual ascores over time or cumulated ascores over time.
+    /// It could either be based on individual ascores deltas/changes over time or cumulated ascores over time.
     /// Specify the position of the plot window ((x,y),(w,h))
     ///
     /// If yminmax is not specified, then a standard min max is used and inturn adjusted based on player's score.
@@ -947,8 +947,8 @@ impl ActionsInfo {
             ymin = yminmax.0;
             ymax = yminmax.1;
         }
-        if *sptype == SummaryPlayerType::Individual {
-            vts = &player.score.vtimeascore_indiv;
+        if *sptype == SummaryPlayerType::ScoreDeltas {
+            vts = &player.score.vtimeascore_deltas;
         } else {
             vts = &player.score.vtimeascore_cumul;
             if yminmax.is_none() {

@@ -440,7 +440,7 @@ fn main() {
         }
         if gui.showaidistances {
             gui.pgentities.actionsinfo.summary_dist_sdl(&mut sx, gui.aidistances_summarytype);
-            gui.pgentities.actionsinfo.summary_tvs(&mut sx, timecounter, &actions::SummaryPlayerType::Cumulative, ((0.1,0.9),(0.8,0.8)));
+            gui.pgentities.actionsinfo.summary_tvs(&mut sx, timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)));
         }
 
         // Present screen update to user
