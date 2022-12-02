@@ -102,22 +102,27 @@ impl Score {
         self.vtimeascore_cumul.push((time, self.ascore));
     }
 
-    fn card_issued(&mut self, card: playdata::Card) {
-        self.card = card;
+    fn card_score_value(card: playdata::Card) -> f32 {
+        match card {
+            playdata::Card::None => 0.0,
+            playdata::Card::Yellow => -1.5,
+            playdata::Card::Red => -3.0,
+        }
+    }
+
+    fn card_issued(&mut self, time: usize, card: playdata::Card) {
+        self.card = card.clone();
+        self.ascore_update(time, Self::card_score_value(card));
     }
 
     fn score(&self, inc_cardscore: bool) -> f32 {
-        let cardscore;
+        let adjustcardscore;
         if inc_cardscore {
-            cardscore = match self.card {
-                playdata::Card::None => 0.0,
-                playdata::Card::Yellow => -1.5,
-                playdata::Card::Red => -3.0,
-            };
+            adjustcardscore = 0.0
         } else {
-            cardscore = 0.0;
+            adjustcardscore = Self::card_score_value(self.card.clone());
         }
-        return self.ascore + cardscore;
+        return self.ascore - adjustcardscore;
     }
 
 }
@@ -179,8 +184,8 @@ impl Players {
     }
     */
 
-    /// Help update the score of a specific player
-    fn card_issued(&mut self, side: char, playerid: usize, card: playdata::Card) {
+    /// Help update the score of a specific player, based on card issued if any
+    fn card_issued(&mut self, time: usize, side: char, playerid: usize, card: playdata::Card) {
         if playerid >= entities::XPLAYERID_START {
             ldebug!(&format!("WARN:{}:Players:Card:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
@@ -188,9 +193,9 @@ impl Players {
             eprintln!("DBUG:{}:Players:Card:{}{:02}:{}", MTAG, side, playerid, card);
         }
         if side == entities::SIDE_L {
-            self.lplayers[playerid].score.card_issued(card);
+            self.lplayers[playerid].score.card_issued(time, card);
         } else {
-            self.rplayers[playerid].score.card_issued(card);
+            self.rplayers[playerid].score.card_issued(time, card);
         }
     }
 
@@ -873,8 +878,8 @@ impl ActionsInfo {
 
 impl ActionsInfo {
 
-    pub fn handle_card(&mut self, side: char, playerid: usize, card: playdata::Card) {
-        self.players.card_issued(side, playerid, card);
+    pub fn handle_card(&mut self, time: usize, side: char, playerid: usize, card: playdata::Card) {
+        self.players.card_issued(time, side, playerid, card);
     }
 
 }

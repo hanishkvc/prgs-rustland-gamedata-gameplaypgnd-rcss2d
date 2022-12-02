@@ -100,7 +100,7 @@ impl<'a> Team<'a> {
                             let penalised = penalised.unwrap();
                             if !penalised.contains(&pi) {
                                 penalised.push(pi);
-                                actionsinfo.handle_card(side, pi, card.clone())
+                                actionsinfo.handle_card(timecounter, side, pi, card.clone())
                             }
                         }
                         let mut card_color = sdlx::COLOR_INVISIBLE;
