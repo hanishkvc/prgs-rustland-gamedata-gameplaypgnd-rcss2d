@@ -532,22 +532,26 @@ impl SdlX {
     /// Sliding window cross-correlation of given data with given weights
     fn dsp_f_of_uf_crosscorr_weighted(vdata: &Vec<(usize, f32)>, vweights: &Vec<f32>) -> Vec<(usize, f32)> {
         let fw = vweights.len();
-        let fwh = (fw/2) as isize;
+        let fwh = (fw/2) as usize;
+        let ifwh = fwh as isize;
         let mut vnew = Vec::new();
         for i in 0..fwh {
             vnew.push(vdata[i as usize]);
         }
-        for i in fw..vdata.len()-fw {
+        for i in fwh..(vdata.len()-fwh) {
             let mut d = 0.0;
-            for j in -fwh..=fwh {
-                let wi = (j + fwh) as usize;
+            for j in -ifwh..=ifwh {
+                let wi = (j + ifwh) as usize;
                 let di = (i as isize + j) as usize;
                 d += vdata[di].1 * vweights[wi];
             }
             vnew.push((vdata[i].0, d/fw as f32));
         }
-        for i in (1..=fwh as usize).rev() {
-            vnew.push(vdata[vdata.len()-i]);
+        for _i in (1..=fwh as usize).rev() {
+            //let fi = vdata.len() - i;
+            let fi = vdata.len() - fwh - 1;
+            //eprintln!("DBUG:SdlX:CrossCorrWeighted:{:?}:{:?}:{:?}:{}",vdata, vweights, vnew, fi);
+            vnew.push(vnew[fi]);
         }
         vnew
     }
