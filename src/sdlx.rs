@@ -567,11 +567,18 @@ impl SdlX {
     /// * usize takes x-axis, f32 takes y-axis
     /// * nx,ny gives the left,bottom position of the plot window
     /// * nw,nh gives the width and height of the plot window
+    ///
+    /// Use average of weights to adjust/adapt the yminmax in a crude way
+    ///
     pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vindata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, stag: &str, plottype: PlotType) {
         let sx = self.n2s.d2ox(nx).round();
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
         let sh = self.n2s.d2oy(nh).round();
+        let weights = vec![0.1,0.2,0.4,0.2,0.1];
+        let weightsavg = 0.2;
+        let ymin = ymin*weightsavg;
+        let ymax = ymax*weightsavg;
         let drect = ((xmin,ymin), (xmax,ymax));
         let orect = ((sx,sy),(sx+sw,sy-sh));
         let d2s = XSpaces::new(drect, orect);
@@ -582,7 +589,7 @@ impl SdlX {
         let filterwindow = 5;
         if vindata.len() > filterwindow {
             //vnew = Self::dsp_uf_f_lowpass_average(vindata, filterwindow);
-            vnew = Self::dsp_f_of_uf_crosscorr_weighted(vindata, &vec![0.1,0.2,0.4,0.2,0.1]);
+            vnew = Self::dsp_f_of_uf_crosscorr_weighted(vindata, &weights);
             vdata = &vnew;
         } else {
             vdata = vindata;
