@@ -535,9 +535,11 @@ impl SdlX {
         let fwh = (fw/2) as usize;
         let ifwh = fwh as isize;
         let mut vnew = Vec::new();
+        // Initial placeholders
         for i in 0..fwh {
             vnew.push(vdata[i as usize]);
         }
+        // CrossCorrelated data
         for i in fwh..(vdata.len()-fwh) {
             let mut d = 0.0;
             for j in -ifwh..=ifwh {
@@ -547,6 +549,11 @@ impl SdlX {
             }
             vnew.push((vdata[i].0, d/fw as f32));
         }
+        // Extend data at begin
+        for i in 0..fwh {
+            vnew[i] = vnew[fwh];
+        }
+        // Extend data at end.
         for _i in (1..=fwh as usize).rev() {
             //let fi = vdata.len() - i;
             let fi = vdata.len() - fwh - 1;
