@@ -3,6 +3,8 @@
 //! HanishKVC, 2022
 //!
 
+use std::ops::{AddAssign, Div};
+
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::rect::Rect;
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
@@ -563,6 +565,14 @@ impl SdlX {
         vnew
     }
 
+    fn vec_avg<T: AddAssign + From<usize> + Div<Output = T>>(vdata: &Vec<T>) -> T {
+        let d = vdata[0];
+        for i in 1..vdata.len() {
+            d += vdata[i];
+        }
+        d/vdata.len().into()
+    }
+
     /// Plot the give Vector(usize,f32)
     /// * usize takes x-axis, f32 takes y-axis
     /// * nx,ny gives the left,bottom position of the plot window
@@ -570,13 +580,13 @@ impl SdlX {
     ///
     /// Use average of weights to adjust/adapt the yminmax in a crude way
     ///
-    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vindata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, stag: &str, plottype: PlotType) {
+    pub fn n_plot_uf(&self, nx: f32, ny: f32, nw: f32, nh: f32, vindata: &Vec<(usize, f32)>, xmin: f32, xmax: f32, ymin: f32, ymax: f32, weights: Option<Vec<f32>>, stag: &str, plottype: PlotType) {
         let sx = self.n2s.d2ox(nx).round();
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
         let sh = self.n2s.d2oy(nh).round();
         let weights = vec![0.1,0.2,0.4,0.2,0.1];
-        let weightsavg = 0.2;
+        let weightsavg = Self::vec_avg(&weights);
         let ymin = ymin*weightsavg;
         let ymax = ymax*weightsavg;
         let drect = ((xmin,ymin), (xmax,ymax));
