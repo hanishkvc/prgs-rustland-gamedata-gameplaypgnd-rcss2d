@@ -503,7 +503,8 @@ impl SdlX {
         }
     }
 
-    fn dsp_uf_f_lowpass(vdata: &Vec<(usize, f32)>, fw: usize) -> Vec<(usize, f32)> {
+    /// Sliding window averaging over a given window size
+    fn dsp_f_of_uf_lowpass_average(vdata: &Vec<(usize, f32)>, fw: usize) -> Vec<(usize, f32)> {
         let fwh = (fw/2) as isize;
         let weight = 1.0/(fw as f32);
         let mut vnew = Vec::new();
@@ -521,6 +522,29 @@ impl SdlX {
                 d += vbtw[fi];
             }
             vnew.push((vdata[i].0, d));
+        }
+        for i in (1..=fwh as usize).rev() {
+            vnew.push(vdata[vdata.len()-i]);
+        }
+        vnew
+    }
+
+    /// Sliding window cross-correlation of given data with given weights
+    fn dsp_f_of_uf_crosscorr_weighted(vdata: &Vec<(usize, f32)>, vweights: &Vec<f32>) -> Vec<(usize, f32)> {
+        let fw = vweights.len();
+        let fwh = (fw/2) as isize;
+        let mut vnew = Vec::new();
+        for i in 0..fwh {
+            vnew.push(vdata[i as usize]);
+        }
+        for i in fw..vdata.len()-fw {
+            let mut d = 0.0;
+            for j in -fwh..=fwh {
+                let wi = (j + fwh) as usize;
+                let di = (i as isize + j) as usize;
+                d += vdata[di].1 * vweights[wi];
+            }
+            vnew.push((vdata[i].0, d/fw as f32));
         }
         for i in (1..=fwh as usize).rev() {
             vnew.push(vdata[vdata.len()-i]);
@@ -546,7 +570,8 @@ impl SdlX {
         let vnew;
         let filterwindow = 5;
         if vindata.len() > filterwindow {
-            vnew = Self::dsp_uf_f_lowpass(vindata, filterwindow);
+            //vnew = Self::dsp_uf_f_lowpass_average(vindata, filterwindow);
+            vnew = Self::dsp_f_of_uf_crosscorr_weighted(vindata, &vec![0.1,0.2,0.4,0.2,0.1]);
             vdata = &vnew;
         } else {
             vdata = vindata;
