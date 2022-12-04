@@ -595,9 +595,19 @@ impl SdlX {
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
         let sh = self.n2s.d2oy(nh).round();
-        //let weights = ;
-        let weightsavg;
+        let crosscorr;
         if weights.is_some() {
+            let weights = weights.as_ref().unwrap();
+            if vindata.len() > weights.len() {
+                crosscorr = true;
+            } else {
+                crosscorr = false;
+            }
+        } else {
+            crosscorr = false;
+        }
+        let weightsavg;
+        if crosscorr {
             let weights = weights.as_ref().unwrap();
             weightsavg = Self::vec_avg(weights);
         } else {
@@ -612,8 +622,7 @@ impl SdlX {
         let mut py = i16::MIN;
         let vdata;
         let vnew;
-        let filterwindow = 5;
-        if weights.is_some() && vindata.len() > filterwindow {
+        if crosscorr {
             let weights = weights.unwrap();
             vnew = Self::dsp_f_of_uf_crosscorr_weighted(vindata, &weights);
             vdata = &vnew;
