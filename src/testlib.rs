@@ -164,7 +164,7 @@ pub fn sdlx_plots() {
             }
         }
         sx.n_plot_f(0.1, 0.4, 0.8, 0.3, vec![2.0, 3.0, 4.0, 3.0, 2.0, 1.0], 0.0, 5.0);
-        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, &vec![(2,2.0), (4,4.0), (6,2.0)], 0.0, 8.0, -1.0, 6.0, "test plotuf", PlotType::Lines);
+        sx.n_plot_uf(0.1, 0.9, 0.8, 0.4, &vec![(2,2.0), (4,4.0), (6,2.0)], 0.0, 8.0, -1.0, 6.0, Some(vec![0.2,0.6,0.2]), "test plotuf", PlotType::Lines);
         sx.wc.present();
     }
 }

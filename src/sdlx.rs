@@ -565,12 +565,20 @@ impl SdlX {
         vnew
     }
 
-    fn vec_avg<T: AddAssign + From<usize> + Div<Output = T>>(vdata: &Vec<T>) -> T {
-        let d = vdata[0];
+    fn vec_avg<T: AddAssign + From<u16> + Div<Output = T> + Copy>(vdata: &Vec<T>) -> T {
+        let mut d = vdata[0];
         for i in 1..vdata.len() {
             d += vdata[i];
         }
-        d/vdata.len().into()
+        d/(vdata.len() as u16).into()
+    }
+
+    fn vec_avg_f32(vdata: &Vec<f32>) -> f32 {
+        let mut d = vdata[0];
+        for i in 1..vdata.len() {
+            d += vdata[i];
+        }
+        d/vdata.len() as f32
     }
 
     /// Plot the give Vector(usize,f32)
@@ -585,8 +593,14 @@ impl SdlX {
         let sy = self.n2s.d2oy(ny).round();
         let sw = self.n2s.d2ox(nw).round();
         let sh = self.n2s.d2oy(nh).round();
-        let weights = vec![0.1,0.2,0.4,0.2,0.1];
-        let weightsavg = Self::vec_avg(&weights);
+        //let weights = ;
+        let weightsavg;
+        if weights.is_some() {
+            let weights = weights.unwrap();
+            weightsavg = Self::vec_avg(&weights);
+        } else {
+            weightsavg = 1.0;
+        }
         let ymin = ymin*weightsavg;
         let ymax = ymax*weightsavg;
         let drect = ((xmin,ymin), (xmax,ymax));
@@ -597,8 +611,8 @@ impl SdlX {
         let vdata;
         let vnew;
         let filterwindow = 5;
-        if vindata.len() > filterwindow {
-            //vnew = Self::dsp_uf_f_lowpass_average(vindata, filterwindow);
+        if weights.is_some() && vindata.len() > filterwindow {
+            let weights = weights.unwrap();
             vnew = Self::dsp_f_of_uf_crosscorr_weighted(vindata, &weights);
             vdata = &vnew;
         } else {

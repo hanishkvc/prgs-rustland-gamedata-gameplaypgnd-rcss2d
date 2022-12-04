@@ -967,7 +967,7 @@ impl ActionsInfo {
         }
         let stag = format!("{}{:02}", side, playerid);
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
-        sx.n_plot_uf(win.0.0, win.0.1, win.1.0, win.1.1, vts, 0.0, maxtime as f32, ymin, ymax, &stag, PlotType::Lines);
+        sx.n_plot_uf(win.0.0, win.0.1, win.1.0, win.1.1, vts, 0.0, maxtime as f32, ymin, ymax, Some(vec![0.1,0.2,0.4,0.2,0.1]), &stag, PlotType::Lines);
     }
 
     #[allow(dead_code)]
