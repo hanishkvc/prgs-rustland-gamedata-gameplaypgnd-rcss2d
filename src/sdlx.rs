@@ -505,6 +505,7 @@ impl SdlX {
         }
     }
 
+    #[allow(dead_code)]
     /// Sliding window averaging over a given window size
     fn dsp_f_of_uf_lowpass_average(vdata: &Vec<(usize, f32)>, fw: usize) -> Vec<(usize, f32)> {
         let fwh = (fw/2) as isize;
@@ -573,6 +574,7 @@ impl SdlX {
         d/(vdata.len() as u16).into()
     }
 
+    #[allow(dead_code)]
     fn vec_avg_f32(vdata: &Vec<f32>) -> f32 {
         let mut d = vdata[0];
         for i in 1..vdata.len() {
@@ -596,8 +598,8 @@ impl SdlX {
         //let weights = ;
         let weightsavg;
         if weights.is_some() {
-            let weights = weights.unwrap();
-            weightsavg = Self::vec_avg(&weights);
+            let weights = weights.as_ref().unwrap();
+            weightsavg = Self::vec_avg(weights);
         } else {
             weightsavg = 1.0;
         }
