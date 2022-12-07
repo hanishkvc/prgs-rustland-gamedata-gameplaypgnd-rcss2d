@@ -3,14 +3,14 @@
 //! HanishKVC, 2022
 //!
 
-use std::ops::{AddAssign, Div};
-
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::rect::Rect;
 use sdl2::{self, VideoSubsystem, Sdl, EventPump, ttf::Font, surface::Surface};
 use sdl2::render::{WindowCanvas, TextureCreator, Texture, BlendMode};
 use sdl2::video::WindowContext;
 pub use sdl2::pixels::Color;
+
+use datautilsk::sigpro;
 
 
 pub const COLOR_INVISIBLE: Color = Color::RGBA(0, 0, 0, 0);
@@ -505,84 +505,6 @@ impl SdlX {
         }
     }
 
-    #[allow(dead_code)]
-    /// Sliding window averaging over a given window size
-    fn dsp_f_of_uf_lowpass_average(vdata: &Vec<(usize, f32)>, fw: usize) -> Vec<(usize, f32)> {
-        let fwh = (fw/2) as isize;
-        let weight = 1.0/(fw as f32);
-        let mut vnew = Vec::new();
-        let mut vbtw = Vec::new();
-        for i in 0..vdata.len() {
-            vbtw.push(vdata[i].1*weight);
-        }
-        for i in 0..fwh {
-            vnew.push(vdata[i as usize]);
-        }
-        for i in fw..vbtw.len()-fw {
-            let mut d = 0.0;
-            for j in -fwh..(fwh+1) {
-                let fi = (i as isize + j) as usize;
-                d += vbtw[fi];
-            }
-            vnew.push((vdata[i].0, d));
-        }
-        for i in (1..=fwh as usize).rev() {
-            vnew.push(vdata[vdata.len()-i]);
-        }
-        vnew
-    }
-
-    /// Sliding window cross-correlation of given data with given weights
-    fn dsp_f_of_uf_crosscorr_weighted(vdata: &Vec<(usize, f32)>, vweights: &Vec<f32>) -> Vec<(usize, f32)> {
-        let fw = vweights.len();
-        let fwh = (fw/2) as usize;
-        let ifwh = fwh as isize;
-        let mut vnew = Vec::new();
-        // Initial placeholders
-        for i in 0..fwh {
-            vnew.push(vdata[i as usize]);
-        }
-        // CrossCorrelated data
-        for i in fwh..(vdata.len()-fwh) {
-            let mut d = 0.0;
-            for j in -ifwh..=ifwh {
-                let wi = (j + ifwh) as usize;
-                let di = (i as isize + j) as usize;
-                d += vdata[di].1 * vweights[wi];
-            }
-            vnew.push((vdata[i].0, d/fw as f32));
-        }
-        // Extend data at begin
-        for i in 0..fwh {
-            vnew[i] = vnew[fwh];
-        }
-        // Extend data at end.
-        for _i in (1..=fwh as usize).rev() {
-            //let fi = vdata.len() - i;
-            let fi = vdata.len() - fwh - 1;
-            //eprintln!("DBUG:SdlX:CrossCorrWeighted:{:?}:{:?}:{:?}:{}",vdata, vweights, vnew, fi);
-            vnew.push(vnew[fi]);
-        }
-        vnew
-    }
-
-    fn vec_avg<T: AddAssign + From<u16> + Div<Output = T> + Copy>(vdata: &Vec<T>) -> T {
-        let mut d = vdata[0];
-        for i in 1..vdata.len() {
-            d += vdata[i];
-        }
-        d/(vdata.len() as u16).into()
-    }
-
-    #[allow(dead_code)]
-    fn vec_avg_f32(vdata: &Vec<f32>) -> f32 {
-        let mut d = vdata[0];
-        for i in 1..vdata.len() {
-            d += vdata[i];
-        }
-        d/vdata.len() as f32
-    }
-
     /// Plot the give Vector(usize,f32)
     /// * usize takes x-axis, f32 takes y-axis
     /// * nx,ny gives the left,bottom position of the plot window
@@ -609,7 +531,7 @@ impl SdlX {
         let weightsavg;
         if crosscorr {
             let weights = weights.as_ref().unwrap();
-            weightsavg = Self::vec_avg(weights);
+            weightsavg = sigpro::vec_avg(weights);
         } else {
             weightsavg = 1.0;
         }
@@ -624,7 +546,7 @@ impl SdlX {
         let vnew;
         if crosscorr {
             let weights = weights.unwrap();
-            vnew = Self::dsp_f_of_uf_crosscorr_weighted(vindata, &weights);
+            vnew = sigpro::sw_crosscorr_f_of_xf(vindata, &weights);
             vdata = &vnew;
         } else {
             vdata = vindata;
