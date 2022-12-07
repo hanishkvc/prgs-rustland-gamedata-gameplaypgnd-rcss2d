@@ -7,6 +7,9 @@ cbuild-inbtw:
 	cargo build --features inbetween_frames
 	cargo build --release --features inbetween_frames
 
+cupdate:
+	cargo update
+
 cclean:
 	cargo clean
 

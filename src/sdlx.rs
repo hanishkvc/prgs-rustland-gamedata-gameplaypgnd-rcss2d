@@ -528,15 +528,15 @@ impl SdlX {
         } else {
             crosscorr = false;
         }
-        let weightsavg;
+        let weightsimpact;
         if crosscorr {
             let weights = weights.as_ref().unwrap();
-            weightsavg = sigpro::vec_avg(weights);
+            weightsimpact = sigpro::vec_sum(weights);
         } else {
-            weightsavg = 1.0;
+            weightsimpact = 1.0;
         }
-        let ymin = ymin*weightsavg;
-        let ymax = ymax*weightsavg;
+        let ymin = ymin*weightsimpact;
+        let ymax = ymax*weightsimpact;
         let drect = ((xmin,ymin), (xmax,ymax));
         let orect = ((sx,sy),(sx+sw,sy-sh));
         let d2s = XSpaces::new(drect, orect);
