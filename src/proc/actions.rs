@@ -154,26 +154,27 @@ impl Player {
     }
 }
 
+
 #[derive(Debug)]
-struct Players {
+struct Teams {
     lplayers: Vec<Player>,
     rplayers: Vec<Player>,
 }
 
-impl Players {
+impl Teams {
 
-    fn new(lcnt: usize, rcnt: usize) -> Players {
-        let mut players = Players {
+    fn new(lcnt: usize, rcnt: usize) -> Teams {
+        let mut teams = Teams {
             lplayers: Vec::new(),
             rplayers: Vec::new(),
         };
         for i in 0..lcnt {
-            players.lplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
+            teams.lplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
         }
         for i in 0..rcnt {
-            players.rplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
+            teams.rplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
         }
-        return players;
+        return teams;
     }
 
     /// Get the specified player
@@ -441,7 +442,7 @@ impl Display for ActionData {
 /// Contains info about game actions and inturn performance of the players
 /// NOTE: Movement is not a action, but only a perf characteristics
 pub struct ActionsInfo {
-    players: Players,
+    teams: Teams,
     /// Contains significant game actions
     actions: Vec<ActionData>,
     /// Contains all game actions, even same type actions which are too near in time.
@@ -452,9 +453,9 @@ pub struct ActionsInfo {
 
 impl ActionsInfo {
 
-    pub fn new(acnt: usize, bcnt: usize) -> ActionsInfo {
+    pub fn new(lcnt: usize, rcnt: usize) -> ActionsInfo {
         ActionsInfo {
-            players: Players::new(acnt, bcnt),
+            teams: Teams::new(lcnt, rcnt),
             actions: Vec::new(),
             rawactions: Vec::new(),
             handle_deferedseek: false,
@@ -484,27 +485,27 @@ impl ActionsInfo {
     }
 
     fn summary_score_simple(&self, inc_cardscore: bool) {
-        for i in 0..self.players.lplayers.len() {
-            let player = &self.players.lplayers[i];
+        for i in 0..self.teams.lplayers.len() {
+            let player = &self.teams.lplayers[i];
             eprintln!("DBUG:{}:L{:02}:{}", MTAG, player.id, player.score.score(inc_cardscore));
         }
-        for i in 0..self.players.rplayers.len() {
-            let player = &self.players.rplayers[i];
+        for i in 0..self.teams.rplayers.len() {
+            let player = &self.teams.rplayers[i];
             eprintln!("DBUG:{}:R{:02}:{}", MTAG, player.id, player.score.score(inc_cardscore));
         }
     }
 
     fn summary_score_asciiart(&self, inc_cardscore: bool) {
-        for i in 0..self.players.lplayers.len() {
-            let player = &self.players.lplayers[i];
+        for i in 0..self.teams.lplayers.len() {
+            let player = &self.teams.lplayers[i];
             eprint!("DBUG:{}:L{:02}:", MTAG, player.id);
             for _j in 0..player.score.score(inc_cardscore).round() as usize {
                 eprint!("#");
             }
             eprintln!();
         }
-        for i in 0..self.players.rplayers.len() {
-            let player = &self.players.rplayers[i];
+        for i in 0..self.teams.rplayers.len() {
+            let player = &self.teams.rplayers[i];
             eprint!("DBUG:{}:R{:02}:", MTAG, player.id);
             for _j in 0..player.score.score(inc_cardscore).round() as usize {
                 eprint!("#");
@@ -521,22 +522,22 @@ impl ActionsInfo {
     /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_score_sdl(&self, sx: &mut SdlX, summarytype: char, inc_cardscore: bool) {
         // let (amax, bmax) = (20.0, 20.0);
-        let ((mut lmin, mut lmax), (mut rmin, mut rmax)) = self.players.score_minmax(inc_cardscore);
+        let ((mut lmin, mut lmax), (mut rmin, mut rmax)) = self.teams.score_minmax(inc_cardscore);
         if summarytype == SUMMARY_RELATIVE_ALL {
             lmax = lmax.max(rmax);
             rmax = lmax;
             lmin = lmin.min(rmin);
             rmin = lmin;
         }
-        for i in 0..self.players.lplayers.len() {
-            let player = &self.players.lplayers[i];
+        for i in 0..self.teams.lplayers.len() {
+            let player = &self.teams.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let lpscore = player.score.score(inc_cardscore) - lmin;
             sx.nn_fill_rect(0.05, 0.05*(i as f32 + 4.0), 0.4*(lpscore/(lmax-lmin)), 0.04)
         }
-        for i in 0..self.players.rplayers.len() {
-            let player = &self.players.rplayers[i];
+        for i in 0..self.teams.rplayers.len() {
+            let player = &self.teams.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let rpscore = player.score.score(inc_cardscore) - rmin;
@@ -547,18 +548,18 @@ impl ActionsInfo {
     /// SummaryType if 'T' => Bar relative to max in each team
     /// SummaryType if 'A' => Bar relative to max across both teams
     pub fn summary_dist_sdl(&self, sx: &mut SdlX, summarytype: char) {
-        let (mut lmax, mut rmax) = self.players.dist_max();
+        let (mut lmax, mut rmax) = self.teams.dist_max();
         if summarytype == SUMMARY_RELATIVE_ALL {
             lmax = lmax.max(rmax);
             rmax = lmax;
         }
         let xs = 0.05;
         let xw = 0.4;
-        let xu = xw/self.players.lplayers.len() as f32;
+        let xu = xw/self.teams.lplayers.len() as f32;
         let yb = 0.8;
         let yh = 0.1;
-        for i in 0..self.players.lplayers.len() {
-            let player = &self.players.lplayers[i];
+        for i in 0..self.teams.lplayers.len() {
+            let player = &self.teams.lplayers[i];
             sx.wc.set_draw_color(Color::RGBA(200, 0, 0, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let x = xs + (i as f32 * xu);
@@ -566,8 +567,8 @@ impl ActionsInfo {
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
         }
         let xs = 0.55;
-        for i in 0..self.players.rplayers.len() {
-            let player = &self.players.rplayers[i];
+        for i in 0..self.teams.rplayers.len() {
+            let player = &self.teams.rplayers[i];
             sx.wc.set_draw_color(Color::RGBA(0, 0, 200, 40));
             sx.wc.set_blend_mode(BlendMode::Blend);
             let x = xs + (i as f32 * xu);
@@ -615,13 +616,13 @@ impl ActionsInfo {
                         ppscore *= SCORE_SELF_PASS_RATIO;
                         cpscore *= SCORE_SELF_PASS_RATIO;
                     }
-                    self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                    self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                    self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                    self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 } else {
                     let pscore = score.0 * score.3;
-                    self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
+                    self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                     let pscore = score.0 * score.4;
-                    self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, pscore);
+                    self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, pscore);
                 }
                 return HAReturn::Done(true);
             },
@@ -634,7 +635,7 @@ impl ActionsInfo {
                 } else {
                     // This is like a no effort kick potentially, ie after a goal, so low score
                     let pscore = score.0 * score.2 * SCORE_SELF_PASS_RATIO;
-                    self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, pscore);
+                    self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, pscore);
                     return HAReturn::Done(true);
                 }
             },
@@ -682,7 +683,7 @@ impl ActionsInfo {
                     // Nearest player scores more compared to farther players, wrt the chain of actions leading to the goal
                     let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
                     let pid = if lookbackcnt <= 1 { curactd.playerid } else { prevactd.playerid };
-                    self.players.pscore_update(curactd.time, curactd.side, pid, pscore);
+                    self.teams.pscore_update(curactd.time, curactd.side, pid, pscore);
                     if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
                         return HAReturn::Done(true);
                     }
@@ -696,11 +697,11 @@ impl ActionsInfo {
                         if prevactd.action == AIAction::Catch {
                             pscore *= SCORE_GOALIE_MISSED_CATCH_PENALTY_RATIO;
                         }
-                        self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
+                        self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                         return HAReturn::ContinueSearch;
                     }
                     pscore *= SCORE_GOALCHAIN_OTHERSIDE_BEYOND_IMMIDIATE_RATIO;
-                    self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
+                    self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, pscore);
                     HAReturn::Done(true)
                 }
             },
@@ -727,8 +728,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Tackle => {
@@ -748,8 +749,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -780,8 +781,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.players.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.players.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
+                self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -863,13 +864,13 @@ impl ActionsInfo {
         }
         // Update things as required.
         if bupdate_dist {
-            self.players.dist_update_from_pos(curactd.side, curactd.playerid, curactd.pos);
+            self.teams.dist_update_from_pos(curactd.side, curactd.playerid, curactd.pos);
         }
         if bupdate_actions {
             self.actions.push(curactd.clone());
         }
         if bupdate_rawactions {
-            self.players.count_increment(curactd.side, curactd.playerid, curactd.action.clone());
+            self.teams.count_increment(curactd.side, curactd.playerid, curactd.action.clone());
             ldebug!(&format!("DBUG:{}:RawActions:{}", MTAG, curactd));
             self.rawactions.push(curactd);
         }
@@ -880,7 +881,7 @@ impl ActionsInfo {
 impl ActionsInfo {
 
     pub fn handle_card(&mut self, time: usize, side: char, playerid: usize, card: playdata::Card) {
-        self.players.card_issued(time, side, playerid, card);
+        self.teams.card_issued(time, side, playerid, card);
     }
 
 }
@@ -944,7 +945,7 @@ impl ActionsInfo {
     /// If yminmax is not specified, then a standard min max is used and inturn adjusted based on player's score.
     pub fn summary_tvs_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         use crate::sdlx::PlotType;
-        let player = self.players.get_player(side, playerid);
+        let player = self.teams.get_player(side, playerid);
         let vts;
         let mut ymin = -2.0;
         let mut ymax = 5.0;
@@ -973,7 +974,7 @@ impl ActionsInfo {
     #[allow(dead_code)]
     pub fn summary_tvs_givenside_independent(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
         let ((wx,wy), (ww,wh)) = win;
-        let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
+        let players = if side == entities::SIDE_L { &self.teams.lplayers } else { &self.teams.rplayers };
         let ph = wh/players.len() as f32;
         for pi in 0..players.len() {
             let x = wx;
@@ -984,7 +985,7 @@ impl ActionsInfo {
 
     /// Display time vs score wrt players of the specified side
     pub fn summary_tvs_givenside_shared(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
-        let players = if side == entities::SIDE_L { &self.players.lplayers } else { &self.players.rplayers };
+        let players = if side == entities::SIDE_L { &self.teams.lplayers } else { &self.teams.rplayers };
         for pi in 0..players.len() {
             self.summary_tvs_player(sx, side, pi, maxtime, yminmax, &sptype, win);
         }
@@ -996,7 +997,7 @@ impl ActionsInfo {
     /// So if in future, we want to plot wrt score deltas rather than cumulative score, then one needs to get the minmax
     /// wrt score deltas.
     pub fn summary_tvs(&mut self, sx: &mut SdlX, maxtime: usize, sptype: &SummaryPlayerType, win: XRect, summarytype: char) {
-        let ((mut lmin,mut lmax), (mut rmin,mut rmax)) = self.players.score_hist_cumul_minmax();
+        let ((mut lmin,mut lmax), (mut rmin,mut rmax)) = self.teams.score_hist_cumul_minmax();
         //eprintln!("DBUG:{}:SummaryTVS:MinMax:{},{}:{},{}", MTAG, lmin, lmax, rmin, rmax);
         if summarytype == SUMMARY_RELATIVE_ALL {
             lmin = lmin.min(rmin);
