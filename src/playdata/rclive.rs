@@ -265,6 +265,10 @@ impl PlayData for RCLive {
         }
         let sbuf = String::from_utf8_lossy(&buf);
         ldebug!(&format!("DBUG:{}:Got:{:?}:{}", fmtag, gotr, &sbuf));
+        if !sbuf.starts_with("{") {
+            eprintln!("WARN:{}:Ignoring unexpected data [{}]...", fmtag, sbuf);
+            return pu;
+        }
         let mut tstr = self.tstrx.from_str(&sbuf, true);
         tstr.peel_bracket('{').unwrap();
         let toks = tstr.tokens_vec(',', true, true).unwrap();

@@ -393,3 +393,8 @@ RCLive extract game mode info and update pu.state.
 
 Filter out duplicate goal action data.
 
+Avoid low pass filtering of t vs s data before plotting.
+
+Ignore unexpected message format messages from the rcssserver, wrt wrong
+initial handshake.
+
