@@ -45,6 +45,9 @@ pub const SUMMARY_RELATIVE_TEAM: char = 'T';
 /// Relative summary graphs wrt Best across both teams
 pub const SUMMARY_RELATIVE_ALL: char = 'A';
 
+/// Filtering of player time vs score data
+pub const PLOT_TVS_FILTER: [f32;5] = [0.1,0.2,0.4,0.2,0.1];
+
 #[derive(Debug)]
 /// Maintain the scoring related to a player
 struct Score {
@@ -1001,7 +1004,12 @@ impl ActionsInfo {
         }
         let stag = format!("{}{:02}", side, playerid);
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
-        sx.n_plot_uf(win.0.0, win.0.1, win.1.0, win.1.1, vts, 0.0, maxtime as f32, ymin, ymax, Some(vec![0.1,0.2,0.4,0.2,0.1]), &stag, PlotType::Lines);
+        let weights =if PLOT_TVS_FILTER.len() > 0 {
+            Some(PLOT_TVS_FILTER.to_vec())
+        } else {
+            None
+        };
+        sx.n_plot_uf(win.0.0, win.0.1, win.1.0, win.1.1, vts, 0.0, maxtime as f32, ymin, ymax, weights, &stag, PlotType::Lines);
     }
 
     #[allow(dead_code)]
