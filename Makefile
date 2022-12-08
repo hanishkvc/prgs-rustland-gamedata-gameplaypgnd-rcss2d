@@ -49,7 +49,8 @@ test2_vb:
 	target/release/gameplaypgnd-rcss2d --mode rcg --src gamedata/20221118233608-tm01_3-vs-tm02_1.rcg --virtball gamedata/20221118233608-tm01_3-vs-tm02_1.virtball.csv
 
 rgb2png:
-	for i in /tmp/gppgnd*rgb; do echo $$i; gm convert -size 1024x600 -depth 8 -format rgb $$i $$i.png; done
+	#for i in /tmp/gppgnd*rgb; do echo $$i; gm convert -size 1024x600 -depth 8 -format rgb $$i $$i.png; done
+	for i in /tmp/gppgnd*rgb; do echo $$i; gm convert -size 1536x864 -depth 8 -format rgb $$i $$i.png; done
 
 png2mp4:
 	mencoder mf:///tmp/gppgnd*png -mf fps=10 -o /tmp/gppgnd.mp4 -ovc lavc

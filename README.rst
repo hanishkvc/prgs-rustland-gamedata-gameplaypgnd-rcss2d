@@ -39,6 +39,9 @@ can include
 * overlapping of past games data wrt movements/actions/performance in useful
   ways.
 
+.. image:: gamedata/gppgnd2400.rgb.png
+  :alt: Capture of a game playback with Scoring (relative bars and plot wrt time), ball possession, relative distance traversed
+
 
 Usage
 #######
@@ -395,6 +398,5 @@ Filter out duplicate goal action data.
 
 Avoid low pass filtering of t vs s data before plotting.
 
-Ignore unexpected message format messages from the rcssserver, wrt wrong
-initial handshake.
-
+Ignore unexpected message format messages from the rcssserver, for example
+wrt wrong initial handshake.
