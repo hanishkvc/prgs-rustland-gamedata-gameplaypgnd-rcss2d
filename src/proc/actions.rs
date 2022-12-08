@@ -4,7 +4,8 @@
 //!
 //! TODO:
 //! * Track for halftime/etal and avoid providing -ve scoring
-//!   due to any of these shifting side that will kick
+//!   due to any of these leading to shifting/switching of side
+//!   wrt the kick that will follow.
 //! * Allow -ve scoring to goalie, if they allow a goal to occur
 //!   ie beyond the failed catch situations.
 //! * Account penalties beyond cards during scoring.
@@ -46,7 +47,9 @@ pub const SUMMARY_RELATIVE_TEAM: char = 'T';
 pub const SUMMARY_RELATIVE_ALL: char = 'A';
 
 /// Filtering of player time vs score data
-pub const PLOT_TVS_FILTER: [f32;5] = [0.1,0.2,0.4,0.2,0.1];
+//pub const PLOT_TVS_FILTER: [f32;5] = [0.1,0.2,0.4,0.2,0.1];
+pub const PLOT_TVS_FILTER: [f32;0] = [];
+
 
 #[derive(Debug)]
 /// Maintain the scoring related to a player
