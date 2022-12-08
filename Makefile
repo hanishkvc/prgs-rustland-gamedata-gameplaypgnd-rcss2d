@@ -1,4 +1,7 @@
 
+ECHO=/bin/echo -e
+SLEEP=/bin/sleep
+
 cbuild:
 	cargo build
 	cargo build --release
@@ -17,13 +20,17 @@ crun:
 	cargo run --release
 
 rclive:
-	echo "*********** NOTE ***************"
-	echo "Remember to start rcssserver"
-	echo "user$ rcssserver"
-	echo "Also start TWO team logic instances, like say for example if using helios"
-	echo "user$ path/to/helios-base/src/start.sh -t team01"
-	echo "user$ path/to/helios-base/src/start.sh -t team02"
-	input "Dont forget to start the above ideally, before continuing. After that press c1 wrt gameplaypgnd-rcss2d"
+	$(ECHO) "*********** NOTE ***************\n\
+		Remember to start rcssserver\n\
+		user$ rcssserver\n\
+		Also start TWO team logic instances, like say for example if using helios\n\
+		user$ path/to/helios-base/src/start.sh -t team01\n\
+		user$ path/to/helios-base/src/start.sh -t team02\n\
+		Dont forget to start the above ideally, before continuing.\n\
+		*** After that press c1 in gameplaypgnd-rcss2d ***\n\n\
+		Else if you started gppgnd b4 rcssserver, you need to\n\
+		*** Press c 0 and then 1 in gameplaypgnd-rcss2d ***\n"
+	$(SLEEP) 10
 	target/release/gameplaypgnd-rcss2d --mode rclive
 
 test1:
