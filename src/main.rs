@@ -468,6 +468,7 @@ fn main() {
         if gui.showaitimevsscore {
             gui.pgentities.actionsinfo.summary_tvs(&mut sx, gui.timecounter, &actions::SummaryPlayerType::ScoreCumulative, ((0.1,0.9),(0.8,0.8)), gui.aitimevsscore_summarytype);
         }
+        gui.pgentities.actionsinfo.show_ballpossession(&mut sx);
 
         // Present screen update to user
         sx.wc.present();

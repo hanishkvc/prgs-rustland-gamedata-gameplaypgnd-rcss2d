@@ -1042,3 +1042,16 @@ impl ActionsInfo {
     }
 
 }
+
+impl ActionsInfo {
+
+    pub fn show_ballpossession(&self, sx: &mut SdlX) {
+        let lposs = ((self.teams.lballtime/(self.teams.lballtime + self.teams.rballtime))*100.0).round();
+        let rposs = 100.0-lposs;
+        let lpos = entities::MSG_LBALLPOSS_POS;
+        let rpos = entities::MSG_RBALLPOSS_POS;
+        sx.n_string(lpos.0, lpos.1, &lposs.to_string(), Color::WHITE);
+        sx.n_string(rpos.0, rpos.1, &rposs.to_string(), Color::WHITE);
+    }
+
+}

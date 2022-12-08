@@ -33,6 +33,8 @@ pub const MSG_FPS_POS: (f32,f32)        = (0.80,0.01);
 pub const MSG_GAME_POS: (f32,f32)       = (0.01,0.98);
 pub const MSG_UNKNOWN_POS: (f32,f32)    = (0.50,0.98);
 pub const MSG_TIMED_POS: (f32, f32)     = (0.01,0.08);
+pub const MSG_LBALLPOSS_POS: (f32, f32) = (0.44,0.01);
+pub const MSG_RBALLPOSS_POS: (f32, f32) = (0.55,0.01);
 
 const MSG_TIMED_NUMFRAMES: isize = 40;
 

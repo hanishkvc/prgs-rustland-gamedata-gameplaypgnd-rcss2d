@@ -26,7 +26,9 @@ can include
 
     * good / bad (self) goals (including chain of actions leading to it)
 
-  * also performance scoring based on infered/otherwise game actions
+  * performance scoring based on infered/otherwise game actions
+
+  * ball possession wrt both sides
 
 * color coding, graphs, etal of
 
@@ -233,6 +235,8 @@ player movements.
 * curently active starting key in multikey cmds and set+actual fps,
   at the top right
 
+* ball possession of both sides on the top towards to the center.
+
 
 Augumenting
 =============
@@ -379,4 +383,6 @@ Points/Lines) wrt individual player / full team / both teams, with controllable
 positioning.
 
 * filtered plotting of time vs player perf graphs
+
+Track and show ball posession.
 
