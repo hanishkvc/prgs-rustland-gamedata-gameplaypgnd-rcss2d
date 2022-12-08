@@ -159,6 +159,8 @@ impl Player {
 struct Teams {
     lplayers: Vec<Player>,
     rplayers: Vec<Player>,
+    lballtime: f32,
+    rballtime: f32,
 }
 
 impl Teams {
@@ -167,6 +169,8 @@ impl Teams {
         let mut teams = Teams {
             lplayers: Vec::new(),
             rplayers: Vec::new(),
+            lballtime: 0.0,
+            rballtime: 0.0,
         };
         for i in 0..lcnt {
             teams.lplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
@@ -345,6 +349,18 @@ impl Teams {
             }
         }
         (lmax, rmax)
+    }
+
+    /// If ball actions remain on the same side, give ball time to the side
+    fn balltime_update(&mut self, prevactd: &ActionData, curactd: &ActionData) {
+        if curactd.side == prevactd.side {
+            let dtime = (curactd.time - prevactd.time) as f32;
+            if curactd.side == entities::SIDE_L {
+                self.lballtime += dtime;
+            } else {
+                self.rballtime += dtime;
+            }
+        }
     }
 
 }
@@ -793,6 +809,13 @@ impl ActionsInfo {
         }
     }
 
+    fn balltime_update(&mut self, prevactd: &ActionData, curactd: &ActionData, lookbackcnt: usize) {
+        if lookbackcnt != 1 {
+            return;
+        }
+        self.teams.balltime_update(&prevactd, &curactd);
+    }
+
     /// Handle the passed action by
     /// * looking at the sequence leading to it and scoring players accordingly.
     ///   * normally 1 step back,
@@ -821,24 +844,28 @@ impl ActionsInfo {
                     break;
                 },
                 AIAction::Kick => {
+                    self.balltime_update(&prevactd, &curactd, lookbackcnt);
                     if let HAReturn::Done(save) = self.handle_kick(&mut curactd, &prevactd) {
                         bupdate_actions = save;
                         break;
                     }
                 },
                 AIAction::Tackle => {
+                    self.balltime_update(&prevactd, &curactd, lookbackcnt);
                     if let HAReturn::Done(save) = self.handle_tackle(&mut curactd, &prevactd) {
                         bupdate_actions = save;
                         break;
                     }
                 },
                 AIAction::Catch => {
+                    self.balltime_update(&prevactd, &curactd, lookbackcnt);
                     if let HAReturn::Done(save) = self.handle_catch(&mut curactd, &prevactd) {
                         bupdate_actions = save;
                         break;
                     }
                 },
                 AIAction::Goal => {
+                    self.balltime_update(&prevactd, &curactd, lookbackcnt);
                     // Allow 1st lookback check to filter out this goal if required.
                     // Else If one goes beyond 1st lookback, then the goal is always saved into actions.
                     bupdate_dist = false;
