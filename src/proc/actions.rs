@@ -678,6 +678,12 @@ impl ActionsInfo {
             },
             AIAction::Goal => {
                 if lookbackcnt <= 1 {
+                    if curactd.time == prevactd.time {
+                        // In case playdata source doesnt filter out duplicate entries wrt a given goal,
+                        // Skip duplicate goal action data
+                        ldebug!(&format!("DBUG:{}:HandleGoal:Goal{}->Goal{} shouldnt occur, ignoring...", MTAG, prevactd, curactd));
+                        return HAReturn::Done(false);
+                    }
                     panic!("DBUG:{}:HandleGoal:Goal{}->Goal{} shouldnt occur", MTAG, prevactd, curactd);
                 }
                 return HAReturn::Done(true);

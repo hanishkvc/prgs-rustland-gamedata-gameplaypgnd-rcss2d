@@ -3,7 +3,7 @@ GamePlay Playground - RobocupSoccerSim2d+ version
 #################################################
 
 Author: HanishKVC
-Version: 20221129IST1205
+Version: 20221208IST1607
 License: GPL-3.0+
 
 
@@ -384,5 +384,12 @@ positioning.
 
 * filtered plotting of time vs player perf graphs
 
+20221208++
+============
+
 Track and show ball posession.
+
+RCLive extract game mode info and update pu.state.
+
+Filter out duplicate goal action data.
 
