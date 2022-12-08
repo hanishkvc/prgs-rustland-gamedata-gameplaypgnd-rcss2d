@@ -84,6 +84,7 @@ impl RCLive {
 
     fn handle_mode(&mut self, tok: &str, pu: &mut PlayUpdate) {
         let (_t,d) = tok.split_once(':').unwrap();
+        let d = d.strip_prefix('"').unwrap().strip_suffix('"').unwrap();
         pu.msgs.insert("game".to_string(), format!("{}:{}", self.stime, d));
         if d == "goal_r" {
             pu.state = GameState::Goal('r');
