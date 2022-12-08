@@ -17,6 +17,13 @@ crun:
 	cargo run --release
 
 rclive:
+	echo "*********** NOTE ***************"
+	echo "Remember to start rcssserver"
+	echo "user$ rcssserver"
+	echo "Also start TWO team logic instances, like say for example if using helios"
+	echo "user$ path/to/helios-base/src/start.sh -t team01"
+	echo "user$ path/to/helios-base/src/start.sh -t team02"
+	input "Dont forget to start the above ideally, before continuing. After that press c1 wrt gameplaypgnd-rcss2d"
 	target/release/gameplaypgnd-rcss2d --mode rclive
 
 test1:
