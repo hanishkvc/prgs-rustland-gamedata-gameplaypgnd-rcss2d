@@ -12,7 +12,7 @@ use loggerk::{ldebug,log_d};
 use crate::sdlx::XSpaces;
 
 use crate::playdata;
-use super::rcss;
+use super::{rcss, GameState};
 use super::{PlayData, PlayUpdate, PlayerData};
 
 
@@ -85,6 +85,15 @@ impl RCLive {
     fn handle_mode(&mut self, tok: &str, pu: &mut PlayUpdate) {
         let (_t,d) = tok.split_once(':').unwrap();
         pu.msgs.insert("game".to_string(), format!("{}:{}", self.stime, d));
+        if d == "goal_r" {
+            pu.state = GameState::Goal('r');
+        } else if d == "goal_l" {
+            pu.state = GameState::Goal('l');
+        } else if d == "play_on" {
+            pu.state = GameState::PlayOn;
+        } else {
+            pu.state = GameState::Other(d.to_string());
+        }
     }
 
     fn handle_teams(&mut self, tok: &str, pu: &mut PlayUpdate) {

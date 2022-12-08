@@ -56,6 +56,7 @@ pub enum GameState {
     PlayPaused,
     PlayOn,
     Goal(char),
+    Other(String),
 }
 
 pub type Messages = HashMap<String, String>;
