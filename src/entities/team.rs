@@ -76,6 +76,11 @@ impl<'a> Team<'a> {
                             self.players[pi].move_to_in_frames((fx, fy), inframes);
                         }
                     },
+                    playdata::PlayerData::Dir(body, neck) => {
+                        let body = (body+neck).round() as i16;
+                        let arcangles = (body-20, body+20);
+                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::BLACK});
+                    },
                     playdata::PlayerData::Stamina(fstamina) => {
                         // Stamina
                         //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);

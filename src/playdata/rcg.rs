@@ -102,6 +102,10 @@ impl Rcg {
             eprintln!("DBUG:{}:Player:BeyondBoundry:{},{}:{},{}", MTAG, fxin, fyin, fx, fy);
         }
         pd.push(PlayerData::Pos(fx, fy));
+        // Handle Direction
+        let fbody: f32 = vdata[7].parse().unwrap();
+        let fneck: f32 = vdata[8].parse().unwrap();
+        pd.push(PlayerData::Dir(fbody, fneck));
         // Handle stamina
         for i in 5..vdata.len() {
             if !vdata[i].starts_with("(s ") {

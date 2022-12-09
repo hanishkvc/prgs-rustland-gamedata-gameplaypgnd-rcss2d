@@ -38,10 +38,13 @@ pub enum Action {
 #[derive(Debug)]
 /// Player related data
 pub enum PlayerData {
+    /// Player position x,y
     Pos(f32,f32),
     Stamina(f32),
     Card(Card),
     Action(Action),
+    /// Player Body and Neck direction
+    Dir(f32,f32),
 }
 
 /// Maintain a vector of player related data
