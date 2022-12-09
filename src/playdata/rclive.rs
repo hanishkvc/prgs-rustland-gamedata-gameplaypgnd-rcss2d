@@ -175,7 +175,7 @@ impl RCLive {
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
             ldebug!(&format!("DBUG:{}:Players:Got:Toks:Player:{:#?}", MTAG, toksl2));
-            let mut pnum = 0;
+            let mut pid = "";
             let mut fx = 0.0;
             let mut fy = 0.0;
             let mut side = String::new();
@@ -192,7 +192,7 @@ impl RCLive {
                     side = v.to_string();
                 }
                 if k == "\"unum\"" {
-                    pnum = v.parse().unwrap();
+                    pid = v;
                 }
                 if k == "\"x\"" {
                     fx = v.parse().unwrap();
@@ -216,7 +216,7 @@ impl RCLive {
                     let state: u32 = v.parse().unwrap();
                     (action, card) = rcss::handle_state(state);
                     if (action == playdata::Action::None) && (card == playdata::Card::None) {
-                        ldebug!(&format!("DBUG:{}:Players:{}-{}:{}", MTAG, side, pnum, state));
+                        ldebug!(&format!("DBUG:{}:Players:{}-{}:{}", MTAG, side, pid, state));
                     }
                 }
             }
@@ -230,9 +230,9 @@ impl RCLive {
             let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
             pd.push(PlayerData::Dir(fbody, fneck, fvw));
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.lteamcoded.push((pnum-1, pd));
+                pu.lteamcoded.push((pid.to_string(), pd));
             } else {
-                pu.rteamcoded.push((pnum-1, pd));
+                pu.rteamcoded.push((pid.to_string(), pd));
             }
         }
 

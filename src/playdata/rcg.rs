@@ -78,7 +78,6 @@ impl Rcg {
         let mut tstr = TStr::from_str(&vdata[0], true);
         tstr.peel_bracket('(').unwrap();
         let (steam, splayer) = tstr.split_once(' ').unwrap();
-        let iplayer: i32 = splayer.parse().unwrap();
         // Handle actions and cards
         let sstate;
         if vdata[2].contains("x") {
@@ -89,7 +88,7 @@ impl Rcg {
         let state: u32 = u32::from_str_radix(sstate, 16).unwrap();
         let (action, card) = rcss::handle_state(state);
         if (action == playdata::Action::None) && (card == playdata::Card::None) {
-            ldebug!(&format!("DBUG:{}:Player:{}-{}:{}", MTAG, steam, iplayer, state));
+            ldebug!(&format!("DBUG:{}:Player:{}-{}:{}", MTAG, steam, splayer, state));
         }
         pd.push(PlayerData::Card(card));
         pd.push(PlayerData::Action(action));
@@ -127,9 +126,9 @@ impl Rcg {
         }
         // Fill in the player data
         if steam == "l" {
-            pu.lteamcoded.push((iplayer-1, pd));
+            pu.lteamcoded.push((splayer, pd));
         } else {
-            pu.rteamcoded.push((iplayer-1, pd));
+            pu.rteamcoded.push((splayer, pd));
         }
     }
 

@@ -6,7 +6,7 @@
 use std::{collections::HashMap, fmt::Display};
 
 
-type TPlayerId = i32;
+type TPlayerId = String;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Card {
