@@ -364,6 +364,9 @@ pub enum GELineType {
 /// * if +ve, it specifies for how many draw calls this graphics will be shown
 pub enum GEDrawPrimitive {
     /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
+    /// ArcAngles will be interpreted to generate a clockwise arc from start to end.
+    /// +ve angles refer to clockwise angles from 0 degree
+    /// -ve angles refer to anti-clockwise angles from 0 degree
     NSArc{ remfc: isize, radratio: f32, arcangles: (i16,i16), color: Color },
     #[allow(dead_code)]
     /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionWrtCorrespondingBoundry, Color

@@ -64,3 +64,11 @@ pub fn handle_state(state: u32) -> (Action, Card) {
     }
     return (action, card);
 }
+
+/// RCSS Direction is in degrees.
+/// +ve is clockwise from 0 degree,
+/// -ve is anticlockwise from 0 degree.
+/// RCSS and SdlX interpret arc angles in same way, so simple straight mapping.
+pub fn handle_dir(fbody: f32, fneck: f32) -> (f32,f32) {
+    (fbody, fneck)
+}

@@ -223,6 +223,7 @@ impl RCLive {
             pd.push(PlayerData::Stamina(fstamina));
             pd.push(PlayerData::Card(card));
             pd.push(PlayerData::Action(action));
+            let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
             pd.push(PlayerData::Dir(fbody, fneck));
             if side.chars().nth(1).unwrap() == 'l' {
                 pu.lteamcoded.push((pnum-1, pd));

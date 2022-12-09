@@ -77,8 +77,16 @@ impl<'a> Team<'a> {
                         }
                     },
                     playdata::PlayerData::Dir(body, neck) => {
-                        let body = (body+neck).round() as i16;
-                        let arcangles = (body-20, body+20);
+                        // Body direction
+                        let bstart = (body.round() as i16) - 10;
+                        let bend = (body.round() as i16) + 10;
+                        let arcangles = (bstart, bend);
+                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::WHITE});
+                        // Body+Neck ie look direction
+                        let mid = (body+neck).round() as i16;
+                        let start = mid - 30;
+                        let end = mid + 30;
+                        let arcangles = (start, end);
                         self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::BLACK});
                     },
                     playdata::PlayerData::Stamina(fstamina) => {

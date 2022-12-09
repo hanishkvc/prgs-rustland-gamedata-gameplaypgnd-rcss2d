@@ -362,6 +362,11 @@ impl SdlX {
 
 impl SdlX {
 
+    /// Arc angles
+    /// * are expected to be in degrees
+    /// * logic will try to generate a arc in the clock wise direction from start to end angle specified.
+    /// * a +ve angle will be interpreted along clockwise direction from 0 degree
+    /// * a -ve angle will be interpreted along anti clockwise direction from 0 degree
     /// NOTE: Remember if start and end angle are same (inc 0 to 360), then no arc
     pub fn ns_arc(&self, nx: f32, ny: f32, sradius: i16, sstartangle: i16, sendangle: i16, swidth: isize, color: Color) {
         let (sx,sy) = self.n2s.d2o((nx,ny));

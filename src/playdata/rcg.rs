@@ -105,6 +105,7 @@ impl Rcg {
         // Handle Direction
         let fbody: f32 = vdata[7].parse().unwrap();
         let fneck: f32 = vdata[8].parse().unwrap();
+        let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
         pd.push(PlayerData::Dir(fbody, fneck));
         // Handle stamina
         for i in 5..vdata.len() {
