@@ -748,8 +748,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.teams.pscore_update(curactd.time, prevactd.side, &prevactd.playerid, ppscore);
+                self.teams.pscore_update(curactd.time, curactd.side, &curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Tackle => {
@@ -769,8 +769,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.teams.pscore_update(curactd.time, prevactd.side, &prevactd.playerid, ppscore);
+                self.teams.pscore_update(curactd.time, curactd.side, &curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -801,8 +801,8 @@ impl ActionsInfo {
                     ppscore = score.0 * score.3;
                     cpscore = score.0 * score.4;
                 }
-                self.teams.pscore_update(curactd.time, prevactd.side, prevactd.playerid, ppscore);
-                self.teams.pscore_update(curactd.time, curactd.side, curactd.playerid, cpscore);
+                self.teams.pscore_update(curactd.time, prevactd.side, &prevactd.playerid, ppscore);
+                self.teams.pscore_update(curactd.time, curactd.side, &curactd.playerid, cpscore);
                 return HAReturn::Done(true);
             },
             AIAction::Catch | AIAction::Goal => {
@@ -895,13 +895,13 @@ impl ActionsInfo {
         }
         // Update things as required.
         if bupdate_dist {
-            self.teams.dist_update_from_pos(curactd.side, curactd.playerid, curactd.pos);
+            self.teams.dist_update_from_pos(curactd.side, &curactd.playerid, curactd.pos);
         }
         if bupdate_actions {
             self.actions.push(curactd.clone());
         }
         if bupdate_rawactions {
-            self.teams.count_increment(curactd.side, curactd.playerid, curactd.action.clone());
+            self.teams.count_increment(curactd.side, &curactd.playerid, curactd.action.clone());
             ldebug!(&format!("DBUG:{}:RawActions:{}", MTAG, curactd));
             self.rawactions.push(curactd);
         }
@@ -974,7 +974,7 @@ impl ActionsInfo {
     /// Specify the position of the plot window ((x,y),(w,h))
     ///
     /// If yminmax is not specified, then a standard min max is used and inturn adjusted based on player's score.
-    pub fn summary_tvs_player(&mut self, sx: &mut SdlX, side: char, playerid: usize, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
+    pub fn summary_tvs_player(&mut self, sx: &mut SdlX, side: char, playerid: &str, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
         use crate::sdlx::PlotType;
         let player = self.teams.get_player(side, playerid);
         let vts;
@@ -1010,20 +1010,22 @@ impl ActionsInfo {
     #[allow(dead_code)]
     pub fn summary_tvs_givenside_independent(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
         let ((wx,wy), (ww,wh)) = win;
-        let players = if side == entities::SIDE_L { &self.teams.lplayers } else { &self.teams.rplayers };
-        let ph = wh/players.len() as f32;
-        for pi in 0..players.len() {
+        let pids = if side == entities::SIDE_L { &self.teams.lpids } else { &self.teams.rpids };
+        let ph = wh/pids.len() as f32;
+        for pi in 0..pids.len() {
+            let pid = &pids[pi];
             let x = wx;
             let y = wy - (pi as f32*ph);
-            self.summary_tvs_player(sx, side, pi, maxtime, None, &sptype, ((x,y),(ww,ph)));
+            self.summary_tvs_player(sx, side, pid, maxtime, None, &sptype, ((x,y),(ww,ph)));
         }
     }
 
     /// Display time vs score wrt players of the specified side
     pub fn summary_tvs_givenside_shared(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
-        let players = if side == entities::SIDE_L { &self.teams.lplayers } else { &self.teams.rplayers };
-        for pi in 0..players.len() {
-            self.summary_tvs_player(sx, side, pi, maxtime, yminmax, &sptype, win);
+        let pids = if side == entities::SIDE_L { &self.teams.lpids } else { &self.teams.rpids };
+        for pi in 0..pids.len() {
+            let pid = &pids[pi];
+            self.summary_tvs_player(sx, side, pid, maxtime, yminmax, &sptype, win);
         }
     }
 
