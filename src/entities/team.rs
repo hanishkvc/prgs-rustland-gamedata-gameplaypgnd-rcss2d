@@ -22,8 +22,8 @@ use crate::playdata::{PlayerCodedData, self, rcss};
 pub struct Team<'a> {
     name: String,
     color: Color,
-    players: Vec<GEntity<'a>>,
-    cards: HashMap<String, Vec<usize>>,
+    players: HashMap<String, GEntity<'a>>,
+    cards: HashMap<String, Vec<String>>,
     bshowstamina: bool,
     bshowactions: bool,
     bshowcards: bool,
@@ -33,11 +33,11 @@ pub struct Team<'a> {
 
 impl<'a> Team<'a> {
 
-    pub fn new(name: &str, color: Color, nplayers: i32, font: &'a Font) -> Team<'a> {
+    pub fn new(name: &str, color: Color, vplayerids: &Vec<String>, font: &'a Font) -> Team<'a> {
         let mut team = Team {
             name: name.to_string(),
             color: color,
-            players: Vec::new(),
+            players: HashMap::new(),
             cards: HashMap::new(),
             bshowstamina: true,
             bshowactions: true,
@@ -47,10 +47,10 @@ impl<'a> Team<'a> {
         };
         let (prgw, prgh) = sdlx::get_prg_resolution();
         let bx = (rand::random::<u32>() % prgw) as f32;
-        for i in 0..nplayers {
+        for spid in vplayerids {
             let fx = (rand::random::<u32>() % (prgw/4)) as f32;
             let fy = (rand::random::<u32>() % prgh) as f32;
-            team.players.push(GEntity::new(i.to_string().as_str(), (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
+            team.players.insert(spid.clone(), GEntity::new(spid, (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
         }
         team.cards.insert(playdata::Card::Red.to_string(), Vec::new());
         team.cards.insert(playdata::Card::Yellow.to_string(), Vec::new());
@@ -60,22 +60,23 @@ impl<'a> Team<'a> {
 
     pub fn update(&mut self, timecounter: usize, playersdata: Vec<PlayerCodedData>, babsolute: bool, inframes: f32, actionsinfo: &mut ActionsInfo) {
         let side = self.name.chars().nth(0).unwrap();
-        for player in playersdata {
-            ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, player));
-            let pi = player.0 as usize;
+        for playerdata in playersdata {
+            ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, playerdata));
+            let pi = playerdata.0.to_string(); // TODO: Switch to String PlayerId based flow
             let mut px = 0.0;
             let mut py = 0.0;
             let mut pact = AIAction::None;
-            for pd in player.1 {
+            let player = self.players.get_mut(&pi).unwrap();
+            for pd in playerdata.1 {
                 match pd {
                     playdata::PlayerData::Pos(fx, fy) => {
                         px = fx;
                         py = fy;
                         // Position
                         if babsolute {
-                            self.players[pi].pos_set_abs(fx, fy);
+                            player.pos_set_abs(fx, fy);
                         } else {
-                            self.players[pi].move_to_in_frames((fx, fy), inframes);
+                            player.move_to_in_frames((fx, fy), inframes);
                         }
                     },
                     playdata::PlayerData::Dir(body, neck, viewanglewidth) => {
@@ -86,18 +87,18 @@ impl<'a> Team<'a> {
                         let bstart = (body.round() as i16) - 10;
                         let bend = (body.round() as i16) + 10;
                         let arcangles = (bstart, bend);
-                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, width: 1, color: Color::WHITE});
+                        player.gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, width: 1, color: Color::WHITE});
                         // Body+Neck ie look direction
                         let mid = (body+neck).round() as i16;
                         let halfangle = (viewanglewidth.round() as i16)/2;
                         let start = mid - halfangle;
                         let end = mid + halfangle;
                         let arcangles = (start, end);
-                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, width: 1, color: Color::BLACK});
+                        player.gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, width: 1, color: Color::BLACK});
                     },
                     playdata::PlayerData::Stamina(fstamina) => {
                         // Stamina
-                        //self.players[ppos.0 as usize].set_fcolor(1.0-fstamina, 1.0);
+                        //player.set_fcolor(1.0-fstamina, 1.0);
                         let istamina = (fstamina * 100.0).round() as i32;
                         let mut stamina_color = match istamina {
                             0..=30 => Color::RED,
@@ -108,9 +109,9 @@ impl<'a> Team<'a> {
                         if !self.bshowstamina {
                             stamina_color = COLOR_INVISIBLE;
                         }
-                        //self.players[ppos.0 as usize].set_nxarc(0.8, fstamina, stamina_color);
-                        self.players[pi].set_ll_color(stamina_color);
-                        self.players[pi].set_rl_color(stamina_color);
+                        //player.set_nxarc(0.8, fstamina, stamina_color);
+                        player.set_ll_color(stamina_color);
+                        player.set_rl_color(stamina_color);
                     },
                     playdata::PlayerData::Card(card) => {
                         // Cards
@@ -131,8 +132,8 @@ impl<'a> Team<'a> {
                         if !self.bshowcards {
                             card_color = sdlx::COLOR_INVISIBLE;
                         }
-                        self.players[pi].set_tl_color(card_color);
-                        self.players[pi].set_bl_color(card_color);
+                        player.set_tl_color(card_color);
+                        player.set_bl_color(card_color);
                     },
                     playdata::PlayerData::Action(action) => {
                         let mut action_color = match action {
@@ -169,7 +170,7 @@ impl<'a> Team<'a> {
                                     (340,20)
                                 };
                                 if self.bshowotheractions {
-                                    self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, width: 3, color: Color::BLACK});
+                                    player.gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, width: 3, color: Color::BLACK});
                                 }
                                 COLOR_INVISIBLE
                             },
@@ -178,7 +179,7 @@ impl<'a> Team<'a> {
                         if !self.bshowactions {
                             action_color = COLOR_INVISIBLE;
                         }
-                        self.players[pi].set_nxarc(1.0, 0.98, action_color);
+                        player.set_nxarc(1.0, 0.98, action_color);
                     }
                 }
             }
@@ -187,14 +188,14 @@ impl<'a> Team<'a> {
     }
 
     pub fn next_frame(&mut self) {
-        for i in 0..self.players.len() {
-            self.players[i].next_frame();
+        for player in self.players {
+            player.1.next_frame();
         }
     }
 
     pub fn draw(&mut self, sx: &mut SdlX) {
-        for i in 0..self.players.len() {
-            self.players[i].draw(sx);
+        for player in self.players {
+            player.1.draw(sx);
         }
     }
 
@@ -203,8 +204,8 @@ impl<'a> Team<'a> {
 impl<'a> Team<'a> {
 
     pub fn adjust_players(&mut self, colorsel: u8) {
-        for i in 0..self.players.len() {
-            self.players[i].colorsel = colorsel;
+        for player in self.players {
+            player.1.colorsel = colorsel;
         }
     }
 
