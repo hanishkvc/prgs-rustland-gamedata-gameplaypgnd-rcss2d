@@ -410,5 +410,7 @@ wrt wrong initial handshake.
 Show player's body, look(body+neck) direction along with view angle width.
 
 Switch to using string based PlayerIds and inturn hashmap wrt players, rather
-than vectors, where vector index would have been playerid previously.
+than vectors, where vector index would have been playerid previously. So also
+avoid player id of 0, as well as map to RCSS's actual player ids.
+
 

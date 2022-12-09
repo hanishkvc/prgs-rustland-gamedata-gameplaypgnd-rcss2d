@@ -594,6 +594,7 @@ impl ActionsInfo {
             let x = xs + (i as f32 * xu);
             let yh = yh*(player.score.dist/rmax);
             sx.nn_fill_rect(x, yb, xu*0.9, yh);
+            i += 1;
         }
     }
 
