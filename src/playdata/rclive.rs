@@ -175,7 +175,7 @@ impl RCLive {
             tstr.peel_bracket('{').unwrap();
             let toksl2 = tstr.tokens_vec(',', true, true).unwrap();
             ldebug!(&format!("DBUG:{}:Players:Got:Toks:Player:{:#?}", MTAG, toksl2));
-            let mut pid = "";
+            let mut pid = String::new();
             let mut fx = 0.0;
             let mut fy = 0.0;
             let mut side = String::new();
@@ -192,7 +192,7 @@ impl RCLive {
                     side = v.to_string();
                 }
                 if k == "\"unum\"" {
-                    pid = v;
+                    pid = v.to_string();
                 }
                 if k == "\"x\"" {
                     fx = v.parse().unwrap();
@@ -230,9 +230,9 @@ impl RCLive {
             let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
             pd.push(PlayerData::Dir(fbody, fneck, fvw));
             if side.chars().nth(1).unwrap() == 'l' {
-                pu.lteamcoded.push((pid.to_string(), pd));
+                pu.lteamcoded.push((pid, pd));
             } else {
-                pu.rteamcoded.push((pid.to_string(), pd));
+                pu.rteamcoded.push((pid, pd));
             }
         }
 

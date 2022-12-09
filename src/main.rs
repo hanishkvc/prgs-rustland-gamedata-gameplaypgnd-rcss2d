@@ -169,7 +169,7 @@ impl<'a> Gui<'a> {
 
     fn new(cfg: &Cfg, font: &'a Font) -> Gui<'a> {
         // PGEntities
-        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, &entities::LPLAYERS, &entities::RPLAYERS, cfg.fps, font);
+        let mut pgentities = entities::PGEntities::new(entities::PITCH_RECT, &entities::LPLAYERS.to_vec(), &entities::RPLAYERS.to_vec(), cfg.fps, font);
         pgentities.adjust_members(&cfg.fvirtball);
         // Playdata source
         let (pdata, showhelp) = pdata_source(cfg, pgentities.fps());

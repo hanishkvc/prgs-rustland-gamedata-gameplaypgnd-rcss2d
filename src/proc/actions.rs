@@ -196,7 +196,13 @@ impl Teams {
 
     /// Get the specified player
     fn get_player<'a>(&'a self, side: char, playerid: &str) -> &'a Player {
-        let player = if side == entities::SIDE_L { &self.lplayers.get(playerid) } else { &self.rplayers.get(playerid) };
+        let player = if side == entities::SIDE_L { self.lplayers.get(playerid) } else { self.rplayers.get(playerid) };
+        return player.unwrap();
+    }
+
+    /// Get a mutable reference to specified player
+    fn get_player_mut<'a>(&'a mut self, side: char, playerid: &str) -> &'a mut Player {
+        let player = if side == entities::SIDE_L { self.lplayers.get_mut(playerid) } else { self.rplayers.get_mut(playerid) };
         return player.unwrap();
     }
 
@@ -208,7 +214,7 @@ impl Teams {
         } else {
             eprintln!("DBUG:{}:Players:Card:{}{:02}:{}", MTAG, side, playerid, card);
         }
-        let player = self.get_player(side, playerid);
+        let player = self.get_player_mut(side, playerid);
         player.score.card_issued(time, card);
     }
 
@@ -221,7 +227,7 @@ impl Teams {
         } else {
             eprintln!("DBUG:{}:Players:Score:{}{:02}:{}", MTAG, side, playerid, pscoredelta);
         }
-        let player = self.get_player(side, playerid);
+        let player = self.get_player_mut(side, playerid);
         player.score.pscore_update(time, pscoredelta);
     }
 
@@ -231,7 +237,7 @@ impl Teams {
             ldebug!(&format!("WARN:{}:Players:CountInc:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         }
-        let player = self.get_player(side, playerid);
+        let player = self.get_player_mut(side, playerid);
         let stype;
         match atype {
             AIAction::None => stype = "None",
@@ -257,7 +263,7 @@ impl Teams {
             ldebug!(&format!("WARN:{}:Players:DistUpdateFromPos:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         }
-        let player = self.get_player(side, playerid);
+        let player = self.get_player_mut(side, playerid);
         let opos = player.pos;
         if opos.0 == 99.0 && opos.1 == 99.0 {
             player.pos = npos;
@@ -278,7 +284,7 @@ impl Teams {
     fn score_hist_cumul_minmax(&self) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
         let mut lmin = f32::MAX;
-        for player in self.lplayers {
+        for player in &self.lplayers {
             if lmax < player.1.score.hist_cumul_maxpscore {
                 lmax = player.1.score.hist_cumul_maxpscore;
             }
@@ -288,7 +294,7 @@ impl Teams {
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
-        for player in self.rplayers {
+        for player in &self.rplayers {
             if rmax < player.1.score.hist_cumul_maxpscore {
                 rmax = player.1.score.hist_cumul_maxpscore;
             }
@@ -304,7 +310,7 @@ impl Teams {
     fn score_minmax(&self, inc_cardscore: bool) -> ((f32,f32), (f32,f32)) {
         let mut lmax = f32::MIN;
         let mut lmin = f32::MAX;
-        for player in self.lplayers {
+        for player in &self.lplayers {
             if lmax < player.1.score.score(inc_cardscore) {
                 lmax = player.1.score.score(inc_cardscore);
             }
@@ -314,7 +320,7 @@ impl Teams {
         }
         let mut rmax = f32::MIN;
         let mut rmin = f32::MAX;
-        for player in self.rplayers {
+        for player in &self.rplayers {
             if rmax < player.1.score.score(inc_cardscore) {
                 rmax = player.1.score.score(inc_cardscore);
             }
@@ -328,13 +334,13 @@ impl Teams {
     /// Return the max player distance traversed for each of the teams
     fn dist_max(&self) -> (f32, f32) {
         let mut lmax = f32::MIN;
-        for player in self.lplayers {
+        for player in &self.lplayers {
             if lmax < player.1.score.dist {
                 lmax = player.1.score.dist;
             }
         }
         let mut rmax = f32::MIN;
-        for player in self.rplayers {
+        for player in &self.rplayers {
             if rmax < player.1.score.dist {
                 rmax = player.1.score.dist;
             }
@@ -692,7 +698,7 @@ impl ActionsInfo {
                         // Fill the player responsible for the goal bcas
                         // One doesnt know whether a kick will become a goal or not
                         // at the time of the kick, in general.
-                        curactd.playerid = prevactd.playerid;
+                        curactd.playerid = prevactd.playerid.clone();
                         eprintln!("INFO:{}:HandleGoal:{}:Player updated; PrevAction {}", MTAG, curactd, prevactd);
                     } else {
                         eprintln!("WARN:{}:HandleGoal:{}:Player already set; PrevAction {}", MTAG, curactd, prevactd);
@@ -702,8 +708,8 @@ impl ActionsInfo {
                     // A successful goal
                     // Nearest player scores more compared to farther players, wrt the chain of actions leading to the goal
                     let pscore = score.0 * score.1 * (1.0/lookbackcnt as f32);
-                    let pid = if lookbackcnt <= 1 { curactd.playerid } else { prevactd.playerid };
-                    self.teams.pscore_update(curactd.time, curactd.side, &pid, pscore);
+                    let pid = if lookbackcnt <= 1 { &curactd.playerid } else { &prevactd.playerid };
+                    self.teams.pscore_update(curactd.time, curactd.side, pid, pscore);
                     if (curactd.time - prevactd.time) > GOAL_CHAIN_TIME {
                         return HAReturn::Done(true);
                     }
@@ -1010,7 +1016,7 @@ impl ActionsInfo {
     #[allow(dead_code)]
     pub fn summary_tvs_givenside_independent(&mut self, sx: &mut SdlX, side: char, maxtime: usize, sptype: &SummaryPlayerType, win: XRect) {
         let ((wx,wy), (ww,wh)) = win;
-        let pids = if side == entities::SIDE_L { &self.teams.lpids } else { &self.teams.rpids };
+        let pids = if side == entities::SIDE_L { self.teams.lpids.clone() } else { self.teams.rpids.clone() };
         let ph = wh/pids.len() as f32;
         for pi in 0..pids.len() {
             let pid = &pids[pi];
@@ -1022,7 +1028,7 @@ impl ActionsInfo {
 
     /// Display time vs score wrt players of the specified side
     pub fn summary_tvs_givenside_shared(&mut self, sx: &mut SdlX, side: char, maxtime: usize, yminmax: Option<(f32, f32)>, sptype: &SummaryPlayerType, win: XRect) {
-        let pids = if side == entities::SIDE_L { &self.teams.lpids } else { &self.teams.rpids };
+        let pids = if side == entities::SIDE_L { self.teams.lpids.clone() } else { self.teams.rpids.clone() };
         for pi in 0..pids.len() {
             let pid = &pids[pi];
             self.summary_tvs_player(sx, side, pid, maxtime, yminmax, &sptype, win);

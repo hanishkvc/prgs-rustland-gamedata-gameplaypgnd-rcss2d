@@ -38,8 +38,8 @@ pub const MSG_RBALLPOSS_POS: (f32, f32) = (0.55,0.01);
 
 const MSG_TIMED_NUMFRAMES: isize = 40;
 
-pub const LPLAYERS: Vec<&str> = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" ];
-pub const RPLAYERS: Vec<&str> = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" ];
+pub const LPLAYERS: [&str; 11] = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" ];
+pub const RPLAYERS: [&str; 11] = [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" ];
 
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {

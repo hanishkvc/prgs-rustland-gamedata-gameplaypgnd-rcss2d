@@ -119,7 +119,7 @@ impl<'a> Team<'a> {
                         if penalised.is_some() {
                             let penalised = penalised.unwrap();
                             if !penalised.contains(&pid) {
-                                penalised.push(pid);
+                                penalised.push(pid.clone());
                                 actionsinfo.handle_card(timecounter, side, &pid, card.clone())
                             }
                         }
@@ -188,13 +188,13 @@ impl<'a> Team<'a> {
     }
 
     pub fn next_frame(&mut self) {
-        for player in self.players {
+        for player in &mut self.players {
             player.1.next_frame();
         }
     }
 
     pub fn draw(&mut self, sx: &mut SdlX) {
-        for player in self.players {
+        for player in &mut self.players {
             player.1.draw(sx);
         }
     }
@@ -204,7 +204,7 @@ impl<'a> Team<'a> {
 impl<'a> Team<'a> {
 
     pub fn adjust_players(&mut self, colorsel: u8) {
-        for player in self.players {
+        for player in &mut self.players {
             player.1.colorsel = colorsel;
         }
     }
