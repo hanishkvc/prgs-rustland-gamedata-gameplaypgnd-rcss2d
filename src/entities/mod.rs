@@ -14,7 +14,7 @@ pub const SIDE_L: char = 'l';
 pub const SIDE_R: char = 'r';
 pub const XPLAYERID_START: &str = "X-";
 pub const XPLAYERID_UNKNOWN: &str = "X-UNKNOWN";
-pub const XPLAYERID_OOPS_OTHERSIDE_START: &str = "X-OS";
+pub const XPLAYERID_OOPS_OTHERSIDE_START: &str = "X-OS-";
 
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
