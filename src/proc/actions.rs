@@ -1004,7 +1004,7 @@ impl ActionsInfo {
                 }
             }
         }
-        let stag = format!("{}{:02}", side, playerid);
+        let stag = format!("{}{:02}", side.to_uppercase(), playerid);
         //eprintln!("DBUG:{}:SummaryPlayer:{}{:02}:Len[{}]", MTAG, side, playerid, vts.len());
         let weights =if PLOT_TVS_FILTER.len() > 0 {
             Some(PLOT_TVS_FILTER.to_vec())

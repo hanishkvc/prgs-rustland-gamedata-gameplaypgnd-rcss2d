@@ -10,10 +10,10 @@ use crate::sdlx::{SdlX, XRect};
 use crate::playdata::{PlayUpdate, GameState};
 use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 
-pub const SIDE_L: char = 'L';
-pub const SIDE_R: char = 'R';
-pub const SIDE_L_TEAM: &str = "LTeam";
-pub const SIDE_R_TEAM: &str = "RTeam";
+pub const SIDE_L: char = 'l';
+pub const SIDE_R: char = 'r';
+pub const SIDE_L_TEAM: &str = "lteam";
+pub const SIDE_R_TEAM: &str = "rteam";
 pub const XPLAYERID_START: &str = "X-";
 pub const XPLAYERID_UNKNOWN: &str = "X-UNKNOWN";
 pub const XPLAYERID_OOPS_OTHERSIDE_START: &str = "X-OS-";
