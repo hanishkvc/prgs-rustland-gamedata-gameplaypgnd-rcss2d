@@ -18,6 +18,7 @@ pub enum ProgramEvent {
     ToggleShowBall,
     ToggleShowStamina,
     ToggleShowCards,
+    ToggleShowPlayerViewDir,
     SeekBackward,
     SeekForward,
     AdjustFPS(f32),
@@ -44,6 +45,9 @@ fn handle_s_cmds(keycode: Keycode) -> ProgramEvent {
         },
         Keycode::C => {
             return ProgramEvent::ToggleShowCards;
+        },
+        Keycode::D => {
+            return ProgramEvent::ToggleShowPlayerViewDir;
         },
         Keycode::H => {
             return ProgramEvent::ToggleShowHelp;

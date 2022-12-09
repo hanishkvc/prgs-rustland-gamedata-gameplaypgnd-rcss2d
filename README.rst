@@ -137,6 +137,10 @@ to control the behaviour as noted below.
 
   * b -> to show/hide the ball
 
+  * c -> to show/hide the card issued to player
+
+  * d -> to show/hide player view direction
+
   * any other key -> exit set-show/hide-mode
 
 * Seeking

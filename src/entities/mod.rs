@@ -269,6 +269,16 @@ impl<'a> PGEntities<'a> {
         }
     }
 
+    pub fn toggle_bshowplayerviewdir(&mut self) {
+        let lshow = self.lteam.toggle_bshowplayerviewdir();
+        let rshow = self.rteam.toggle_bshowplayerviewdir();
+        if lshow && rshow {
+            self.timedmsg.update_direct("PlayerViewDir:Show");
+        } else {
+            self.timedmsg.update_direct("PlayerViewDir:Hide");
+        }
+    }
+
     pub fn seek(&mut self, seekdelta: isize) {
         if self.virtballd.is_some() {
             self.virtballd.as_mut().unwrap().seek(seekdelta);

@@ -28,6 +28,7 @@ pub struct Team<'a> {
     bshowactions: bool,
     bshowcards: bool,
     bshowotheractions: bool,
+    bshowplayerviewdir: bool,
 }
 
 impl<'a> Team<'a> {
@@ -42,6 +43,7 @@ impl<'a> Team<'a> {
             bshowactions: true,
             bshowcards: true,
             bshowotheractions: false,
+            bshowplayerviewdir: false,
         };
         let (prgw, prgh) = sdlx::get_prg_resolution();
         let bx = (rand::random::<u32>() % prgw) as f32;
@@ -77,6 +79,9 @@ impl<'a> Team<'a> {
                         }
                     },
                     playdata::PlayerData::Dir(body, neck, viewanglewidth) => {
+                        if !self.bshowplayerviewdir {
+                            continue;
+                        }
                         // Body direction
                         let bstart = (body.round() as i16) - 10;
                         let bend = (body.round() as i16) + 10;
@@ -216,6 +221,11 @@ impl<'a> Team<'a> {
     pub fn toggle_bshowcards(&mut self) -> bool {
         self.bshowcards = !self.bshowcards;
         self.bshowcards
+    }
+
+    pub fn toggle_bshowplayerviewdir(&mut self) -> bool {
+        self.bshowplayerviewdir = !self.bshowplayerviewdir;
+        self.bshowplayerviewdir
     }
 
 }
