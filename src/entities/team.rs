@@ -76,7 +76,7 @@ impl<'a> Team<'a> {
                             self.players[pi].move_to_in_frames((fx, fy), inframes);
                         }
                     },
-                    playdata::PlayerData::Dir(body, neck) => {
+                    playdata::PlayerData::Dir(body, neck, viewanglewidth) => {
                         // Body direction
                         let bstart = (body.round() as i16) - 10;
                         let bend = (body.round() as i16) + 10;
@@ -84,8 +84,9 @@ impl<'a> Team<'a> {
                         self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::WHITE});
                         // Body+Neck ie look direction
                         let mid = (body+neck).round() as i16;
-                        let start = mid - 30;
-                        let end = mid + 30;
+                        let halfangle = (viewanglewidth.round() as i16)/2;
+                        let start = mid - halfangle;
+                        let end = mid + halfangle;
                         let arcangles = (start, end);
                         self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::BLACK});
                     },

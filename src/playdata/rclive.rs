@@ -184,6 +184,7 @@ impl RCLive {
             let mut action = playdata::Action::None;
             let mut fbody = 0.0;
             let mut fneck = 0.0;
+            let mut fvw = 60.0;
             // Extract the player specific datas
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
@@ -205,6 +206,9 @@ impl RCLive {
                 if k == "\"neck\"" {
                     fneck = v.parse().unwrap();
                 }
+                if k == "\"vw\"" {
+                    fvw = v.parse().unwrap();
+                }
                 if k == "\"stamina\"" {
                     fstamina = v.parse().unwrap();
                 }
@@ -224,7 +228,7 @@ impl RCLive {
             pd.push(PlayerData::Card(card));
             pd.push(PlayerData::Action(action));
             let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
-            pd.push(PlayerData::Dir(fbody, fneck));
+            pd.push(PlayerData::Dir(fbody, fneck, fvw));
             if side.chars().nth(1).unwrap() == 'l' {
                 pu.lteamcoded.push((pnum-1, pd));
             } else {

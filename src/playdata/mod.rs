@@ -43,8 +43,8 @@ pub enum PlayerData {
     Stamina(f32),
     Card(Card),
     Action(Action),
-    /// Player Body and Neck direction
-    Dir(f32,f32),
+    /// Player Body and Neck direction, view angle width
+    Dir(f32,f32,f32),
 }
 
 /// Maintain a vector of player related data

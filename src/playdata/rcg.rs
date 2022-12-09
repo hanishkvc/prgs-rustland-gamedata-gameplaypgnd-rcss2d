@@ -106,7 +106,11 @@ impl Rcg {
         let fbody: f32 = vdata[7].parse().unwrap();
         let fneck: f32 = vdata[8].parse().unwrap();
         let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
-        pd.push(PlayerData::Dir(fbody, fneck));
+        let mut sview = TStr::from_str(&vdata[9], true);
+        sview.peel_bracket('(').unwrap();
+        let vview = sview.tokens_vec(' ', true, false).unwrap();
+        let fview: f32 = vview[2].parse().unwrap();
+        pd.push(PlayerData::Dir(fbody, fneck, fview));
         // Handle stamina
         for i in 5..vdata.len() {
             if !vdata[i].starts_with("(s ") {

@@ -402,3 +402,6 @@ Avoid low pass filtering of t vs s data before plotting.
 
 Ignore unexpected message format messages from the rcssserver, for example
 wrt wrong initial handshake.
+
+Show player's body, look(body+neck) direction along with view angle width.
+
