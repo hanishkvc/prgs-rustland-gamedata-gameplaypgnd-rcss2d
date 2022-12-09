@@ -26,6 +26,8 @@ can include
 
     * good / bad (self) goals (including chain of actions leading to it)
 
+    * virtual ball (if required)
+
   * performance scoring based on infered/otherwise game actions
 
   * ball possession wrt both sides

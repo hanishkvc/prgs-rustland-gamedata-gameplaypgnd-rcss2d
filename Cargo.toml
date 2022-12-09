@@ -18,5 +18,5 @@ tokensk = { git="https://github.com/hanishkvc/prgs-rustland-libs-tokensk" }
 #tokensk = { path="../../tokensk" }
 loggerk = { git="https://github.com/hanishkvc/prgs-rustland-libs-loggerk" }
 argsclsk = { git="https://github.com/hanishkvc/prgs-rustland-libs-argsclsk" }
-datautilsk = { path="../../datautilsk" }
+datautilsk = { git="https://github.com/hanishkvc/prgs-rustland-libs-datautilsk" }
 
