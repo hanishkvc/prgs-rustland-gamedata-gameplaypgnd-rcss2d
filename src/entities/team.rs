@@ -62,11 +62,11 @@ impl<'a> Team<'a> {
         let side = self.name.chars().nth(0).unwrap();
         for playerdata in playersdata {
             ldebug!(&format!("DBUG:PPGND:Team:{}:{:?}", self.name, playerdata));
-            let pi = playerdata.0.to_string(); // TODO: Switch to String PlayerId based flow
+            let pid = playerdata.0.to_string(); // TODO: Switch to String PlayerId based flow
             let mut px = 0.0;
             let mut py = 0.0;
             let mut pact = AIAction::None;
-            let player = self.players.get_mut(&pi).unwrap();
+            let player = self.players.get_mut(&pid).unwrap();
             for pd in playerdata.1 {
                 match pd {
                     playdata::PlayerData::Pos(fx, fy) => {
@@ -118,9 +118,9 @@ impl<'a> Team<'a> {
                         let penalised = self.cards.get_mut(&card.to_string());
                         if penalised.is_some() {
                             let penalised = penalised.unwrap();
-                            if !penalised.contains(&pi) {
-                                penalised.push(pi);
-                                actionsinfo.handle_card(timecounter, side, pi, card.clone())
+                            if !penalised.contains(&pid) {
+                                penalised.push(pid);
+                                actionsinfo.handle_card(timecounter, side, pid, card.clone())
                             }
                         }
                         let mut card_color = sdlx::COLOR_INVISIBLE;
@@ -183,7 +183,7 @@ impl<'a> Team<'a> {
                     }
                 }
             }
-            actionsinfo.handle_action(ActionData::new(timecounter, side, pi, (px,py), pact));
+            actionsinfo.handle_action(ActionData::new(timecounter, side, pid, (px,py), pact));
         }
     }
 
