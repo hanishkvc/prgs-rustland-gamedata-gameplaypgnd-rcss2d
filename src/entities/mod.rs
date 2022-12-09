@@ -93,14 +93,15 @@ impl<'a> PGEntities<'a> {
     /// Create a playground instance with
     /// * pitch: the dimensions of the pitch with in the screen,
     ///   in normalised 0.0-1.0 space.
-    /// * [l/r]nplayers: the number of players on both sides.
+    /// * [l/r]players: player ids of players on both sides.
+    ///   Everywhere else these ids is what will be used to identify the specific player (along with side info).
     /// * font: the font used for creating the cached text image datas if any
     ///
     /// The following fixed position messages are supported on the screen
     /// * score: Give the current score, if any.
     /// * stime: Provide any time related info wrt the game.
     /// * game: show any game related messages.
-    pub fn new(pitch: XRect, lnplayers: i32, rnplayers: i32, fps: f32, font: &'a Font) -> PGEntities<'a> {
+    pub fn new(pitch: XRect, lplayers: &Vec<String>, rplayers: &Vec<String>, fps: f32, font: &'a Font) -> PGEntities<'a> {
         let mut vfpmsgs = Vec::new();
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);
@@ -120,11 +121,11 @@ impl<'a> PGEntities<'a> {
             showball: true,
             virtballg: Ball::new(font),
             virtballd: None,
-            lteam: team::Team::new("lteam", Color::RED, lnplayers, font),
-            rteam: team::Team::new("rteam", Color::BLUE, rnplayers, font),
+            lteam: team::Team::new("lteam", Color::RED, lplayers, font),
+            rteam: team::Team::new("rteam", Color::BLUE, rplayers, font),
             pitch: pitch,
             showxtrapitchmarkers: true,
-            actionsinfo: ActionsInfo::new(lnplayers as usize, rnplayers as usize),
+            actionsinfo: ActionsInfo::new(lplayers, rplayers),
             timedmsg: timedmsg,
         }
     }
