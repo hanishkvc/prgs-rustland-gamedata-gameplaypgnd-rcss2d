@@ -115,7 +115,7 @@ impl RCLive {
             for tok in toks {
                 if tok.starts_with("\"side\"") {
                     let (_,d) = tok.split_once(':').unwrap();
-                    side = d.to_uppercase().chars().nth(1).unwrap();
+                    side = d.chars().nth(1).unwrap();
                 }
                 if tok.starts_with("\"name\"") {
                     let (_,d) = tok.split_once(':').unwrap();
@@ -189,7 +189,7 @@ impl RCLive {
             for tokl2 in toksl2 {
                 let (k,v) = tokl2.split_once(':').unwrap();
                 if k == "\"side\"" {
-                    side = v.to_uppercase();
+                    side = v.to_string();
                 }
                 if k == "\"unum\"" {
                     pid = v.to_string();
