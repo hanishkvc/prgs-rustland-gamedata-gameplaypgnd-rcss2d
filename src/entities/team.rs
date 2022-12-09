@@ -120,7 +120,7 @@ impl<'a> Team<'a> {
                             let penalised = penalised.unwrap();
                             if !penalised.contains(&pid) {
                                 penalised.push(pid);
-                                actionsinfo.handle_card(timecounter, side, pid, card.clone())
+                                actionsinfo.handle_card(timecounter, side, &pid, card.clone())
                             }
                         }
                         let mut card_color = sdlx::COLOR_INVISIBLE;

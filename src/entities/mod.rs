@@ -12,9 +12,9 @@ use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 
 pub const SIDE_L: char = 'l';
 pub const SIDE_R: char = 'r';
-pub const XPLAYERID_START: usize = 0x1000;
-pub const XPLAYERID_UNKNOWN: usize = 0x1001;
-pub const XPLAYERID_OOPS_OTHERSIDE_START: usize = 0x8000;
+pub const XPLAYERID_START: &str = "X-";
+pub const XPLAYERID_UNKNOWN: &str = "X-UNKNOWN";
+pub const XPLAYERID_OOPS_OTHERSIDE_START: &str = "X-OS";
 
 const ENTITY_WIDTH: u32 = 16;
 const ENTITY_HEIGHT: u32 = 16;
@@ -170,7 +170,7 @@ impl<'a> PGEntities<'a> {
         self.rteam.update(pu.timecounter, pu.rteamcoded, babsolute, inframes, &mut self.actionsinfo);
         match pu.state {
             GameState::Goal(side)=> {
-                self.actionsinfo.handle_action(ActionData::new(pu.timecounter, side, XPLAYERID_UNKNOWN, pu.ball, AIAction::Goal))
+                self.actionsinfo.handle_action(ActionData::new(pu.timecounter, side, XPLAYERID_UNKNOWN.to_string(), pu.ball, AIAction::Goal))
             },
             _ => {
 

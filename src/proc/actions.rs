@@ -11,6 +11,7 @@
 //! * Account penalties beyond cards during scoring.
 //!
 
+use std::collections::HashMap;
 use std::fmt::Display;
 
 use loggerk::{ldebug, log_d};
@@ -145,13 +146,13 @@ type Pos = (f32, f32);
 
 #[derive(Debug)]
 struct Player {
-    id: usize,
+    id: String,
     score: Score,
     pos: Pos,
 }
 
 impl Player {
-    fn new(playerid: usize, score: Score, pos: Pos) -> Player {
+    fn new(playerid: String, score: Score, pos: Pos) -> Player {
         Player {
             id: playerid,
             score: score,
@@ -163,39 +164,39 @@ impl Player {
 
 #[derive(Debug)]
 struct Teams {
-    lplayers: Vec<Player>,
-    rplayers: Vec<Player>,
+    lplayers: HashMap<String, Player>,
+    rplayers: HashMap<String, Player>,
     lballtime: f32,
     rballtime: f32,
 }
 
 impl Teams {
 
-    fn new(lcnt: usize, rcnt: usize) -> Teams {
+    fn new(lplayers: &Vec<&str>, rplayers: &Vec<&str>) -> Teams {
         let mut teams = Teams {
-            lplayers: Vec::new(),
-            rplayers: Vec::new(),
+            lplayers: HashMap::new(),
+            rplayers: HashMap::new(),
             lballtime: 0.0,
             rballtime: 0.0,
         };
-        for i in 0..lcnt {
-            teams.lplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
+        for pid in lplayers {
+            teams.lplayers.insert(pid.to_string(), Player::new(pid.to_string(), Score::default(), (99.0,99.0)));
         }
-        for i in 0..rcnt {
-            teams.rplayers.push(Player::new(i, Score::default(), (99.0,99.0)));
+        for pid in rplayers {
+            teams.rplayers.insert(pid.to_string(), Player::new(pid.to_string(), Score::default(), (99.0,99.0)));
         }
         return teams;
     }
 
     /// Get the specified player
-    fn get_player<'a>(&'a self, side: char, playerid: usize) -> &'a Player {
-        let player = if side == entities::SIDE_L { &self.lplayers[playerid] } else { &self.rplayers[playerid] };
-        return player;
+    fn get_player<'a>(&'a self, side: char, playerid: &str) -> &'a Player {
+        let player = if side == entities::SIDE_L { &self.lplayers.get(playerid) } else { &self.rplayers.get(playerid) };
+        return player.unwrap();
     }
 
     /// Help update the score of a specific player, based on card issued if any
-    fn card_issued(&mut self, time: usize, side: char, playerid: usize, card: playdata::Card) {
-        if playerid >= entities::XPLAYERID_START {
+    fn card_issued(&mut self, time: usize, side: char, playerid: &str, card: playdata::Card) {
+        if playerid.starts_with(entities::XPLAYERID_START) {
             ldebug!(&format!("WARN:{}:Players:Card:SpecialPlayerId:{}{:02}:Ignoring...", MTAG, side, playerid));
             return;
         } else {
@@ -422,14 +423,14 @@ impl AIAction {
 pub struct ActionData {
     pub time: usize,
     side: char,
-    playerid: usize,
+    playerid: String,
     pub pos: (f32, f32),
     action: AIAction,
 }
 
 impl ActionData {
 
-    pub fn new(time: usize, side: char, playerid: usize, pos: (f32,f32), action: AIAction) -> ActionData {
+    pub fn new(time: usize, side: char, playerid: String, pos: (f32,f32), action: AIAction) -> ActionData {
         ActionData {
             time: time,
             side: side,
@@ -475,9 +476,9 @@ pub struct ActionsInfo {
 
 impl ActionsInfo {
 
-    pub fn new(lcnt: usize, rcnt: usize) -> ActionsInfo {
+    pub fn new(lplayers: &Vec<&str>, rplayers: &Vec<&str>) -> ActionsInfo {
         ActionsInfo {
-            teams: Teams::new(lcnt, rcnt),
+            teams: Teams::new(lplayers, rplayers),
             actions: Vec::new(),
             rawactions: Vec::new(),
             handle_deferedseek: false,
@@ -919,7 +920,7 @@ impl ActionsInfo {
 
 impl ActionsInfo {
 
-    pub fn handle_card(&mut self, time: usize, side: char, playerid: usize, card: playdata::Card) {
+    pub fn handle_card(&mut self, time: usize, side: char, playerid: &str, card: playdata::Card) {
         self.teams.card_issued(time, side, playerid, card);
     }
 
