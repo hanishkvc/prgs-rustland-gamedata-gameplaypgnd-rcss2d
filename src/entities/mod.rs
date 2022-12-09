@@ -38,6 +38,9 @@ pub const MSG_RBALLPOSS_POS: (f32, f32) = (0.55,0.01);
 
 const MSG_TIMED_NUMFRAMES: isize = 40;
 
+pub const LPLAYERS: Vec<&str> = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" ];
+pub const RPLAYERS: Vec<&str> = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" ];
+
 pub fn screen_color_bg_rel(r: u8, g: u8, b: u8) -> Color {
     Color {
         r: SCREEN_COLOR_BG.r.saturating_add(r),
@@ -101,7 +104,7 @@ impl<'a> PGEntities<'a> {
     /// * score: Give the current score, if any.
     /// * stime: Provide any time related info wrt the game.
     /// * game: show any game related messages.
-    pub fn new(pitch: XRect, lplayers: &Vec<String>, rplayers: &Vec<String>, fps: f32, font: &'a Font) -> PGEntities<'a> {
+    pub fn new(pitch: XRect, lplayers: &Vec<&str>, rplayers: &Vec<&str>, fps: f32, font: &'a Font) -> PGEntities<'a> {
         let mut vfpmsgs = Vec::new();
         let scoremsg = FixedPosMessage::new("score", MSG_SCORE_POS, false, -1);
         vfpmsgs.push(scoremsg);

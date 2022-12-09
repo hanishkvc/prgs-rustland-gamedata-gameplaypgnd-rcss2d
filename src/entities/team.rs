@@ -33,7 +33,7 @@ pub struct Team<'a> {
 
 impl<'a> Team<'a> {
 
-    pub fn new(name: &str, color: Color, vplayerids: &Vec<String>, font: &'a Font) -> Team<'a> {
+    pub fn new(name: &str, color: Color, vplayerids: &Vec<&str>, font: &'a Font) -> Team<'a> {
         let mut team = Team {
             name: name.to_string(),
             color: color,
@@ -50,7 +50,7 @@ impl<'a> Team<'a> {
         for spid in vplayerids {
             let fx = (rand::random::<u32>() % (prgw/4)) as f32;
             let fy = (rand::random::<u32>() % prgh) as f32;
-            team.players.insert(spid.clone(), GEntity::new(spid, (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
+            team.players.insert(spid.to_string(), GEntity::new(spid, (bx+fx, fy), (ENTITY_WIDTH, ENTITY_HEIGHT), team.color, font));
         }
         team.cards.insert(playdata::Card::Red.to_string(), Vec::new());
         team.cards.insert(playdata::Card::Yellow.to_string(), Vec::new());
