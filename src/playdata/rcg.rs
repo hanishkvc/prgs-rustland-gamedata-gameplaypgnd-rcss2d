@@ -126,7 +126,7 @@ impl Rcg {
             pd.push(PlayerData::Stamina(fstamina));
         }
         // Fill in the player data
-        if steam == entities::SIDE_L.to_string() {
+        if steam.to_uppercase() == entities::SIDE_L.to_string() {
             pu.lteamcoded.push((splayer, pd));
         } else {
             pu.rteamcoded.push((splayer, pd));
