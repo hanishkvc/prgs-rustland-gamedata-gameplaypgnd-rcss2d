@@ -363,11 +363,12 @@ pub enum GELineType {
 /// * if -ve, the graphics lives for ever
 /// * if +ve, it specifies for how many draw calls this graphics will be shown
 pub enum GEDrawPrimitive {
-    /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), Color
+    /// RemainingFramesCnt, RelativeRadius, ArcAngles(sStart,sEnd), LineWidth, Color
     /// ArcAngles will be interpreted to generate a clockwise arc from start to end.
     /// +ve angles refer to clockwise angles from 0 degree
     /// -ve angles refer to anti-clockwise angles from 0 degree
-    NSArc{ remfc: isize, radratio: f32, arcangles: (i16,i16), color: Color },
+    /// width of the arc line in terms of screen pixels
+    NSArc{ remfc: isize, radratio: f32, arcangles: (i16,i16), width: isize, color: Color },
     #[allow(dead_code)]
     /// RemainingFramesCnt, Line type (Top,Bottom,Left,Right), RelativePositionWrtCorrespondingBoundry, Color
     NLine{ remfc: isize, linetype: GELineType, radratio: f32, color: Color },
@@ -380,7 +381,7 @@ impl GEDrawPrimitive {
     fn life_decrement_need_removal(&mut self) -> bool {
         let mut bremove = false;
         match self {
-            GEDrawPrimitive::NSArc{ remfc, radratio: _, arcangles: _, color: _ } => {
+            GEDrawPrimitive::NSArc{ remfc, radratio: _, arcangles: _, width: _, color: _ } => {
                 if *remfc > 0 {
                     *remfc -= 1;
                     if *remfc == 0 {
@@ -417,10 +418,10 @@ impl<'a> GEntity<'a> {
         for i in (0..self.gextras.len()).rev() {
             let ge = &self.gextras[i];
             match ge {
-                GEDrawPrimitive::NSArc{remfc: _, radratio, arcangles, color } => {
+                GEDrawPrimitive::NSArc{remfc: _, radratio, arcangles, width, color } => {
                     let (nx,ny) = self.npos;
                     let srad = (self.radius  as f32 * *radratio) as i16;
-                    sx.ns_arc(nx, ny, srad, arcangles.0, arcangles.1, 3, *color);
+                    sx.ns_arc(nx, ny, srad, arcangles.0, arcangles.1, *width, *color);
                 },
                 GEDrawPrimitive::NLine { remfc: _, linetype, radratio, color } => {
                     self.draw_geline(sx, linetype.clone(), *radratio, *color);

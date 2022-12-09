@@ -81,14 +81,14 @@ impl<'a> Team<'a> {
                         let bstart = (body.round() as i16) - 10;
                         let bend = (body.round() as i16) + 10;
                         let arcangles = (bstart, bend);
-                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::WHITE});
+                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, width: 1, color: Color::WHITE});
                         // Body+Neck ie look direction
                         let mid = (body+neck).round() as i16;
                         let halfangle = (viewanglewidth.round() as i16)/2;
                         let start = mid - halfangle;
                         let end = mid + halfangle;
                         let arcangles = (start, end);
-                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, color: Color::BLACK});
+                        self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 2, radratio: 1.2, arcangles, width: 1, color: Color::BLACK});
                     },
                     playdata::PlayerData::Stamina(fstamina) => {
                         // Stamina
@@ -164,7 +164,7 @@ impl<'a> Team<'a> {
                                     (340,20)
                                 };
                                 if self.bshowotheractions {
-                                    self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, color: Color::BLACK});
+                                    self.players[pi].gextras_add(GEDrawPrimitive::NSArc{ remfc: 10, radratio: 1.4, arcangles, width: 3, color: Color::BLACK});
                                 }
                                 COLOR_INVISIBLE
                             },
