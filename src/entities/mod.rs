@@ -10,8 +10,10 @@ use crate::sdlx::{SdlX, XRect};
 use crate::playdata::{PlayUpdate, GameState};
 use crate::proc::actions::{ActionsInfo, ActionData, AIAction};
 
-pub const SIDE_L: char = 'l';
-pub const SIDE_R: char = 'r';
+pub const SIDE_L: char = 'L';
+pub const SIDE_R: char = 'R';
+pub const SIDE_L_TEAM: &str = "LTeam";
+pub const SIDE_R_TEAM: &str = "RTeam";
 pub const XPLAYERID_START: &str = "X-";
 pub const XPLAYERID_UNKNOWN: &str = "X-UNKNOWN";
 pub const XPLAYERID_OOPS_OTHERSIDE_START: &str = "X-OS-";
@@ -124,8 +126,8 @@ impl<'a> PGEntities<'a> {
             showball: true,
             virtballg: Ball::new(font),
             virtballd: None,
-            lteam: team::Team::new("lteam", Color::RED, lplayers, font),
-            rteam: team::Team::new("rteam", Color::BLUE, rplayers, font),
+            lteam: team::Team::new(SIDE_L_TEAM, Color::RED, lplayers, font),
+            rteam: team::Team::new(SIDE_R_TEAM, Color::BLUE, rplayers, font),
             pitch: pitch,
             showxtrapitchmarkers: true,
             actionsinfo: ActionsInfo::new(lplayers, rplayers),

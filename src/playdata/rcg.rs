@@ -7,6 +7,7 @@ use std::{fs::File, io::Read};
 use loggerk::{ldebug, log_d};
 use tokensk::TStr;
 
+use crate::entities;
 use crate::playdata;
 use crate::playdata::GameState;
 use crate::playdata::rcss;
@@ -125,7 +126,7 @@ impl Rcg {
             pd.push(PlayerData::Stamina(fstamina));
         }
         // Fill in the player data
-        if steam == "l" {
+        if steam == entities::SIDE_L.to_string() {
             pu.lteamcoded.push((splayer, pd));
         } else {
             pu.rteamcoded.push((splayer, pd));
@@ -197,9 +198,9 @@ impl PlayData for Rcg {
                 break;
             } else if toks[0].starts_with("playmode") {
                 if toks[2] == "goal_r" {
-                    pu.state = GameState::Goal('r');
+                    pu.state = GameState::Goal(entities::SIDE_R);
                 } else if toks[2] == "goal_l" {
-                    pu.state = GameState::Goal('l');
+                    pu.state = GameState::Goal(entities::SIDE_L);
                 } else if toks[2] == "play_on" {
                     pu.state = GameState::PlayOn;
                 } else {

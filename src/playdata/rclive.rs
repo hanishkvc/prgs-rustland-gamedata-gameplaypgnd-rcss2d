@@ -11,7 +11,7 @@ use loggerk::{ldebug,log_d};
 
 use crate::sdlx::XSpaces;
 
-use crate::playdata;
+use crate::{playdata, entities};
 use super::{rcss, GameState};
 use super::{PlayData, PlayUpdate, PlayerData};
 
@@ -87,9 +87,9 @@ impl RCLive {
         let d = d.strip_prefix('"').unwrap().strip_suffix('"').unwrap();
         pu.msgs.insert("game".to_string(), format!("{}:{}", self.stime, d));
         if d == "goal_r" {
-            pu.state = GameState::Goal('r');
+            pu.state = GameState::Goal(entities::SIDE_R);
         } else if d == "goal_l" {
-            pu.state = GameState::Goal('l');
+            pu.state = GameState::Goal(entities::SIDE_L);
         } else if d == "play_on" {
             pu.state = GameState::PlayOn;
         } else {
@@ -131,9 +131,9 @@ impl RCLive {
                 }
             }
             let ts = format!("{} [{}]", name, score);
-            if side == 'l' {
+            if side == entities::SIDE_L {
                 self.ateam = ts;
-            } else if side == 'r' {
+            } else if side == entities::SIDE_R {
                 self.bteam = ts;
             }
         }
@@ -229,7 +229,7 @@ impl RCLive {
             pd.push(PlayerData::Action(action));
             let (fbody, fneck) = rcss::handle_dir(fbody, fneck);
             pd.push(PlayerData::Dir(fbody, fneck, fvw));
-            if side.chars().nth(1).unwrap() == 'l' {
+            if side.chars().nth(1).unwrap() == entities::SIDE_L {
                 pu.lteamcoded.push((pid, pd));
             } else {
                 pu.rteamcoded.push((pid, pd));
