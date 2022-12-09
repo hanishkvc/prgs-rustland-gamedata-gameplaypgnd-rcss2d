@@ -96,6 +96,7 @@ impl Team {
             pd.push(PlayerData::Pos(fx, fy));
             let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
             pd.push(PlayerData::Stamina(fstamina));
+            let i = i+1; // Change from internal 0..10 to 1..11 as expected by default by main logic
             if team == entities::SIDE_L {
                 pu.lteamcoded.push((i.to_string(), pd));
             } else {
@@ -112,9 +113,9 @@ pub struct RandomData {
     /// frames per record
     fpr: f32,
     next: f32,
-    ateam: Team,
-    bteam: Team,
-    rcnt: usize,
+    lteam: Team,
+    rteam: Team,
+    reccnt: usize,
     s2n: XSpaces,
 }
 
@@ -122,20 +123,20 @@ impl RandomData {
 
     ///
     /// base_spr: the smallest fraction of a second, at which the logic works internally wrt movemens
-    pub fn new(base_spr: f32, acnt: usize, bcnt: usize) -> RandomData {
+    pub fn new(base_spr: f32, lcnt: usize, rcnt: usize) -> RandomData {
         let (prgw, prgh) = sdlx::get_prg_resolution();
         let srect = ((-20.0, -20.0), (prgw as f32 + 20.0, prgh as f32 + 20.0));
         let nrect = ((0.0,0.0), (1.0,1.0));
-        let ateam = Team::new(acnt);
-        let bteam = Team::new(bcnt);
+        let lteam = Team::new(lcnt);
+        let rteam = Team::new(rcnt);
         RandomData {
             base_spr,
             fpr: 0.0,
             next: 0.0,
-            rcnt: 0,
+            reccnt: 0,
             s2n: XSpaces::new(srect, nrect),
-            ateam: ateam,
-            bteam: bteam,
+            lteam,
+            rteam,
         }
     }
 
@@ -144,8 +145,8 @@ impl RandomData {
 impl RandomData {
 
     fn pos_fix(&mut self) {
-        self.ateam.pos_fix();
-        self.bteam.pos_fix();
+        self.lteam.pos_fix();
+        self.rteam.pos_fix();
     }
 
     #[cfg(feature="inbetween_frames")]
@@ -156,8 +157,8 @@ impl RandomData {
 
     #[cfg(not(feature="inbetween_frames"))]
     fn next_external_record(&mut self, pu: &mut PlayUpdate) {
-        self.ateam.next_external_record(pu, &self.s2n, 'a', FRAMES_NORMAL_SPR_MULT as usize);
-        self.bteam.next_external_record(pu, &self.s2n, 'b', FRAMES_NORMAL_SPR_MULT as usize);
+        self.lteam.next_external_record(pu, &self.s2n, entities::SIDE_L, FRAMES_NORMAL_SPR_MULT as usize);
+        self.rteam.next_external_record(pu, &self.s2n, entities::SIDE_R, FRAMES_NORMAL_SPR_MULT as usize);
     }
 
 }
@@ -189,12 +190,12 @@ impl PlayData for RandomData {
     }
 
     fn next_record(&mut self) -> PlayUpdate {
-        self.rcnt += 1;
+        self.reccnt += 1;
         let mut pu = PlayUpdate::new();
         // Messages
-        pu.msgs.insert("stime".to_string(), self.rcnt.to_string());
-        pu.timecounter = self.rcnt;
-        let gphase = (self.rcnt%3000)/1000;
+        pu.msgs.insert("stime".to_string(), self.reccnt.to_string());
+        pu.timecounter = self.reccnt;
+        let gphase = (self.reccnt%3000)/1000;
         let sgphase = match gphase {
             0 => "Phase 1",
             1 => "Phase 2",
@@ -209,7 +210,7 @@ impl PlayData for RandomData {
     }
 
     fn seek(&mut self, seekdelta: isize) {
-        self.rcnt = (self.rcnt as isize + seekdelta) as usize;
+        self.reccnt = (self.reccnt as isize + seekdelta) as usize;
         return;
     }
 
