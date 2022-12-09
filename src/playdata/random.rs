@@ -97,9 +97,9 @@ impl Team {
             let fstamina = 1.0-(((self.rcnt%3000) as f32)/3000.0);
             pd.push(PlayerData::Stamina(fstamina));
             if team == entities::SIDE_L {
-                pu.lteamcoded.push((i as i32, pd));
+                pu.lteamcoded.push((i.to_string(), pd));
             } else {
-                pu.rteamcoded.push((i as i32, pd));
+                pu.rteamcoded.push((i.to_string(), pd));
             }
         }
     }
